@@ -10,6 +10,9 @@ const {
   deleteStudent,
   bulkCreateStudents,
   uploadProfilePhoto,
+  uploadClassTestReport,
+  getClassTestReport,      // <- NEW: singular get handler
+  deleteClassTestReport,   // <- NEW: delete handler
 } = require("../controllers/studentController");
 
 const { uploadReportCard } = require("../controllers/studentController");
@@ -61,5 +64,16 @@ router.delete(
   protect,
   authorize("admin", "teacher"),
   deleteReportCard
+);
+// Upload a class test report
+router.post("/:id/class-test-report", upload.single("file"), uploadClassTestReport);
+
+// Get all class test reports
+router.get("/:id/class-test-report", getClassTestReport);
+router.delete(
+  "/:id/class-test-report",
+  protect,
+  authorize("admin", "teacher"),
+  deleteClassTestReport
 );
 module.exports = router;

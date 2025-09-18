@@ -20,17 +20,24 @@ const StudentListPage = () => {
   const [reportStudentId, setReportStudentId] = useState(null);
 
   const [reportCardSendStatuses, setReportCardSendStatuses] = useState({});
-  const [customMessageSendStatuses, setCustomMessageSendStatuses] = useState({});
-  const [personalMessageSendStatuses, setPersonalMessageSendStatuses] = useState({});
+  const [customMessageSendStatuses, setCustomMessageSendStatuses] = useState(
+    {}
+  );
+  const [personalMessageSendStatuses, setPersonalMessageSendStatuses] =
+    useState({});
 
   const [customMessage, setCustomMessage] = useState("");
   const [whatsappReady, setWhatsappReady] = useState(false);
 
-  const [personalMessageStudentId, setPersonalMessageStudentId] = useState(null);
+  const [personalMessageStudentId, setPersonalMessageStudentId] =
+    useState(null);
   const [personalMessageContent, setPersonalMessageContent] = useState("");
 
   // Checkbox selection
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+
+  const [classTestReportSendStatuses, setClassTestReportSendStatuses] =
+    useState({});
 
   useEffect(() => {
     if (selectedGrade) localStorage.setItem("selectedGrade", selectedGrade);
@@ -136,7 +143,9 @@ const StudentListPage = () => {
       alert("Please enter a message first.");
       return;
     }
-    const studentsToSend = filteredStudents.filter(s => selectedStudentIds.includes(s._id));
+    const studentsToSend = filteredStudents.filter((s) =>
+      selectedStudentIds.includes(s._id)
+    );
     if (studentsToSend.length === 0) {
       alert("No students selected.");
       return;
@@ -185,9 +194,10 @@ const StudentListPage = () => {
   // ---------- REPORT CARD SEND FUNCTION ----------
   const sendReportCardsToParents = async () => {
     const studentsToSend = filteredStudents.filter(
-      (s) => selectedStudentIds.includes(s._id) &&
-             s.reportCardUrl &&
-             s.reportCardUrl.trim() !== ""
+      (s) =>
+        selectedStudentIds.includes(s._id) &&
+        s.reportCardUrl &&
+        s.reportCardUrl.trim() !== ""
     );
     if (studentsToSend.length === 0) {
       alert("No students have uploaded report cards or are selected.");
@@ -229,6 +239,7 @@ const StudentListPage = () => {
               section: student.section,
               studentId: student.studentId,
               reportLink: student.reportCardUrl,
+              reportType: "reportCard",
               message: reportCardMessage,
             },
           ],
@@ -253,6 +264,83 @@ const StudentListPage = () => {
       }
     }
     alert("Finished sending report cards.");
+  };
+
+  const sendClassTestReportsToParents = async () => {
+    const studentsToSend = filteredStudents.filter(
+      (s) =>
+        selectedStudentIds.includes(s._id) &&
+        s.reportClassTestUrl &&
+        s.reportClassTestUrl.trim() !== ""
+    );
+    if (studentsToSend.length === 0) {
+      alert("No students have uploaded class test reports or are selected.");
+      return;
+    }
+    const confirmed = window.confirm(
+      `Send class test report links to ${studentsToSend.length} selected parents?`
+    );
+    if (!confirmed) return;
+
+    const newStatuses = { ...classTestReportSendStatuses };
+    for (const student of studentsToSend) {
+      try {
+        newStatuses[student._id] = "Sending...";
+        setClassTestReportSendStatuses({ ...newStatuses });
+
+        const classTestReportMessage =
+          `Dear ${student.parentContact?.parentName || "Parent"},\n\n` +
+          `Greetings from Aneja Kiddos School.\n\n` +
+          `We are pleased to share the class test report of your child, ${student.fullName}:\n\n` +
+          `• Grade Level: ${student.gradeLevel || "N/A"}\n` +
+          `• Date of Birth: ${formatDate(student.dateOfBirth)}\n` +
+          `• Gender: ${student.gender || "N/A"}\n` +
+          `• Section: ${student.section || "N/A"}\n` +
+          `• Student ID: ${student.studentId || "N/A"}\n\n` +
+          `You can view the class test report securely via the link below:\n\n` +
+          `${window.location.origin}/students/${student._id}/class-test-report\n\n` +
+          `Thank you for your continued support.\n\n` +
+          `Best regards,\nAneja Kiddos School`;
+
+        const payload = {
+          students: [
+            {
+              id: student._id,
+              fullName: student.fullName,
+              parentContact: student.parentContact,
+              parentPhone: student.parentContact?.phone,
+              gradeLevel: student.gradeLevel,
+              dateOfBirth: student.dateOfBirth,
+              gender: student.gender,
+              section: student.section,
+              studentId: student.studentId,
+              reportLink: student.reportClassTestUrl,
+              reportType: "classTest",
+              message: classTestReportMessage,
+            },
+          ],
+        };
+
+        const response = await fetch(
+          "http://localhost:5001/api/whatsapp/send-report-links",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+        if (response.ok) {
+          newStatuses[student._id] = "Sent ✓";
+        } else {
+          newStatuses[student._id] = "Failed ✗";
+        }
+        setClassTestReportSendStatuses({ ...newStatuses });
+      } catch {
+        newStatuses[student._id] = "Failed ✗";
+        setClassTestReportSendStatuses({ ...newStatuses });
+      }
+    }
+    alert("Finished sending class test reports.");
   };
 
   // ---------- PERSONAL MESSAGE ----------
@@ -400,19 +488,25 @@ const StudentListPage = () => {
           />
         </div>
 
-        {/* Buttons */}
         <div className="flex flex-wrap gap-4 mb-6 justify-end">
           <button
             onClick={sendCustomMessageToParents}
-            disabled={!customMessage.trim() || !whatsappReady || selectedStudentIds.length === 0}
+            disabled={
+              !customMessage.trim() ||
+              !whatsappReady ||
+              selectedStudentIds.length === 0
+            }
             className={`bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-shadow ${
-              !customMessage.trim() || !whatsappReady || selectedStudentIds.length === 0
+              !customMessage.trim() ||
+              !whatsappReady ||
+              selectedStudentIds.length === 0
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
           >
             Send Custom Message
           </button>
+
           <button
             onClick={sendReportCardsToParents}
             disabled={selectedStudentIds.length === 0 || !whatsappReady}
@@ -422,7 +516,20 @@ const StudentListPage = () => {
                 : ""
             }`}
           >
-            Send Report Cards via WhatsApp
+            Send Report Cards
+          </button>
+
+          {/* New button for class test reports */}
+          <button
+            onClick={sendClassTestReportsToParents}
+            disabled={selectedStudentIds.length === 0 || !whatsappReady}
+            className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-shadow ${
+              selectedStudentIds.length === 0 || !whatsappReady
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+          >
+            Send Class Test Reports
           </button>
         </div>
 
@@ -443,14 +550,15 @@ const StudentListPage = () => {
             <table className="min-w-full bg-white divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {/* Select all checkbox */}
                   <th className={tableHeader}>
                     <input
                       type="checkbox"
-                      onChange={e => handleSelectAll(e.target.checked)}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
                       checked={
                         filteredStudents.length > 0 &&
-                        filteredStudents.every(s => selectedStudentIds.includes(s._id))
+                        filteredStudents.every((s) =>
+                          selectedStudentIds.includes(s._id)
+                        )
                       }
                       indeterminate={
                         selectedStudentIds.length > 0 &&
@@ -461,7 +569,10 @@ const StudentListPage = () => {
                   <th className={tableHeader}>Student ID</th>
                   <th className={tableHeader}>Full Name</th>
                   <th className={tableHeader}>Gender</th>
-                  <th className={tableHeader}>WhatsApp Status</th>
+                  <th className={tableHeader}>Report</th>
+                  <th className={tableHeader}>Custom Msg</th>
+                  <th className={tableHeader}>Personal Msg</th>
+                  <th className={tableHeader}>Class Test</th>
                   <th className={tableHeader}>Personal Message</th>
                   <th className={tableHeader}>Actions</th>
                 </tr>
@@ -469,7 +580,9 @@ const StudentListPage = () => {
               <tbody className="divide-y divide-gray-100">
                 {filteredStudents.length > 0 ? (
                   filteredStudents.map((student, idx) => {
-                    const hasReport = student.reportCardUrl && student.reportCardUrl.trim() !== "";
+                    const hasReport =
+                      student.reportCardUrl &&
+                      student.reportCardUrl.trim() !== "";
                     return (
                       <tr
                         key={student._id}
@@ -481,8 +594,12 @@ const StudentListPage = () => {
                           <input
                             type="checkbox"
                             checked={selectedStudentIds.includes(student._id)}
-                            onChange={e => handleCheckboxChange(student._id, e.target.checked)}
-                            // No disables for custom message
+                            onChange={(e) =>
+                              handleCheckboxChange(
+                                student._id,
+                                e.target.checked
+                              )
+                            }
                           />
                         </td>
                         <td className={`${tableCell} text-pink-600 font-mono`}>
@@ -501,37 +618,37 @@ const StudentListPage = () => {
                         <td className={`${tableCell} text-gray-600`}>
                           {student.gender}
                         </td>
-                        <td className={`${tableCell} text-sm font-semibold`}>
-                          <div className="flex justify-between">
-                            <div>
-                              <strong>Report:</strong>{" "}
-                              <StatusBadge
-                                status={
-                                  reportCardSendStatuses[student._id] || "Idle"
-                                }
-                              />
-                            </div>
-                            <div>
-                              <strong>Custom Msg:</strong>{" "}
-                              <StatusBadge
-                                status={
-                                  customMessageSendStatuses[student._id] ||
-                                  "Idle"
-                                }
-                              />
-                            </div>
-                            <div>
-                              <strong>Personal Msg:</strong>{" "}
-                              <StatusBadge
-                                status={
-                                  personalMessageSendStatuses[student._id] ||
-                                  "Idle"
-                                }
-                              />
-                            </div>
-                          </div>
+                        {/* Status Columns */}
+                        <td className={tableCell}>
+                          <StatusBadge
+                            status={
+                              reportCardSendStatuses[student._id] || "Idle"
+                            }
+                          />
                         </td>
-                        <td className={`${tableCell}`}>
+                        <td className={tableCell}>
+                          <StatusBadge
+                            status={
+                              customMessageSendStatuses[student._id] || "Idle"
+                            }
+                          />
+                        </td>
+                        <td className={tableCell}>
+                          <StatusBadge
+                            status={
+                              personalMessageSendStatuses[student._id] || "Idle"
+                            }
+                          />
+                        </td>
+                        <td className={tableCell}>
+                          <StatusBadge
+                            status={
+                              classTestReportSendStatuses[student._id] || "Idle"
+                            }
+                          />
+                        </td>
+                        {/* Personal Message Input */}
+                        <td className={tableCell}>
                           {personalMessageStudentId === student._id ? (
                             <div className="flex flex-col space-y-2">
                               <textarea
@@ -574,6 +691,7 @@ const StudentListPage = () => {
                             </button>
                           )}
                         </td>
+                        {/* Actions */}
                         <td className={`${tableCell} flex items-center gap-3`}>
                           {hasReport ? (
                             <span
@@ -653,7 +771,7 @@ const StudentListPage = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={10}
                       className="text-center py-6 text-gray-500 italic"
                     >
                       No students found for this grade.
@@ -670,7 +788,8 @@ const StudentListPage = () => {
 };
 
 const StatusBadge = ({ status }) => {
-  const baseClasses = "inline-block px-2 py-0.5 rounded-full text-xs font-semibold";
+  const baseClasses =
+    "inline-block px-2 py-0.5 rounded-full text-xs font-semibold";
   const colors = {
     Idle: "bg-gray-200 text-gray-700",
     "Sending...": "bg-yellow-100 text-yellow-800",
@@ -683,3 +802,6 @@ const StatusBadge = ({ status }) => {
 };
 
 export default StudentListPage;
+
+
+

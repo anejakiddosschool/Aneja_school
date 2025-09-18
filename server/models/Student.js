@@ -25,8 +25,10 @@ const studentSchema = new mongoose.Schema(
     },
     reportCardUrl: { type: String, default: "" },
     reportCardPublicId: { type: String, default: "" },
-    reportClasstestUrl: { type: String, default: "" },
-    reportClasstestPublicId: { type: String, default: "" },
+    // NEW: store class test reports in Cloudinary
+    // STORE only one latest file just like report card
+    reportClassTestUrl: { type: String, default: "" },
+    reportClassTestPublicId: { type: String, default: "" },
 
     parentContact: {
       parentName: { type: String, trim: true, default: "" },

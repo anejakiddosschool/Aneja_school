@@ -15,7 +15,7 @@ const AddReportPage = () => {
 
     // --- State Management ---
     const [semester, setSemester] = useState('First Semester');
-    const [academicYear, setAcademicYear] = useState('');
+    // const [academicYear, setAcademicYear] = useState('');
     const [teacherComment, setTeacherComment] = useState('');
     const [conduct, setConduct] = useState('A');
     const [evaluations, setEvaluations] = useState(
@@ -53,6 +53,24 @@ const AddReportPage = () => {
     const textAreaInput = "shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-pink-500 h-24";
     const submitButton = `w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`;
     
+
+    // At the top of your component file or inside AddReportPage component (before useState)
+const getCurrentAcademicYear = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1; // JS months: 0-11
+
+  // Assuming academic year starts in August (month 8)
+  if (month >= 8) {
+    return `${year}-${year + 1}`;
+  } else {
+    return `${year - 1}-${year}`;
+  }
+};
+
+// Then in your component state initialization
+const [academicYear, setAcademicYear] = useState(getCurrentAcademicYear());
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Add Behavioral & Skills Assessment</h2>
@@ -127,3 +145,4 @@ const AddReportPage = () => {
 };
 
 export default AddReportPage;
+
