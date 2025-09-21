@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import { useNotifications } from './context/NotificationContext';
 import authService from './services/authService';
 import studentAuthService from './services/studentAuthService';
-
+import WhatsAppQR from "./components/WhatsAppQR";
 // --- Component Imports ---
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute'; 
@@ -83,6 +83,7 @@ function App() {
   return (
     <div className="bg-gray-100 min-h-screen">
       <Navbar /> 
+         {/* <WhatsAppQR /> */}
       <main className="container mx-auto p-4">
         <Routes>
           {/* ======= 1. PUBLIC ROUTES ======== */}

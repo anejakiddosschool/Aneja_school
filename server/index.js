@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 require("./config/webPushConfig");
-
+const { initWhatsApp } = require("./whatsappClient");
 const path = require("path");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -56,7 +56,8 @@ io.on("connection", (socket) => {
     });
   });
 });
-
+// initialize WhatsApp client (after Socket.IO is ready)
+  initWhatsApp(io);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
