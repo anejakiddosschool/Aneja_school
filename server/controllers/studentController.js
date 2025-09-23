@@ -5,7 +5,6 @@
 // const Grade = require("../models/Grade");
 // const { cloudinary } = require("../config/cloudinary");
 
-
 // // --- HELPER FUNCTIONS ---
 // const capitalizeName = (name) => {
 //   if (!name || typeof name !== "string") return "";
@@ -251,7 +250,6 @@
 //       .json({ message: "Error uploading report card", details: error.message });
 //   }
 // };
-
 
 // exports.deleteReportCard = async (req, res) => {
 //   try {
@@ -531,7 +529,6 @@
 // //   }
 // // };
 
-
 // exports.bulkCreateStudents = async (req, res) => {
 //   if (!req.file) return res.status(400).json({ message: "No file uploaded." });
 //   const filePath = req.file.path;
@@ -540,7 +537,7 @@
 //     const workbook = xlsx.readFile(filePath);
 //     const sheetName = workbook.SheetNames[0];
 //     const worksheet = workbook.Sheets[sheetName];
-    
+
 //     // CRITICAL FIX: Use cellDates: true to parse dates correctly
 //     const studentsJson = xlsx.utils.sheet_to_json(worksheet, { cellDates: true });
 
@@ -554,10 +551,10 @@
 //     for (const student of studentsJson) {
 //       const fullName = student["Full Name"] || student["fullName"];
 //       const capitalizedFullName = capitalizeName(fullName);
-      
+
 //       // Get the date - it should now be a proper Date object
 //       let dob = student["Date of Birth"] || student["dateOfBirth"];
-      
+
 //       // Additional safety check: if it's still a number, convert it manually
 //       if (typeof dob === 'number') {
 //         // Excel date conversion: Excel epoch (1900-01-01) to Unix epoch (1970-01-01)
@@ -565,7 +562,7 @@
 //       } else if (typeof dob === 'string') {
 //         dob = new Date(dob);
 //       }
-      
+
 //       // Validate the date
 //       if (!(dob instanceof Date) || isNaN(dob.getTime())) {
 //         throw new Error(`Invalid date format for student: ${fullName}`);
@@ -625,9 +622,9 @@
 //       });
 //     }
 //     console.error("Bulk import error:", error);
-//     res.status(500).json({ 
-//       message: "An error occurred during the import process.", 
-//       details: error.message 
+//     res.status(500).json({
+//       message: "An error occurred during the import process.",
+//       details: error.message
 //     });
 //   }
 // };
@@ -709,8 +706,18 @@ exports.createStudent = async (req, res) => {
   // Student ID = AKS-YYYYMMDD-XXX (unique per DOB + sequence).
   // Password = MiddleName@YearOfBirth.
 
-  const { fullName, gender, dateOfBirth, parentContact, gradeLevel, section, rollNumber } =
-    req.body;
+  const {
+    fullName,
+    gender,
+    dateOfBirth,
+    parentContact,
+    gradeLevel,
+    section,
+    rollNumber,
+    motherName,
+    address,
+    adhaarNumber,
+  } = req.body;
 
   try {
     const capitalizedFullName = capitalizeName(fullName);
@@ -749,6 +756,9 @@ exports.createStudent = async (req, res) => {
       parentContact,
       section,
       rollNumber,
+      motherName,
+      address,
+      adhaarNumber,
     });
 
     await student.save();
@@ -874,7 +884,8 @@ exports.uploadReportCard = async (req, res) => {
     // then we simply save that url and filename/public_id.
     if (req.file.path && /^https?:\/\//i.test(req.file.path)) {
       student.reportCardUrl = req.file.path;
-      student.reportCardPublicId = req.file.filename || req.file.public_id || "";
+      student.reportCardPublicId =
+        req.file.filename || req.file.public_id || "";
     } else {
       // Otherwise upload the local file to Cloudinary and then unlink local file
       const result = await cloudinary.uploader.upload(req.file.path, {
@@ -906,7 +917,8 @@ exports.uploadReportCard = async (req, res) => {
 exports.deleteReportCard = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
-    if (!student) return res.status(404).json({ message: "Student not found." });
+    if (!student)
+      return res.status(404).json({ message: "Student not found." });
 
     if (!student.reportCardPublicId) {
       return res.status(400).json({ message: "No report card to delete." });
@@ -925,7 +937,10 @@ exports.deleteReportCard = async (req, res) => {
     student.reportCardPublicId = null;
     await student.save();
 
-    return res.json({ success: true, message: "Report card deleted successfully." });
+    return res.json({
+      success: true,
+      message: "Report card deleted successfully.",
+    });
   } catch (error) {
     console.error("Cloudinary deletion error:", error);
     res.status(500).json({ message: "Failed to delete report card." });
@@ -942,7 +957,9 @@ exports.bulkCreateStudents = async (req, res) => {
     const worksheet = workbook.Sheets[sheetName];
 
     // CRITICAL FIX: Use cellDates: true to parse dates correctly
-    const studentsJson = xlsx.utils.sheet_to_json(worksheet, { cellDates: true });
+    const studentsJson = xlsx.utils.sheet_to_json(worksheet, {
+      cellDates: true,
+    });
 
     if (studentsJson.length === 0) {
       fs.unlinkSync(filePath);
@@ -982,7 +999,9 @@ exports.bulkCreateStudents = async (req, res) => {
         ? parseInt(lastStudent.studentId.split("-")[2], 10)
         : 0;
 
-      const newStudentId = `AKS-${dobString}-${String(lastSequence + 1).padStart(3, "0")}`;
+      const newStudentId = `AKS-${dobString}-${String(
+        lastSequence + 1
+      ).padStart(3, "0")}`;
       const middleName = getMiddleName(capitalizedFullName);
       const initialPassword = `${middleName}@${yearOfBirth}`;
 
@@ -999,6 +1018,9 @@ exports.bulkCreateStudents = async (req, res) => {
         },
         section: studentRow["Section"],
         rollNumber: studentRow["Roll No"] || studentRow["rollNumber"],
+        motherName: studentRow["Mother's Name"] || studentRow["motherName"],
+        address: studentRow["Address"] || studentRow["address"],
+        adhaarNumber: studentRow["Aadhaar Card Number"] || studentRow["address"],
       };
 
       const newStudent = new Student(studentData);
@@ -1018,9 +1040,14 @@ exports.bulkCreateStudents = async (req, res) => {
     });
   } catch (error) {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    if (error.code === 11000 || error.name === "MongoBulkWriteError" || error.name === "ValidationError") {
+    if (
+      error.code === 11000 ||
+      error.name === "MongoBulkWriteError" ||
+      error.name === "ValidationError"
+    ) {
       return res.status(400).json({
-        message: "Import failed. Students may already exist or have invalid data.",
+        message:
+          "Import failed. Students may already exist or have invalid data.",
       });
     }
     console.error("Bulk import error:", error);
@@ -1147,15 +1174,20 @@ exports.uploadClassTestReport = async (req, res) => {
     const studentId = req.params.id;
 
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
     }
 
     const student = await Student.findById(studentId);
     if (!student) {
       try {
-        if (req.file.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        if (req.file.path && fs.existsSync(req.file.path))
+          fs.unlinkSync(req.file.path);
       } catch (e) {}
-      return res.status(404).json({ success: false, message: "Student not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Student not found" });
     }
 
     let secureUrl = null;
@@ -1189,7 +1221,13 @@ exports.uploadClassTestReport = async (req, res) => {
     });
   } catch (error) {
     console.error("Error uploading class test report:", error);
-    res.status(500).json({ success: false, message: "Server error", details: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error",
+        details: error.message,
+      });
   }
 };
 
@@ -1199,24 +1237,34 @@ exports.getClassTestReport = async (req, res) => {
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ success: false, message: "Student not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Student not found" });
     }
 
     if (student.reportClassTestUrl) {
       return res.json({
         success: true,
-        data: [{
-          url: student.reportClassTestUrl,
-          public_id: student.reportClassTestPublicId || "",
-          uploadedAt: student.updatedAt || student.createdAt || new Date(),
-        }],
+        data: [
+          {
+            url: student.reportClassTestUrl,
+            public_id: student.reportClassTestPublicId || "",
+            uploadedAt: student.updatedAt || student.createdAt || new Date(),
+          },
+        ],
       });
     } else {
       return res.json({ success: true, data: [] });
     }
   } catch (error) {
     console.error("Error fetching class test report:", error);
-    res.status(500).json({ success: false, message: "Server error", details: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error",
+        details: error.message,
+      });
   }
 };
 
@@ -1226,11 +1274,15 @@ exports.deleteClassTestReport = async (req, res) => {
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ success: false, message: "Student not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Student not found" });
     }
 
     if (!student.reportClassTestPublicId) {
-      return res.status(400).json({ success: false, message: "No class test report to delete." });
+      return res
+        .status(400)
+        .json({ success: false, message: "No class test report to delete." });
     }
 
     // Remove file from Cloudinary
@@ -1241,9 +1293,18 @@ exports.deleteClassTestReport = async (req, res) => {
 
     await student.save();
 
-    res.json({ success: true, message: "Class test report deleted successfully." });
+    res.json({
+      success: true,
+      message: "Class test report deleted successfully.",
+    });
   } catch (error) {
     console.error("Error deleting class test report:", error);
-    res.status(500).json({ success: false, message: "Server error", details: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error",
+        details: error.message,
+      });
   }
 };

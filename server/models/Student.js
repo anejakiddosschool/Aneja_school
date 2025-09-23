@@ -40,6 +40,9 @@ const studentSchema = new mongoose.Schema(
       trim: true,
     },
     rollNumber: { type: String, trim: true },
+      motherName: { type: String, trim: true },
+        address: { type: String, trim: true },
+          adhaarNumber: { type: String, trim: true },
   },
   {
     timestamps: true,
