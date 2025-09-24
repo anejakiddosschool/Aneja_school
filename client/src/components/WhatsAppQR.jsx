@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { QRCodeCanvas } from "qrcode.react";
 
-const BACKEND = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
+const BACKEND = import.meta.env.VITE_BACKEND_URL || "http://98.89.3.88:5001";
 const socket = io(BACKEND);
 
 export default function WhatsAppQR() {
