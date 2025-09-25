@@ -47,7 +47,7 @@ const StudentListPage = () => {
   useEffect(() => {
     const checkWhatsappStatus = async () => {
       try {
-        const res = await fetch("http://98.89.3.88:5001/api/whatsapp/status");
+        const res = await fetch("http://3.95.220.206:5001/api/whatsapp/status");
         const data = await res.json();
         setWhatsappReady(data.status === "ready");
       } catch {
@@ -170,7 +170,7 @@ const StudentListPage = () => {
           ],
         };
         const response = await fetch(
-          "http://98.89.3.88:5001/api/whatsapp/send-custom-message",
+          "http://3.95.220.206:5001/api/whatsapp/send-custom-message",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -245,7 +245,7 @@ const StudentListPage = () => {
           ],
         };
         const response = await fetch(
-          "http://98.89.3.88:5001/api/whatsapp/send-report-links",
+          "http://3.95.220.206:5001/api/whatsapp/send-report-links",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -322,7 +322,7 @@ const StudentListPage = () => {
         };
 
         const response = await fetch(
-          "http://98.89.3.88:5001/api/whatsapp/send-report-links",
+          "http://3.95.220.206:5001/api/whatsapp/send-report-links",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -360,7 +360,7 @@ const StudentListPage = () => {
         ],
       };
       const response = await fetch(
-        "http://98.89.3.88:5001/api/whatsapp/send-personal-message",
+        "http://3.95.220.206:5001/api/whatsapp/send-personal-message",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

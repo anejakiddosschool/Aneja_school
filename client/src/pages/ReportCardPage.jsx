@@ -525,7 +525,7 @@
 //       formData.append("file", blob, fileName);
 
 //       await axios.post(
-//         `http://98.89.3.88:5001/api/students/${studentIdToSave}/report-card`,
+//         `http://3.95.220.206:5001/api/students/${studentIdToSave}/report-card`,
 //         formData,
 //         {
 //           headers: { "Content-Type": "multipart/form-data" },
@@ -566,7 +566,7 @@
 //       const token = userData ? JSON.parse(userData).token : null;
 
 //       await axios.delete(
-//         `http://98.89.3.88:5001/api/students/${studentId}/report-card`,
+//         `http://3.95.220.206:5001/api/students/${studentId}/report-card`,
 //         {
 //           headers: {
 //             Authorization: `Bearer ${token}`,
@@ -1845,8 +1845,8 @@ const ReportCardPage = ({ studentId }) => {
 
       const endpoint =
         viewType === "classTest"
-          ? `http://98.89.3.88:5001/api/students/${studentIdToSave}/class-test-report`
-          : `http://98.89.3.88:5001/api/students/${studentIdToSave}/report-card`;
+          ? `http://3.95.220.206:5001/api/students/${studentIdToSave}/class-test-report`
+          : `http://3.95.220.206:5001/api/students/${studentIdToSave}/report-card`;
 
       await axios.post(endpoint, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -1895,8 +1895,8 @@ const ReportCardPage = ({ studentId }) => {
 
       const endpoint =
         viewType === "classTest"
-          ? `http://98.89.3.88:5001/api/students/${studentIdToDelete}/class-test-report`
-          : `http://98.89.3.88:5001/api/students/${studentIdToDelete}/report-card`;
+          ? `http://3.95.220.206:5001/api/students/${studentIdToDelete}/class-test-report`
+          : `http://3.95.220.206:5001/api/students/${studentIdToDelete}/report-card`;
 
       await axios.delete(endpoint, {
         headers: {
