@@ -244,11 +244,11 @@ const Navbar = () => {
     if (currentUser) {
       authService.logout();
       setCurrentUser(null);
-      navigate("/login");
+      navigate("/");
     } else if (currentStudent) {
       studentAuthService.logout();
       setCurrentStudent(null);
-      navigate("/parent-login");
+      navigate("/");
     }
     window.location.reload();
   };
