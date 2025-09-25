@@ -13,6 +13,7 @@ const StudentListPage = () => {
     return localStorage.getItem("selectedGrade") || null;
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
   const [availableGrades, setAvailableGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,7 +48,7 @@ const StudentListPage = () => {
   useEffect(() => {
     const checkWhatsappStatus = async () => {
       try {
-        const res = await fetch("http://3.95.220.206:5001/api/whatsapp/status");
+        const res = await fetch(`${API_URL}/whatsapp/status`);
         const data = await res.json();
         setWhatsappReady(data.status === "ready");
       } catch {
@@ -170,7 +171,7 @@ const StudentListPage = () => {
           ],
         };
         const response = await fetch(
-          "http://3.95.220.206:5001/api/whatsapp/send-custom-message",
+          `${API_URL}/whatsapp/send-custom-message`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -244,14 +245,11 @@ const StudentListPage = () => {
             },
           ],
         };
-        const response = await fetch(
-          "http://3.95.220.206:5001/api/whatsapp/send-report-links",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
+        const response = await fetch(`${API_URL}/whatsapp/send-report-links`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
         if (response.ok) {
           newStatuses[student._id] = "Sent ✓";
         } else {
@@ -321,14 +319,11 @@ const StudentListPage = () => {
           ],
         };
 
-        const response = await fetch(
-          "http://3.95.220.206:5001/api/whatsapp/send-report-links",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
+        const response = await fetch(`${API_URL}/whatsapp/send-report-links`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
         if (response.ok) {
           newStatuses[student._id] = "Sent ✓";
         } else {
@@ -360,7 +355,7 @@ const StudentListPage = () => {
         ],
       };
       const response = await fetch(
-        "http://3.95.220.206:5001/api/whatsapp/send-personal-message",
+        `${API_URL}/whatsapp/send-personal-message`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -802,6 +797,3 @@ const StatusBadge = ({ status }) => {
 };
 
 export default StudentListPage;
-
-
-
