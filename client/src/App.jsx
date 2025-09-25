@@ -53,7 +53,7 @@ import ImportStudentsPage from './pages/ImportStudentsPage';
 import ImportUsersPage from './pages/ImportUsersPage';
 import ImportSubjectsPage from './pages/ImportSubjectsPage';
 
-const frontUrl = import.meta.env.VITE_FRONT_URL;
+const frontUrl = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
   const { addNotification } = useNotifications();

@@ -180,7 +180,7 @@ import { useNotifications } from "../context/NotificationContext";
 import { io } from "socket.io-client";
 import { QRCodeCanvas } from "qrcode.react";
 
-const BACKEND = import.meta.env.VITE_BACKEND_URL || "http://3.95.220.206:5001";
+const BACKEND = import.meta.env.VITE_BACKEND_URL;
 const socket = io(BACKEND);
 
 const Navbar = () => {
