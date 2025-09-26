@@ -8,7 +8,7 @@ import rankService from "../services/rankService";
 import "./ReportCard.css";
 import domtoimage from "dom-to-image";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+
 const LOGO_URL =
   "https://res.cloudinary.com/dityqhoqp/image/upload/v1757673591/UNMARK_LOGO_copy_1_nonp8j.png";
 
@@ -16,7 +16,6 @@ const ReportCardPage = ({ studentId }) => {
   const { id: routeId } = useParams();
   const id = studentId || routeId;
   const API_URL = import.meta.env.VITE_API_URL;
-const navigate = useNavigate();
   // --- state ---
   const [userRole, setUserRole] = useState(null);
   const [teacher, setTeacher] = useState(null);
@@ -515,147 +514,74 @@ const navigate = useNavigate();
   };
 
   // Save to Cloud (works for both report card and class test reports)
-  // const saveReportCardToCloud = async (studentIdToSave) => {
-  //   setUploading(true);
-  //   try {
-  //     const reportCardElement = document.getElementById("reportCard");
-  //     const blob = await domtoimage.toBlob(reportCardElement, {
-  //       quality: 1,
-  //       bgcolor: "white",
-  //       width: reportCardElement.scrollWidth * 2,
-  //       height: reportCardElement.scrollHeight * 2,
-  //       style: {
-  //         transform: "scale(2)",
-  //         transformOrigin: "top left",
-  //         width: `${reportCardElement.scrollWidth}px`,
-  //         height: `${reportCardElement.scrollHeight}px`,
-  //       },
-  //     });
+  const saveReportCardToCloud = async (studentIdToSave) => {
+    setUploading(true);
+    try {
+      const reportCardElement = document.getElementById("reportCard");
+      const blob = await domtoimage.toBlob(reportCardElement, {
+        quality: 1,
+        bgcolor: "white",
+        width: reportCardElement.scrollWidth * 2,
+        height: reportCardElement.scrollHeight * 2,
+        style: {
+          transform: "scale(2)",
+          transformOrigin: "top left",
+          width: `${reportCardElement.scrollWidth}px`,
+          height: `${reportCardElement.scrollHeight}px`,
+        },
+      });
 
-  //     const now = new Date();
-  //     const timestamp = now
-  //       .toLocaleString("en-IN", {
-  //         year: "numeric",
-  //         month: "short",
-  //         day: "2-digit",
-  //         hour: "2-digit",
-  //         minute: "2-digit",
-  //         hour12: false,
-  //         timeZone: "Asia/Kolkata",
-  //       })
-  //       .replace(/, /g, "_")
-  //       .replace(/ /g, "_")
-  //       .replace(/:/g, "");
+      const now = new Date();
+      const timestamp = now
+        .toLocaleString("en-IN", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "Asia/Kolkata",
+        })
+        .replace(/, /g, "_")
+        .replace(/ /g, "_")
+        .replace(/:/g, "");
 
-  //     const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
-  //     const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
-  //     const year = (
-  //       allReports.find((r) => r.semester === "First Semester")?.academicYear ||
-  //       "year"
-  //     ).replace(/\s+/g, "_");
+      const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
+      const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
+      const year = (
+        allReports.find((r) => r.semester === "First Semester")?.academicYear ||
+        "year"
+      ).replace(/\s+/g, "_");
 
-  //     const typeSuffix =
-  //       viewType === "classTest" ? "class_test" : "report_card";
-  //     const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
+      const typeSuffix =
+        viewType === "classTest" ? "class_test" : "report_card";
+      const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
 
-  //     console.log("Uploading file:", fileName);
-  //     const formData = new FormData();
-  //     formData.append("file", blob, fileName);
+      console.log("Uploading file:", fileName);
+      const formData = new FormData();
+      formData.append("file", blob, fileName);
 
-  //     const endpoint =
-  //       viewType === "classTest"
-  //         ? `${API_URL}/students/${studentIdToSave}/class-test-report`
-  //         : `${API_URL}/students/${studentIdToSave}/report-card`;
+      const endpoint =
+        viewType === "classTest"
+          ? `${API_URL}/students/${studentIdToSave}/class-test-report`
+          : `${API_URL}/students/${studentIdToSave}/report-card`;
 
-  //     await axios.post(endpoint, formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
+      await axios.post(endpoint, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-  //     alert(
-  //       `${
-  //         viewType === "classTest" ? "Class test report" : "Report card"
-  //       } uploaded successfully!`
-  //     );
-  //   } catch (err) {
-  //     console.error("Upload error:", err);
-  //     alert("Upload failed!");
-  //   }
-  //   setUploading(false);
-  // };
-  // Upload function with refresh
-const saveReportCardToCloud = async (studentIdToSave) => {
-  setUploading(true);
-  try {
-    const reportCardElement = document.getElementById("reportCard");
-    const blob = await domtoimage.toBlob(reportCardElement, {
-      quality: 1,
-      bgcolor: "white",
-      width: reportCardElement.scrollWidth * 2,
-      height: reportCardElement.scrollHeight * 2,
-      style: {
-        transform: "scale(2)",
-        transformOrigin: "top left",
-        width: `${reportCardElement.scrollWidth}px`,
-        height: `${reportCardElement.scrollHeight}px`,
-      },
-    });
-
-    const now = new Date();
-    const timestamp = now
-      .toLocaleString("en-IN", {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Kolkata",
-      })
-      .replace(/, /g, "_")
-      .replace(/ /g, "_")
-      .replace(/:/g, "");
-
-    const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
-    const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
-    const year = (
-      allReports.find((r) => r.semester === "First Semester")?.academicYear ||
-      "year"
-    ).replace(/\s+/g, "_");
-
-    const typeSuffix =
-      viewType === "classTest" ? "class_test" : "report_card";
-    const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
-
-    const formData = new FormData();
-    formData.append("file", blob, fileName);
-
-    const endpoint =
-      viewType === "classTest"
-        ? `${API_URL}/students/${studentIdToSave}/class-test-report`
-        : `${API_URL}/students/${studentIdToSave}/report-card`;
-
-    await axios.post(endpoint, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    alert(
-      `${
-        viewType === "classTest" ? "Class test report" : "Report card"
-      } uploaded successfully!`
-    );
-    // Refresh the student data
-    await fetchAllData();
-    // Optionally, navigate if you want to return to students list on certain failures (rare for upload)
-    if (!student) {
-      navigate("/students");
+      alert(
+        `${
+          viewType === "classTest" ? "Class test report" : "Report card"
+        } uploaded successfully!`
+      );
+      window.location.reload();
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("Upload failed!");
     }
-  } catch (err) {
-    console.error("Upload error:", err);
-    alert("Upload failed!");
-  }
-  setUploading(false);
-};
-
+    setUploading(false);
+  };
 
   if (loading)
     return <p className="loading">Generating Authentic Report Card...</p>;
@@ -674,70 +600,37 @@ const saveReportCardToCloud = async (studentIdToSave) => {
   );
 
   // Delete uploaded report (works for both types)
-  // const handleDeleteUploadedReport = async (studentIdToDelete) => {
-  //   const label =
-  //     viewType === "classTest" ? "class test report" : "report card";
-  //   if (!window.confirm(`Are you sure you want to delete this ${label}?`))
-  //     return;
+  const handleDeleteUploadedReport = async (studentIdToDelete) => {
+    const label =
+      viewType === "classTest" ? "class test report" : "report card";
+    if (!window.confirm(`Are you sure you want to delete this ${label}?`))
+      return;
 
-  //   setUploading(true);
-  //   try {
-  //     const userData = localStorage.getItem("user");
-  //     const token = userData ? JSON.parse(userData).token : null;
+    setUploading(true);
+    try {
+      const userData = localStorage.getItem("user");
+      const token = userData ? JSON.parse(userData).token : null;
 
-  //     const endpoint =
-  //       viewType === "classTest"
-  //         ? `${API_URL}/students/${studentIdToDelete}/class-test-report`
-  //         : `${API_URL}/students/${studentIdToDelete}/report-card`;
+      const endpoint =
+        viewType === "classTest"
+          ? `${API_URL}/students/${studentIdToDelete}/class-test-report`
+          : `${API_URL}/students/${studentIdToDelete}/report-card`;
 
-  //     await axios.delete(endpoint, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
+      await axios.delete(endpoint, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  //     alert(`${label} deleted successfully.`);
-  //   } catch (error) {
-  //     console.error(error);
-  //     alert(`Failed to delete ${label}.`);
-  //   }
-  //   setUploading(false);
-  // };
-
-  // Delete function with refresh and navigation
-const handleDeleteUploadedReport = async (studentIdToDelete) => {
-  const label = viewType === "classTest" ? "class test report" : "report card";
-  if (!window.confirm(`Are you sure you want to delete this ${label}?`)) return;
-
-  setUploading(true);
-  try {
-    const userData = localStorage.getItem("user");
-    const token = userData ? JSON.parse(userData).token : null;
-
-    const endpoint =
-      viewType === "classTest"
-        ? `${API_URL}/students/${studentIdToDelete}/class-test-report`
-        : `${API_URL}/students/${studentIdToDelete}/report-card`;
-
-    await axios.delete(endpoint, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    alert(`${label} deleted successfully.`);
-    // Refresh the student data
-    await fetchAllData();
-    // If data vanished after deletion, route back
-    if (!student) {
-      navigate("/students");
+      alert(`${label} deleted successfully.`);
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      alert(`Failed to delete ${label}.`);
     }
-  } catch (error) {
-    console.error(error);
-    alert(`Failed to delete ${label}.`);
-  }
-  setUploading(false);
-};
+    setUploading(false);
+  };
+
   // Dialog image source depending on viewType
   const dialogImageSrc =
     viewType === "classTest"
