@@ -517,6 +517,17 @@ const HomePage = () => {
   if (profileData?.role === "teacher") {
     return (
       <div className="space-y-10">
+           <div>
+          <h2 className="text-4xl font-extrabold text-gray-800">
+             Welcome {currentUser.fullName}
+          </h2>
+          <Link
+            to="/profile"
+            className="text-pink-500 italic font-bold hover:underline"
+          >
+            Change Username and Password
+          </Link>
+        </div>
         <h2 className="text-4xl font-extrabold text-pink-600">
           👩‍🏫 Teacher Dashboard
         </h2>
