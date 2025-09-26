@@ -578,7 +578,7 @@ const ReportCardPage = ({ studentId }) => {
           viewType === "classTest" ? "Class test report" : "Report card"
         } uploaded successfully!`
       );
-      navigate("/students");
+      navigate(0);
     } catch (err) {
       console.error("Upload error:", err);
       alert("Upload failed!");
@@ -626,7 +626,7 @@ const ReportCardPage = ({ studentId }) => {
       });
 
       alert(`${label} deleted successfully.`);
-      navigate("/students");
+      navigate(0);
     } catch (error) {
       console.error(error);
       alert(`Failed to delete ${label}.`);
