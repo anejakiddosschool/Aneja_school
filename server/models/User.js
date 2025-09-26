@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'teacher'], 
         default: 'teacher' 
     },
+    phoneNumber: {
+        type: String,
+        default: null
+    },
     
     
     homeroomGrade: {
