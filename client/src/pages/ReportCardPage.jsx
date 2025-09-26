@@ -8,7 +8,6 @@ import rankService from "../services/rankService";
 import "./ReportCard.css";
 import domtoimage from "dom-to-image";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const LOGO_URL =
   "https://res.cloudinary.com/dityqhoqp/image/upload/v1757673591/UNMARK_LOGO_copy_1_nonp8j.png";
@@ -17,7 +16,6 @@ const ReportCardPage = ({ studentId }) => {
   const { id: routeId } = useParams();
   const id = studentId || routeId;
   const API_URL = import.meta.env.VITE_API_URL;
-  const navigate = useNavigate();
 
   // --- state ---
   const [userRole, setUserRole] = useState(null);
@@ -578,7 +576,6 @@ const ReportCardPage = ({ studentId }) => {
           viewType === "classTest" ? "Class test report" : "Report card"
         } uploaded successfully!`
       );
-      navigate(0);
     } catch (err) {
       console.error("Upload error:", err);
       alert("Upload failed!");
@@ -626,7 +623,6 @@ const ReportCardPage = ({ studentId }) => {
       });
 
       alert(`${label} deleted successfully.`);
-      navigate(0);
     } catch (error) {
       console.error(error);
       alert(`Failed to delete ${label}.`);
