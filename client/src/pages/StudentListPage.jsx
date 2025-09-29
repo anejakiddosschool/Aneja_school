@@ -561,6 +561,7 @@ const StudentListPage = () => {
                       }
                     />
                   </th>
+                  <th className={tableHeader}>Roll No</th>
                   <th className={tableHeader}>Student ID</th>
                   <th className={tableHeader}>Full Name</th>
                   <th className={tableHeader}>Gender</th>
@@ -596,6 +597,9 @@ const StudentListPage = () => {
                               )
                             }
                           />
+                        </td>
+                         <td className={`${tableCell} text-pink-600 font-mono`}>
+                          {student.rollNumber}
                         </td>
                         <td className={`${tableCell} text-pink-600 font-mono`}>
                           {student.studentId}
