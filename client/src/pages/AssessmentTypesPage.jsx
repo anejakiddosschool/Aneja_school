@@ -332,12 +332,12 @@ const AssessmentTypesPage = () => {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [assessmentTypes, setAssessmentTypes] = useState([]);
-  const [newAssessmentSemester, setNewAssessmentSemester] = useState("First Semester");
+  const [newAssessmentSemester, setNewAssessmentSemester] = useState(null);
 
   // States for form
-  const [newAssessmentName, setNewAssessmentName] = useState("PT-I");
-  const [newAssessmentMarks, setNewAssessmentMarks] = useState(10);
-  const [newAssessmentMonth, setNewAssessmentMonth] = useState("September");
+  const [newAssessmentName, setNewAssessmentName] = useState(null);
+  const [newAssessmentMarks, setNewAssessmentMarks] = useState(null);
+  const [newAssessmentMonth, setNewAssessmentMonth] = useState(null);
   const ASSESSMENT_TYPES = [
     "Periodic Test-I", "Periodic Test-II", "SA-I", "SA-II", "Class Test"
   ];

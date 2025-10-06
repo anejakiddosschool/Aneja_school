@@ -1152,7 +1152,7 @@ const ReportCardPage = ({ studentId }) => {
                   </tr>
                 </thead>
 
-                <tbody>
+                {/* <tbody>
                   {groupedGrades.map(({ subject, semesters }, idx) => (
                     <tr key={subject._id ?? subject.name ?? idx}>
                       <td className="col-num">{idx + 1}</td>
@@ -1347,6 +1347,155 @@ const ReportCardPage = ({ studentId }) => {
                       )}
                     </tr>
                   )}
+                </tbody> */}
+                <tbody>
+                  {groupedGrades.map(({ subject, semesters }, idx) => (
+                    <tr key={subject._id ?? subject.name ?? idx}>
+                      <td className="col-num">{idx + 1}</td>
+                      <td className="col-sub left">{subject?.name}</td>
+
+                      {/* First Semester - Assessment Scores */}
+                      {assessmentTypesByTerm.term1.map(([name], j) => (
+                        <td key={`g-t1-${idx}-${j}`} className="score-cell">
+                          {getDynamicScore(semesters["First Semester"], name)}
+                        </td>
+                      ))}
+
+                      {/* First Semester - Normalized Marks Obtained */}
+                      <td
+                        className={`score-cell ${gradeColorClass(
+                          calculateGrade(
+                            (() => {
+                              const obtained = calculateTotalMarks(
+                                semesters["First Semester"]
+                              );
+                              const max = calculateMaxMarks(
+                                semesters["First Semester"]
+                              );
+                              return max === 0 ? 0 : (obtained / max) * 100;
+                            })(),
+                            100 // Always grade out of 100!
+                          )
+                        )}`}
+                      >
+                        {(() => {
+                          const obtained = calculateTotalMarks(
+                            semesters["First Semester"]
+                          );
+                          const max = calculateMaxMarks(
+                            semesters["First Semester"]
+                          );
+                          return max === 0
+                            ? "-"
+                            : ((obtained / max) * 100).toFixed(2);
+                        })()}
+                      </td>
+
+                      {/* First Semester - Normalized Grade */}
+                      <td
+                        className={`score-cell ${gradeColorClass(
+                          calculateGrade(
+                            (() => {
+                              const obtained = calculateTotalMarks(
+                                semesters["First Semester"]
+                              );
+                              const max = calculateMaxMarks(
+                                semesters["First Semester"]
+                              );
+                              return max === 0 ? 0 : (obtained / max) * 100;
+                            })(),
+                            100 // Always grade out of 100!
+                          )
+                        )}`}
+                      >
+                        {(() => {
+                          const obtained = calculateTotalMarks(
+                            semesters["First Semester"]
+                          );
+                          const max = calculateMaxMarks(
+                            semesters["First Semester"]
+                          );
+                          return max === 0
+                            ? "-"
+                            : calculateGrade((obtained / max) * 100, 100);
+                        })()}
+                      </td>
+
+                      {hasTerm2Data && (
+                        <>
+                          {/* Second Semester - Assessment Scores */}
+                          {assessmentTypesByTerm.term2.map(([name], j) => (
+                            <td key={`g-t2-${idx}-${j}`} className="score-cell">
+                              {getDynamicScore(
+                                semesters["Second Semester"],
+                                name
+                              )}
+                            </td>
+                          ))}
+
+                          {/* Second Semester - Normalized Marks Obtained */}
+                          <td
+                            className={`score-cell ${gradeColorClass(
+                              calculateGrade(
+                                (() => {
+                                  const obtained = calculateTotalMarks(
+                                    semesters["Second Semester"]
+                                  );
+                                  const max = calculateMaxMarks(
+                                    semesters["Second Semester"]
+                                  );
+                                  return max === 0 ? 0 : (obtained / max) * 100;
+                                })(),
+                                100 // Always grade out of 100!
+                              )
+                            )}`}
+                          >
+                            {(() => {
+                              const obtained = calculateTotalMarks(
+                                semesters["Second Semester"]
+                              );
+                              const max = calculateMaxMarks(
+                                semesters["Second Semester"]
+                              );
+                              return max === 0
+                                ? "-"
+                                : ((obtained / max) * 100).toFixed(2);
+                            })()}
+                          </td>
+
+                          {/* Second Semester - Normalized Grade */}
+                          <td
+                            className={`score-cell ${gradeColorClass(
+                              calculateGrade(
+                                (() => {
+                                  const obtained = calculateTotalMarks(
+                                    semesters["Second Semester"]
+                                  );
+                                  const max = calculateMaxMarks(
+                                    semesters["Second Semester"]
+                                  );
+                                  return max === 0 ? 0 : (obtained / max) * 100;
+                                })(),
+                                100 // Always grade out of 100!
+                              )
+                            )}`}
+                          >
+                            {(() => {
+                              const obtained = calculateTotalMarks(
+                                semesters["Second Semester"]
+                              );
+                              const max = calculateMaxMarks(
+                                semesters["Second Semester"]
+                              );
+                              return max === 0
+                                ? "-"
+                                : calculateGrade((obtained / max) * 100, 100);
+                            })()}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
