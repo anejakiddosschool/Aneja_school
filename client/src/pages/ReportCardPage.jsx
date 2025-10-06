@@ -187,6 +187,8 @@ const ReportCardPage = ({ studentId }) => {
     return mapGrades;
   }, [allGrades, viewType]);
 
+
+
   // Group grades by subject with semester buckets (uses filteredGrades now)
   const groupedGrades = useMemo(() => {
     if (!filteredGrades || filteredGrades.length === 0) return [];
@@ -1362,7 +1364,7 @@ const ReportCardPage = ({ studentId }) => {
                       ))}
 
                       {/* First Semester - Normalized Marks Obtained */}
-                      <td
+                      {/* <td
                         className={`score-cell ${gradeColorClass(
                           calculateGrade(
                             (() => {
@@ -1389,7 +1391,15 @@ const ReportCardPage = ({ studentId }) => {
                             ? "-"
                             : ((obtained / max) * 100).toFixed(2);
                         })()}
-                      </td>
+                      </td> */}
+                        <td>
+        {(() => {
+          const s1 = semesters["First Semester"];
+          return s1 && typeof s1.finalScore === "number"
+            ? s1.finalScore
+            : "-";
+        })()}
+      </td>
 
                       {/* First Semester - Normalized Grade */}
                       <td
@@ -1434,7 +1444,7 @@ const ReportCardPage = ({ studentId }) => {
                           ))}
 
                           {/* Second Semester - Normalized Marks Obtained */}
-                          <td
+                          {/* <td
                             className={`score-cell ${gradeColorClass(
                               calculateGrade(
                                 (() => {
@@ -1461,7 +1471,16 @@ const ReportCardPage = ({ studentId }) => {
                                 ? "-"
                                 : ((obtained / max) * 100).toFixed(2);
                             })()}
-                          </td>
+                          </td> */}
+
+                             <td>
+            {(() => {
+              const s2 = semesters["Second Semester"];
+              return s2 && typeof s2.finalScore === "number"
+                ? s2.finalScore
+                : "-";
+            })()}
+          </td>
 
                           {/* Second Semester - Normalized Grade */}
                           <td
