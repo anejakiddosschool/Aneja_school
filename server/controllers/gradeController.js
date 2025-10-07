@@ -117,9 +117,9 @@ exports.updateGrade = async (req, res) => {
         }
         
         // --- Security Check ---
-        if (req.user.role === 'admin') {
-            return res.status(403).json({ message: "Admins cannot alter grade records." });
-        }
+        // if (req.user.role === 'admin') {
+        //     return res.status(403).json({ message: "Admins cannot alter grade records." });
+        // }
         // (In the future, you could add a check here to ensure only the assigned teacher can update)
 
         // --- Server-Side Recalculation (Your existing logic is perfect) ---
