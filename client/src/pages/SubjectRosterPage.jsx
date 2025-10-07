@@ -83,7 +83,9 @@ const SubjectRosterPage = () => {
         printWindow.document.write('<html><head><title>Print Subject Roster</title>');
         printWindow.document.write('<style>@page { size: A4 landscape; margin: 1cm; } body { font-family: Arial, sans-serif; } table { width: 100%; border-collapse: collapse; font-size: 8pt; } th, td { border: 1px solid black; padding: 5px; text-align: center; } th { vertical-align: middle; } td.student-name { text-align: left; }</style>');
         printWindow.document.write('</head><body>');
-        printWindow.document.write(`<h3>Detailed Roster for ${subjects.find(s => s._id === selectedSubject)?.name} (${gradeLevel}) - ${semester}</h3>`);
+        // printWindow.document.write(`<h3>Detailed Roster for ${subjects.find(s => s._id === selectedSubject)?.name} (${gradeLevel}) - ${semester}</h3>`);
+        printWindow.document.write(`<h3>Detailed Roster for ${subjectDetails.name} (${subjectDetails.gradeLevel}) - ${semester}</h3>`);
+
         printWindow.document.write(tableToPrint.outerHTML);
         printWindow.document.write('</body></html>');
         printWindow.document.close();

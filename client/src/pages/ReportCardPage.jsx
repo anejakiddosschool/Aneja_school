@@ -628,7 +628,6 @@ const ReportCardPage = ({ studentId }) => {
     (grade) => grade.semester === "Second Semester"
   );
 
-
   // Delete uploaded report (works for both types)
   const handleDeleteUploadedReport = async (studentIdToDelete) => {
     const label =
@@ -1094,7 +1093,7 @@ const ReportCardPage = ({ studentId }) => {
                   ? "Class Test Results"
                   : "Academic Results"}
               </h4>
-              {viewType === "reportCard" && (
+              {/* {viewType === "reportCard" && (
                 <div className="rank-badges">
                   <div className="badge">
                     Rank (1st Sem): <strong>{rank1stSem}</strong>
@@ -1108,7 +1107,7 @@ const ReportCardPage = ({ studentId }) => {
                     Overall: <strong>{overallRank}</strong>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="table-scroll">
@@ -1290,11 +1289,12 @@ const ReportCardPage = ({ studentId }) => {
                       {hasTerm2Data && <td>&nbsp;</td>}
                     </tr>
                   ))}
-
+                  {/* 
                   <tr className="totals-row">
                     <td colSpan="2" className="left">
                       <strong>Total</strong>
                     </td>
+                   
                     {assessmentTypesByTerm.term1.map(() => (
                       <td className="score-cell"></td>
                     ))}
@@ -1320,8 +1320,72 @@ const ReportCardPage = ({ studentId }) => {
                         <td className="score-cell"></td>
                       </>
                     )}
+                  </tr> */}
+                  <tr className="totals-row">
+                    <td colSpan="2" className="left">
+                      <strong>Total</strong>
+                    </td>
+
+                    {/* Term 1 Assessments */}
+                    {assessmentTypesByTerm.term1.map(() => (
+                      <td className="score-cell"></td>
+                    ))}
+
+                    {/* Term 1 Total */}
+                    <td className="score-cell">
+                      <b>
+                        {grandTotals.term1.obtained.toFixed(2)} /{" "}
+                        {grandTotals.term1.max.toFixed(2)}
+                      </b>
+                    </td>
+
+                    {/* 🟢 Term 1 Percentage */}
+                    <td className="score-cell">
+                      <b>
+                        {grandTotals.term1.max > 0
+                          ? (
+                              (grandTotals.term1.obtained /
+                                grandTotals.term1.max) *
+                              100
+                            ).toFixed(2)
+                          : "0.00"}
+                        %
+                      </b>
+                    </td>
+
+                    {/* If Term 2 exists */}
+                    {hasTerm2Data && (
+                      <>
+                        {assessmentTypesByTerm.term2.map(() => (
+                          <td className="score-cell"></td>
+                        ))}
+
+                        {/* Term 2 Total */}
+                        <td className="score-cell">
+                          <b>
+                            {grandTotals.term2.obtained.toFixed(2)} /{" "}
+                            {grandTotals.term2.max.toFixed(2)}
+                          </b>
+                        </td>
+
+                        {/* 🟢 Term 2 Percentage */}
+                        <td className="score-cell">
+                          <b>
+                            {grandTotals.term2.max > 0
+                              ? (
+                                  (grandTotals.term2.obtained /
+                                    grandTotals.term2.max) *
+                                  100
+                                ).toFixed(2)
+                              : "0.00"}
+                            %
+                          </b>
+                        </td>
+                      </>
+                    )}
                   </tr>
-                  {viewType === "reportCard" && (
+
+                  {/* {viewType === "reportCard" && (
                     <tr>
                       <td colSpan="2" className="left">
                         <strong>Rank</strong>
@@ -1376,7 +1440,7 @@ const ReportCardPage = ({ studentId }) => {
                         </>
                       )}
                     </tr>
-                  )}
+                  )} */}
                 </tbody>
               </table>
             </div>
