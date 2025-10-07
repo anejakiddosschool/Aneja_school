@@ -1,7 +1,9 @@
 // src/pages/AddStudentPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate, Link } from "react-router-dom";
 import studentService from "../services/studentService";
+
+import subjectService from "../services/subjectService";
 
 const AddStudentPage = () => {
   // --- State Management ---
@@ -21,6 +23,8 @@ const AddStudentPage = () => {
   const [success, setSuccess] = useState(null); // To show the auto-generated password
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+const [gradeOptions, setGradeOptions] = useState([]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +38,22 @@ const AddStudentPage = () => {
       setStudentData((prev) => ({ ...prev, [name]: value }));
     }
   };
+
+
+  useEffect(() => {
+  const fetchGradeLevels = async () => {
+    try {
+      const response = await subjectService.getAllSubjects();
+      const subjects = response.data.data;
+      // Get unique, sorted grade levels
+      const uniqueGrades = [...new Set(subjects.map(s => s.gradeLevel))].sort();
+      setGradeOptions(uniqueGrades);
+    } catch (error) {
+      // Optionally setError('Could not fetch grade levels');
+    }
+  };
+  fetchGradeLevels();
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -124,7 +144,7 @@ const AddStudentPage = () => {
               <label htmlFor="gradeLevel" className={inputLabel}>
                 Grade Level
               </label>
-              <input
+              {/* <input
                 id="gradeLevel"
                 type="text"
                 name="gradeLevel"
@@ -133,7 +153,23 @@ const AddStudentPage = () => {
                 className={textInput}
                 placeholder="e.g., Grade 4"
                 required
-              />
+              /> */}
+              <select
+  id="gradeLevel"
+  name="gradeLevel"
+  value={studentData.gradeLevel}
+  onChange={handleChange}
+  className={textInput}
+  required
+>
+  <option value="">Select Grade Level</option>
+  {gradeOptions.map((grade) => (
+    <option key={grade} value={grade}>
+      {grade}
+    </option>
+  ))}
+</select>
+
             </div>
             <div>
               <label htmlFor="gender" className={inputLabel}>

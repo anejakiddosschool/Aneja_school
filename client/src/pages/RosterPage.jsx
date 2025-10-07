@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import rosterService from "../services/rosterService";
 import authService from "../services/authService";
-
+import subjectService from "../services/subjectService";
 const RosterPage = () => {
   const [currentUser] = useState(authService.getCurrentUser());
   const [gradeLevel, setGradeLevel] = useState(currentUser.homeroomGrade || "");
@@ -10,6 +10,7 @@ const RosterPage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [homeroomTeacher, setHomeroomTeacher] = useState("");
+  const [gradeOptions, setGradeOptions] = useState([]);
 
   useEffect(() => {
     if (currentUser.role === "teacher" && currentUser.homeroomGrade) {
@@ -43,6 +44,21 @@ const RosterPage = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchGradeLevels = async () => {
+      try {
+        const response = await subjectService.getAllSubjects();
+        const subjects = response.data.data || [];
+        const uniqueGrades = [
+          ...new Set(subjects.map((s) => s.gradeLevel)),
+        ].sort();
+        setGradeOptions(uniqueGrades);
+      } catch (err) {
+        // Optionally: setError("Failed to fetch grades.");
+      }
+    };
+    fetchGradeLevels();
+  }, []);
   console.log("Roster Data:", rosterData); // Debugging line
 
   const handlePrint = () => {
@@ -135,13 +151,27 @@ const RosterPage = () => {
             >
               Enter Grade Level:
             </label>
-            <input
+            {/* <input
               id="gradeLevel"
               type="text"
               value={gradeLevel}
               onChange={(e) => setGradeLevel(e.target.value)}
               className="shadow-sm border rounded-lg py-2 px-3"
-            />
+            /> */}
+            <select
+              id="gradeLevel"
+              value={gradeLevel}
+              onChange={(e) => setGradeLevel(e.target.value)}
+              className={textInput}
+              required
+            >
+              <option value="">Select Grade Level</option>
+              {gradeOptions.map((grade) => (
+                <option key={grade} value={grade}>
+                  {grade}
+                </option>
+              ))}
+            </select>
           </div>
           {/* <div>
                         <label htmlFor="academicYear" className="font-bold text-gray-700 mr-2">Academic Year:</label>

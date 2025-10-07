@@ -603,7 +603,7 @@ const AssessmentTypesPage = () => {
                     value={newAssessmentSemester}
                     onChange={(e) => setNewAssessmentSemester(e.target.value)}
                     required
-                  >
+                  > <option value="">Select</option>
                     <option value="First Semester">First Semester</option>
                     <option value="Second Semester">Second Semester</option>
                   </select>
