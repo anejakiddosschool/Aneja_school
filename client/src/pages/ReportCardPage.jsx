@@ -58,16 +58,16 @@ const ReportCardPage = ({ studentId }) => {
 
   // --- Render numeric score or Arts grade based on subject ---
   const renderScoreOrGrade = (score, subjectName) => {
-   if (
-  subjectName === "Arts" ||
-  subjectName === "Art" ||
-  subjectName === "Art and Craft" ||
-  subjectName === "Art &Craft" ||
-  subjectName === "Art & Craft"
-) {
-  // do something
-}
-{
+    if (
+      subjectName === "Arts" ||
+      subjectName === "Art" ||
+      subjectName === "Art and Craft" ||
+      subjectName === "Art &Craft" ||
+      subjectName === "Art & Craft"
+    ) {
+      // do something
+    }
+    {
       return getArtGrade(score);
     }
     return score !== null && score !== undefined ? score.toFixed(2) : "-";
@@ -628,6 +628,7 @@ const ReportCardPage = ({ studentId }) => {
     (grade) => grade.semester === "Second Semester"
   );
 
+
   // Delete uploaded report (works for both types)
   const handleDeleteUploadedReport = async (studentIdToDelete) => {
     const label =
@@ -1181,7 +1182,7 @@ const ReportCardPage = ({ studentId }) => {
                   </tr>
                 </thead>
 
-                {/* <tbody>
+                <tbody>
                   {groupedGrades.map(({ subject, semesters }, idx) => (
                     <tr key={subject._id ?? subject.name ?? idx}>
                       <td className="col-num">{idx + 1}</td>
@@ -1299,8 +1300,8 @@ const ReportCardPage = ({ studentId }) => {
                     ))}
                     <td className="score-cell">
                       <b>
-                        {grandTotals.term1.max.toFixed(2)} /{" "}
-                        {grandTotals.term1.obtained.toFixed(2)}
+                        {grandTotals.term1.obtained.toFixed(2)} /{" "}
+                        {grandTotals.term1.max.toFixed(2)}
                       </b>
                     </td>
                     <td className="score-cell"></td>
@@ -1312,8 +1313,8 @@ const ReportCardPage = ({ studentId }) => {
                         ))}
                         <td className="score-cell">
                           <b>
-                            {grandTotals.term2.max.toFixed(2)} /{" "}
-                            {grandTotals.term2.obtained.toFixed(2)}
+                            {grandTotals.term2.obtained.toFixed(2)} /{" "}
+                            {grandTotals.term2.max.toFixed(2)}
                           </b>
                         </td>
                         <td className="score-cell"></td>
@@ -1376,214 +1377,6 @@ const ReportCardPage = ({ studentId }) => {
                       )}
                     </tr>
                   )}
-                </tbody> */}
-                <tbody>
-                  {groupedGrades.map(({ subject, semesters }, idx) => (
-                    <tr key={subject._id ?? subject.name ?? idx}>
-                      <td className="col-num">{idx + 1}</td>
-                      <td className="col-sub left">{subject?.name}</td>
-
-                      {/* First Semester - Assessment Scores */}
-                      {assessmentTypesByTerm.term1.map(([name], j) => (
-                        <td key={`g-t1-${idx}-${j}`} className="score-cell">
-                          {getDynamicScore(semesters["First Semester"], name)}
-                        </td>
-                      ))}
-
-                      {/* First Semester - Normalized Marks Obtained */}
-                      {/* <td
-                        className={`score-cell ${gradeColorClass(
-                          calculateGrade(
-                            (() => {
-                              const obtained = calculateTotalMarks(
-                                semesters["First Semester"]
-                              );
-                              const max = calculateMaxMarks(
-                                semesters["First Semester"]
-                              );
-                              return max === 0 ? 0 : (obtained / max) * 100;
-                            })(),
-                            100 // Always grade out of 100!
-                          )
-                        )}`}
-                      >
-                        {(() => {
-                          const obtained = calculateTotalMarks(
-                            semesters["First Semester"]
-                          );
-                          const max = calculateMaxMarks(
-                            semesters["First Semester"]
-                          );
-                          return max === 0
-                            ? "-"
-                            : ((obtained / max) * 100).toFixed(2);
-                        })()}
-                      </td> */}
-                      <td>
-                        {(() => {
-                          const s1 = semesters["First Semester"];
-                          return s1 && typeof s1.finalScore === "number"
-                            ? s1.finalScore
-                            : "-";
-                        })()}
-                      </td>
-
-                      {/* First Semester - Normalized Grade */}
-                      {/* <td
-                        className={`score-cell ${gradeColorClass(
-                          calculateGrade(
-                            (() => {
-                              const obtained = calculateTotalMarks(
-                                semesters["First Semester"]
-                              );
-                              const max = calculateMaxMarks(
-                                semesters["First Semester"]
-                              );
-                              return max === 0 ? 0 : (obtained / max) * 100;
-                            })(),
-                            100 // Always grade out of 100!
-                          )
-                        )}`}
-                      >
-                        {(() => {
-                          const obtained = calculateTotalMarks(
-                            semesters["First Semester"]
-                          );
-                          const max = calculateMaxMarks(
-                            semesters["First Semester"]
-                          );
-                          return max === 0
-                            ? "-"
-                            : calculateGrade((obtained / max) * 100, 100);
-                        })()}
-                      </td> */}
-                      <td
-                        className={`score-cell ${gradeColorClass(
-                          calculateGrade(
-                            calculateTotalMarks(semesters["First Semester"]),
-                            calculateMaxMarks(semesters["First Semester"])
-                          )
-                        )}`}
-                      >
-                        {(() => {
-                          const total = calculateTotalMarks(
-                            semesters["First Semester"]
-                          );
-                          const max = calculateMaxMarks(
-                            semesters["First Semester"]
-                          );
-                          return max === 0
-                            ? "-"
-                            : renderScoreOrGrade(total, subject?.name);
-                        })()}
-                      </td>
-
-                      {hasTerm2Data && (
-                        <>
-                          {/* Second Semester - Assessment Scores */}
-                          {assessmentTypesByTerm.term2.map(([name], j) => (
-                            <td key={`g-t2-${idx}-${j}`} className="score-cell">
-                              {getDynamicScore(
-                                semesters["Second Semester"],
-                                name
-                              )}
-                            </td>
-                          ))}
-
-                          {/* Second Semester - Normalized Marks Obtained */}
-                          {/* <td
-                            className={`score-cell ${gradeColorClass(
-                              calculateGrade(
-                                (() => {
-                                  const obtained = calculateTotalMarks(
-                                    semesters["Second Semester"]
-                                  );
-                                  const max = calculateMaxMarks(
-                                    semesters["Second Semester"]
-                                  );
-                                  return max === 0 ? 0 : (obtained / max) * 100;
-                                })(),
-                                100 // Always grade out of 100!
-                              )
-                            )}`}
-                          >
-                            {(() => {
-                              const obtained = calculateTotalMarks(
-                                semesters["Second Semester"]
-                              );
-                              const max = calculateMaxMarks(
-                                semesters["Second Semester"]
-                              );
-                              return max === 0
-                                ? "-"
-                                : ((obtained / max) * 100).toFixed(2);
-                            })()}
-                          </td> */}
-
-                          <td>
-                            {(() => {
-                              const s2 = semesters["Second Semester"];
-                              return s2 && typeof s2.finalScore === "number"
-                                ? s2.finalScore
-                                : "-";
-                            })()}
-                          </td>
-
-                          {/* Second Semester - Normalized Grade */}
-                          {/* <td
-                            className={`score-cell ${gradeColorClass(
-                              calculateGrade(
-                                (() => {
-                                  const obtained = calculateTotalMarks(
-                                    semesters["Second Semester"]
-                                  );
-                                  const max = calculateMaxMarks(
-                                    semesters["Second Semester"]
-                                  );
-                                  return max === 0 ? 0 : (obtained / max) * 100;
-                                })(),
-                                100 // Always grade out of 100!
-                              )
-                            )}`}
-                          >
-                            {(() => {
-                              const obtained = calculateTotalMarks(
-                                semesters["Second Semester"]
-                              );
-                              const max = calculateMaxMarks(
-                                semesters["Second Semester"]
-                              );
-                              return max === 0
-                                ? "-"
-                                : calculateGrade((obtained / max) * 100, 100);
-                            })()}
-                          </td> */}
-                          <td
-                            className={`score-cell ${gradeColorClass(
-                              calculateGrade(
-                                calculateTotalMarks(
-                                  semesters["Second Semester"]
-                                ),
-                                calculateMaxMarks(semesters["Second Semester"])
-                              )
-                            )}`}
-                          >
-                            {(() => {
-                              const total = calculateTotalMarks(
-                                semesters["Second Semester"]
-                              );
-                              const max = calculateMaxMarks(
-                                semesters["Second Semester"]
-                              );
-                              return max === 0
-                                ? "-"
-                                : renderScoreOrGrade(total, subject?.name);
-                            })()}
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>
