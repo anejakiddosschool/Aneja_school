@@ -44,6 +44,35 @@ const ReportCardPage = ({ studentId }) => {
     parent: null,
   });
 
+  // ----------
+  const getArtGrade = (score) => {
+    if (score >= 91) return "A+";
+    if (score >= 81) return "A-";
+    if (score >= 71) return "B+";
+    if (score >= 61) return "B-";
+    if (score >= 51) return "C+";
+    if (score >= 41) return "C-";
+    if (score >= 33) return "D";
+    return "E";
+  };
+
+  // --- Render numeric score or Arts grade based on subject ---
+  const renderScoreOrGrade = (score, subjectName) => {
+   if (
+  subjectName === "Arts" ||
+  subjectName === "Art" ||
+  subjectName === "Art and Craft" ||
+  subjectName === "Art &Craft" ||
+  subjectName === "Art & Craft"
+) {
+  // do something
+}
+{
+      return getArtGrade(score);
+    }
+    return score !== null && score !== undefined ? score.toFixed(2) : "-";
+  };
+  // ----------
   // NEW: view toggle - "reportCard" or "classTest"
   const [viewType, setViewType] = useState("reportCard");
 
@@ -186,8 +215,6 @@ const ReportCardPage = ({ studentId }) => {
     // For full report, keep all gradeRecords (with class tests removed from their assessments)
     return mapGrades;
   }, [allGrades, viewType]);
-
-
 
   // Group grades by subject with semester buckets (uses filteredGrades now)
   const groupedGrades = useMemo(() => {
@@ -1392,17 +1419,17 @@ const ReportCardPage = ({ studentId }) => {
                             : ((obtained / max) * 100).toFixed(2);
                         })()}
                       </td> */}
-                        <td>
-        {(() => {
-          const s1 = semesters["First Semester"];
-          return s1 && typeof s1.finalScore === "number"
-            ? s1.finalScore
-            : "-";
-        })()}
-      </td>
+                      <td>
+                        {(() => {
+                          const s1 = semesters["First Semester"];
+                          return s1 && typeof s1.finalScore === "number"
+                            ? s1.finalScore
+                            : "-";
+                        })()}
+                      </td>
 
                       {/* First Semester - Normalized Grade */}
-                      <td
+                      {/* <td
                         className={`score-cell ${gradeColorClass(
                           calculateGrade(
                             (() => {
@@ -1428,6 +1455,26 @@ const ReportCardPage = ({ studentId }) => {
                           return max === 0
                             ? "-"
                             : calculateGrade((obtained / max) * 100, 100);
+                        })()}
+                      </td> */}
+                      <td
+                        className={`score-cell ${gradeColorClass(
+                          calculateGrade(
+                            calculateTotalMarks(semesters["First Semester"]),
+                            calculateMaxMarks(semesters["First Semester"])
+                          )
+                        )}`}
+                      >
+                        {(() => {
+                          const total = calculateTotalMarks(
+                            semesters["First Semester"]
+                          );
+                          const max = calculateMaxMarks(
+                            semesters["First Semester"]
+                          );
+                          return max === 0
+                            ? "-"
+                            : renderScoreOrGrade(total, subject?.name);
                         })()}
                       </td>
 
@@ -1473,17 +1520,17 @@ const ReportCardPage = ({ studentId }) => {
                             })()}
                           </td> */}
 
-                             <td>
-            {(() => {
-              const s2 = semesters["Second Semester"];
-              return s2 && typeof s2.finalScore === "number"
-                ? s2.finalScore
-                : "-";
-            })()}
-          </td>
+                          <td>
+                            {(() => {
+                              const s2 = semesters["Second Semester"];
+                              return s2 && typeof s2.finalScore === "number"
+                                ? s2.finalScore
+                                : "-";
+                            })()}
+                          </td>
 
                           {/* Second Semester - Normalized Grade */}
-                          <td
+                          {/* <td
                             className={`score-cell ${gradeColorClass(
                               calculateGrade(
                                 (() => {
@@ -1509,6 +1556,28 @@ const ReportCardPage = ({ studentId }) => {
                               return max === 0
                                 ? "-"
                                 : calculateGrade((obtained / max) * 100, 100);
+                            })()}
+                          </td> */}
+                          <td
+                            className={`score-cell ${gradeColorClass(
+                              calculateGrade(
+                                calculateTotalMarks(
+                                  semesters["Second Semester"]
+                                ),
+                                calculateMaxMarks(semesters["Second Semester"])
+                              )
+                            )}`}
+                          >
+                            {(() => {
+                              const total = calculateTotalMarks(
+                                semesters["Second Semester"]
+                              );
+                              const max = calculateMaxMarks(
+                                semesters["Second Semester"]
+                              );
+                              return max === 0
+                                ? "-"
+                                : renderScoreOrGrade(total, subject?.name);
                             })()}
                           </td>
                         </>
