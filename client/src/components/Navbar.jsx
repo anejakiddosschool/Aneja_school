@@ -274,7 +274,7 @@ const Navbar = () => {
           )}
 
           {/* Notifications button */}
-          {/* <div className="relative">
+          <div className="relative">
               <button
                 onClick={handleNotificationClick}
                 className="relative text-gray-300 hover:text-white transition-colors"
@@ -338,7 +338,7 @@ const Navbar = () => {
                   </ul>
                 </div>
               )}
-            </div> */}
+            </div>
 
           {currentUser || currentStudent ? (
             <button
