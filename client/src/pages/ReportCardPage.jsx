@@ -1505,10 +1505,19 @@ const ReportCardPage = ({ studentId }) => {
           {/* Signatures */}
           <section className="signatures">
             <div className="sig-col">
-              <div className="sig-box">
+              {/* <div className="sig-box">
                 <p className="sig-label">{teacher}</p>
                 <div className="sig-label">Class Teacher</div>
-              </div>
+              </div> */}
+              <div className="sig-box">
+  <p className="sig-label">
+    {teacher
+      ? teacher.charAt(0).toUpperCase() + teacher.slice(1).toLowerCase()
+      : ""}
+  </p>
+  <div className="sig-label">Class Teacher</div>
+</div>
+
             </div>
 
             <div className="sig-col">
