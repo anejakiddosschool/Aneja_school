@@ -524,93 +524,203 @@ const ReportCardPage = ({ studentId }) => {
     }, 600);
   };
 
-  // Capture image function — unchanged
-  const handleCapture = async () => {
-    const node = document.getElementById("reportCard");
-    if (!node) return;
-    try {
-      const dataUrl = await domtoimage.toPng(node, {
-        quality: 1,
-        bgcolor: "white",
-      });
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `${student?.fullName || "report-card"}.png`;
-      link.click();
-    } catch (err) {
-      console.error("Capture failed:", err);
-    }
-  };
+  // // Capture image function — unchanged
+  // const handleCapture = async () => {
+  //   const node = document.getElementById("reportCard");
+  //   if (!node) return;
+  //   try {
+  //     const dataUrl = await domtoimage.toPng(node, {
+  //       quality: 1,
+  //       bgcolor: "white",
+  //     });
+  //     const link = document.createElement("a");
+  //     link.href = dataUrl;
+  //     link.download = `${student?.fullName || "report-card"}.png`;
+  //     link.click();
+  //   } catch (err) {
+  //     console.error("Capture failed:", err);
+  //   }
+  // };
 
-  // Save to Cloud (works for both report card and class test reports)
-  const saveReportCardToCloud = async (studentIdToSave) => {
-    setUploading(true);
-    try {
-      const reportCardElement = document.getElementById("reportCard");
-      const blob = await domtoimage.toBlob(reportCardElement, {
-        quality: 1,
-        bgcolor: "white",
-        width: reportCardElement.scrollWidth * 2,
-        height: reportCardElement.scrollHeight * 2,
-        style: {
-          transform: "scale(2)",
-          transformOrigin: "top left",
-          width: `${reportCardElement.scrollWidth}px`,
-          height: `${reportCardElement.scrollHeight}px`,
-        },
-      });
+  // // Save to Cloud (works for both report card and class test reports)
+  // const saveReportCardToCloud = async (studentIdToSave) => {
+  //   setUploading(true);
+  //   try {
+  //     const reportCardElement = document.getElementById("reportCard");
+  //     const blob = await domtoimage.toBlob(reportCardElement, {
+  //       quality: 1,
+  //       bgcolor: "white",
+  //       width: reportCardElement.scrollWidth * 2,
+  //       height: reportCardElement.scrollHeight * 2,
+  //       style: {
+  //         transform: "scale(2)",
+  //         transformOrigin: "top left",
+  //         width: `${reportCardElement.scrollWidth}px`,
+  //         height: `${reportCardElement.scrollHeight}px`,
+  //       },
+  //     });
 
-      const now = new Date();
-      const timestamp = now
-        .toLocaleString("en-IN", {
-          year: "numeric",
-          month: "short",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-          timeZone: "Asia/Kolkata",
-        })
-        .replace(/, /g, "_")
-        .replace(/ /g, "_")
-        .replace(/:/g, "");
+  //     const now = new Date();
+  //     const timestamp = now
+  //       .toLocaleString("en-IN", {
+  //         year: "numeric",
+  //         month: "short",
+  //         day: "2-digit",
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         hour12: false,
+  //         timeZone: "Asia/Kolkata",
+  //       })
+  //       .replace(/, /g, "_")
+  //       .replace(/ /g, "_")
+  //       .replace(/:/g, "");
 
-      const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
-      const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
-      const year = (
-        allReports.find((r) => r.semester === "First Semester")?.academicYear ||
-        "year"
-      ).replace(/\s+/g, "_");
+  //     const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
+  //     const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
+  //     const year = (
+  //       allReports.find((r) => r.semester === "First Semester")?.academicYear ||
+  //       "year"
+  //     ).replace(/\s+/g, "_");
 
-      const typeSuffix =
-        viewType === "classTest" ? "class_test" : "report_card";
-      const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
+  //     const typeSuffix =
+  //       viewType === "classTest" ? "class_test" : "report_card";
+  //     const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
 
-      console.log("Uploading file:", fileName);
-      const formData = new FormData();
-      formData.append("file", blob, fileName);
+  //     console.log("Uploading file:", fileName);
+  //     const formData = new FormData();
+  //     formData.append("file", blob, fileName);
 
-      const endpoint =
-        viewType === "classTest"
-          ? `${API_URL}/students/${studentIdToSave}/class-test-report`
-          : `${API_URL}/students/${studentIdToSave}/report-card`;
+  //     const endpoint =
+  //       viewType === "classTest"
+  //         ? `${API_URL}/students/${studentIdToSave}/class-test-report`
+  //         : `${API_URL}/students/${studentIdToSave}/report-card`;
 
-      await axios.post(endpoint, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+  //     await axios.post(endpoint, formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
 
-      alert(
-        `${
-          viewType === "classTest" ? "Class test report" : "Report card"
-        } uploaded successfully!`
-      );
-      window.location.reload();
-    } catch (err) {
-      console.error("Upload error:", err);
-      alert("Upload failed!");
-    }
+  //     alert(
+  //       `${
+  //         viewType === "classTest" ? "Class test report" : "Report card"
+  //       } uploaded successfully!`
+  //     );
+  //     window.location.reload();
+  //   } catch (err) {
+  //     console.error("Upload error:", err);
+  //     alert("Upload failed!");
+  //   }
+  //   setUploading(false);
+  // };
+
+  // 🔧 Helper to capture consistent desktop layout even on mobile
+const generateReportCardImage = async () => {
+  // Temporarily force desktop layout
+  const originalMeta = document.querySelector("meta[name=viewport]");
+  const newMeta = document.createElement("meta");
+  newMeta.name = "viewport";
+  newMeta.content = "width=1100"; // force desktop width
+  document.head.appendChild(newMeta);
+  if (originalMeta) originalMeta.remove();
+
+  // Wait for layout re-render
+  await new Promise((r) => setTimeout(r, 300));
+
+  const node = document.getElementById("reportCard");
+  if (!node) throw new Error("Report card element not found");
+
+  // Capture full-quality image
+  const dataUrl = await domtoimage.toPng(node, {
+    quality: 1,
+    bgcolor: "white",
+    width: node.scrollWidth * 2,
+    height: node.scrollHeight * 2,
+    style: {
+      transform: "scale(2)",
+      transformOrigin: "top left",
+      width: `${node.scrollWidth}px`,
+      height: `${node.scrollHeight}px`,
+    },
+  });
+
+  // Restore viewport
+  document.head.removeChild(newMeta);
+  if (originalMeta) document.head.appendChild(originalMeta);
+
+  return dataUrl;
+};
+
+// 🖼️ Download as PNG (consistent layout)
+const handleCapture = async () => {
+  try {
+    const dataUrl = await generateReportCardImage();
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = `${student?.fullName || "report-card"}.png`;
+    link.click();
+  } catch (err) {
+    console.error("Capture failed:", err);
+  }
+};
+
+// ☁️ Upload to Cloudinary or API (consistent layout)
+const saveReportCardToCloud = async (studentIdToSave) => {
+  setUploading(true);
+  try {
+    const dataUrl = await generateReportCardImage();
+    const blob = await (await fetch(dataUrl)).blob();
+
+    const now = new Date();
+    const timestamp = now
+      .toLocaleString("en-IN", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Kolkata",
+      })
+      .replace(/, /g, "_")
+      .replace(/ /g, "_")
+      .replace(/:/g, "");
+
+    const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
+    const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
+    const year = (
+      allReports.find((r) => r.semester === "First Semester")?.academicYear ||
+      "year"
+    ).replace(/\s+/g, "_");
+
+    const typeSuffix =
+      viewType === "classTest" ? "class_test" : "report_card";
+    const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
+
+    console.log("Uploading file:", fileName);
+    const formData = new FormData();
+    formData.append("file", blob, fileName);
+
+    const endpoint =
+      viewType === "classTest"
+        ? `${API_URL}/students/${studentIdToSave}/class-test-report`
+        : `${API_URL}/students/${studentIdToSave}/report-card`;
+
+    await axios.post(endpoint, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    alert(
+      `${
+        viewType === "classTest" ? "Class test report" : "Report card"
+      } uploaded successfully!`
+    );
+    window.location.reload();
+  } catch (err) {
+    console.error("Upload error:", err);
+    alert("Upload failed!");
+  } finally {
     setUploading(false);
-  };
+  }
+};
 
   if (loading)
     return <p className="loading">Generating Authentic Report Card...</p>;
