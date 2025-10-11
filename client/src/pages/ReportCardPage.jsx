@@ -1119,7 +1119,11 @@ const saveReportCardToCloud = async (studentIdToSave) => {
                   : "Progress Report Card"}
               </div>
               <div className="session">
-                Academic Year: {firstSemesterReport?.academicYear || "-"}
+                {/* Academic Year: {firstSemesterReport?.academicYear || "-"} */}
+                Academic Year:{" "}
+{firstSemesterReport?.academicYear ||
+  `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}
+
               </div>
             </div>
             <div className="rc-right">

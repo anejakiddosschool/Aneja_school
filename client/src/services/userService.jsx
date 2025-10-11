@@ -14,6 +14,7 @@ const getAuthConfig = () => {
 const getProfile = () => api.get('/users/profile', getAuthConfig());
 const getAll = () => api.get('/users', getAuthConfig());
 const getById = (id) => api.get(`/users/${id}`, getAuthConfig());
+const remove = (id) => api.delete(`/users/${id}`); // 👈 NEW
 // Update a user (admin only)
 const update = (id, data) => {
     // We keep your definitive fix for sending raw JSON
@@ -43,5 +44,6 @@ export default {
     getById,
     update,
     uploadUsers,
-    updateProfile
+    updateProfile,
+    remove
 };
