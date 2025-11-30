@@ -35,6 +35,7 @@ const AssessmentTypesPage = () => {
     "SA-I",
     "SA-II",
     "Class Test",
+    "NTSE"
   ];
 
   // UI feedback + loading states
