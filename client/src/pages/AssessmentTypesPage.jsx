@@ -32,10 +32,12 @@ const AssessmentTypesPage = () => {
   const ASSESSMENT_TYPES = [
     "Periodic Test-I",
     "Periodic Test-II",
+    "Periodic Test-III",
+    "Periodic Test-IV",
     "SA-I",
     "SA-II",
     "Class Test",
-    "NTSE"
+    "NTSE",
   ];
 
   // UI feedback + loading states
