@@ -1,4 +1,4 @@
-// // ReportCardPage.jsx
+// // ReportCardPage.jsx - Complete code with NTSE Class Test added
 // import React, { useState, useEffect, useMemo } from "react";
 // import { useParams, Link } from "react-router-dom";
 // import studentService from "../services/studentService";
@@ -16,6 +16,7 @@
 //   const { id: routeId } = useParams();
 //   const id = studentId || routeId;
 //   const API_URL = import.meta.env.VITE_API_URL;
+
 //   // --- state ---
 //   const [userRole, setUserRole] = useState(null);
 //   const [teacher, setTeacher] = useState(null);
@@ -37,6 +38,9 @@
 //   // Fade-in animation trigger
 //   const [visible, setVisible] = useState(false);
 
+//   // View toggle options: reportCard, classTest, ntseTest
+//   const [viewType, setViewType] = useState("reportCard");
+
 //   // Digital signatures (Base64 data URLs)
 //   const [signatures, setSignatures] = useState({
 //     classTeacher: null,
@@ -44,7 +48,7 @@
 //     parent: null,
 //   });
 
-//   // ----------
+//   // ---------- Art grade calculation ----------
 //   const getArtGrade = (score) => {
 //     if (score >= 91) return "A+";
 //     if (score >= 81) return "A-";
@@ -56,7 +60,7 @@
 //     return "E";
 //   };
 
-//   // --- Render numeric score or Arts grade based on subject ---
+//   // Render numeric score or Arts grade based on subject
 //   const renderScoreOrGrade = (score, subjectName) => {
 //     if (
 //       subjectName === "Arts" ||
@@ -65,16 +69,10 @@
 //       subjectName === "Art &Craft" ||
 //       subjectName === "Art & Craft"
 //     ) {
-//       // do something
-//     }
-//     {
 //       return getArtGrade(score);
 //     }
 //     return score !== null && score !== undefined ? score.toFixed(2) : "-";
 //   };
-//   // ----------
-//   // NEW: view toggle - "reportCard" or "classTest"
-//   const [viewType, setViewType] = useState("reportCard");
 
 //   // --- data fetching ---
 //   useEffect(() => {
@@ -187,32 +185,36 @@
 //   }, []);
 
 //   // --- FILTER GRADES BASED ON viewType ---
-//   // If viewType === 'classTest', keep only assessments that are Class Test.
-//   // If viewType === 'reportCard', exclude Class Test assessments.
+//   // reportCard: exclude Class Test & NTSE assessments
+//   // classTest: keep only Class Test assessments
+//   // ntseTest: keep only NTSE assessments
 //   const filteredGrades = useMemo(() => {
 //     if (!allGrades || allGrades.length === 0) return [];
 
 //     const mapGrades = allGrades.map((gradeRecord) => {
-//       // clone gradeRecord shallowly
 //       const cloned = { ...gradeRecord };
-//       // if assessments present, filter them according to viewType
 //       if (Array.isArray(cloned.assessments)) {
 //         cloned.assessments = cloned.assessments.filter((a) => {
 //           const name = a.assessmentType?.name ?? "";
 //           const isClassTest = /class\s*test/i.test(name);
-//           return viewType === "classTest" ? isClassTest : !isClassTest;
+//           const isNTSE = /ntse/i.test(name);
+
+//           if (viewType === "classTest") return isClassTest;
+//           if (viewType === "ntseTest") return isNTSE;
+//           // reportCard: exclude both
+//           return !isClassTest && !isNTSE;
 //         });
 //       }
 //       return cloned;
 //     });
 
-//     // For classTest view, remove gradeRecords with no remaining assessments (we only want subjects that had class tests)
-//     if (viewType === "classTest") {
+//     // For classTest/ntseTest views, remove gradeRecords with no remaining assessments
+//     if (viewType === "classTest" || viewType === "ntseTest") {
 //       return mapGrades.filter(
 //         (g) => Array.isArray(g.assessments) && g.assessments.length > 0
 //       );
 //     }
-//     // For full report, keep all gradeRecords (with class tests removed from their assessments)
+//     // For full report, keep all gradeRecords (with class tests/NTSE removed)
 //     return mapGrades;
 //   }, [allGrades, viewType]);
 
@@ -296,6 +298,7 @@
 //       "SA-II",
 //       "SA - II",
 //       "SA-II (80)",
+//       "NTSE", // Added NTSE to sort order
 //     ];
 //     const sortMap = (entries) =>
 //       Array.from(entries.entries()).sort(([a], [b]) => {
@@ -493,7 +496,44 @@
 //   // Theme toggle handler
 //   const toggleTheme = () => setDarkTheme((prev) => !prev);
 
-//   // Print function — unchanged
+//   // Helper to capture consistent desktop layout even on mobile
+//   const generateReportCardImage = async () => {
+//     // Temporarily force desktop layout
+//     const originalMeta = document.querySelector("meta[name=viewport]");
+//     const newMeta = document.createElement("meta");
+//     newMeta.name = "viewport";
+//     newMeta.content = "width=1100"; // force desktop width
+//     document.head.appendChild(newMeta);
+//     if (originalMeta) originalMeta.remove();
+
+//     // Wait for layout re-render
+//     await new Promise((r) => setTimeout(r, 300));
+
+//     const node = document.getElementById("reportCard");
+//     if (!node) throw new Error("Report card element not found");
+
+//     // Capture full-quality image
+//     const dataUrl = await domtoimage.toPng(node, {
+//       quality: 1,
+//       bgcolor: "white",
+//       width: node.scrollWidth * 2,
+//       height: node.scrollHeight * 2,
+//       style: {
+//         transform: "scale(2)",
+//         transformOrigin: "top left",
+//         width: `${node.scrollWidth}px`,
+//         height: `${node.scrollHeight}px`,
+//       },
+//     });
+
+//     // Restore viewport
+//     document.head.removeChild(newMeta);
+//     if (originalMeta) document.head.appendChild(originalMeta);
+
+//     return dataUrl;
+//   };
+
+//   // Print function
 //   const handlePrint = () => {
 //     const printableContent = document.getElementById("printableArea");
 //     if (!printableContent) return;
@@ -524,203 +564,88 @@
 //     }, 600);
 //   };
 
-//   // // Capture image function — unchanged
-//   // const handleCapture = async () => {
-//   //   const node = document.getElementById("reportCard");
-//   //   if (!node) return;
-//   //   try {
-//   //     const dataUrl = await domtoimage.toPng(node, {
-//   //       quality: 1,
-//   //       bgcolor: "white",
-//   //     });
-//   //     const link = document.createElement("a");
-//   //     link.href = dataUrl;
-//   //     link.download = `${student?.fullName || "report-card"}.png`;
-//   //     link.click();
-//   //   } catch (err) {
-//   //     console.error("Capture failed:", err);
-//   //   }
-//   // };
+//   // Download as PNG (consistent layout)
+//   const handleCapture = async () => {
+//     try {
+//       const dataUrl = await generateReportCardImage();
+//       const link = document.createElement("a");
+//       link.href = dataUrl;
+//       link.download = `${student?.fullName || "report-card"}.png`;
+//       link.click();
+//     } catch (err) {
+//       console.error("Capture failed:", err);
+//     }
+//   };
 
-//   // // Save to Cloud (works for both report card and class test reports)
-//   // const saveReportCardToCloud = async (studentIdToSave) => {
-//   //   setUploading(true);
-//   //   try {
-//   //     const reportCardElement = document.getElementById("reportCard");
-//   //     const blob = await domtoimage.toBlob(reportCardElement, {
-//   //       quality: 1,
-//   //       bgcolor: "white",
-//   //       width: reportCardElement.scrollWidth * 2,
-//   //       height: reportCardElement.scrollHeight * 2,
-//   //       style: {
-//   //         transform: "scale(2)",
-//   //         transformOrigin: "top left",
-//   //         width: `${reportCardElement.scrollWidth}px`,
-//   //         height: `${reportCardElement.scrollHeight}px`,
-//   //       },
-//   //     });
+//   // Save to Cloud (works for report card, class test, and NTSE reports)
+//   const saveReportCardToCloud = async (studentIdToSave) => {
+//     setUploading(true);
+//     try {
+//       const dataUrl = await generateReportCardImage();
+//       const blob = await (await fetch(dataUrl)).blob();
 
-//   //     const now = new Date();
-//   //     const timestamp = now
-//   //       .toLocaleString("en-IN", {
-//   //         year: "numeric",
-//   //         month: "short",
-//   //         day: "2-digit",
-//   //         hour: "2-digit",
-//   //         minute: "2-digit",
-//   //         hour12: false,
-//   //         timeZone: "Asia/Kolkata",
-//   //       })
-//   //       .replace(/, /g, "_")
-//   //       .replace(/ /g, "_")
-//   //       .replace(/:/g, "");
+//       const now = new Date();
+//       const timestamp = now
+//         .toLocaleString("en-IN", {
+//           year: "numeric",
+//           month: "short",
+//           day: "2-digit",
+//           hour: "2-digit",
+//           minute: "2-digit",
+//           hour12: false,
+//           timeZone: "Asia/Kolkata",
+//         })
+//         .replace(/, /g, "_")
+//         .replace(/ /g, "_")
+//         .replace(/:/g, "");
 
-//   //     const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
-//   //     const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
-//   //     const year = (
-//   //       allReports.find((r) => r.semester === "First Semester")?.academicYear ||
-//   //       "year"
-//   //     ).replace(/\s+/g, "_");
+//       const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
+//       const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
+//       const year = (
+//         allReports.find((r) => r.semester === "First Semester")?.academicYear ||
+//         "year"
+//       ).replace(/\s+/g, "_");
 
-//   //     const typeSuffix =
-//   //       viewType === "classTest" ? "class_test" : "report_card";
-//   //     const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
+//       const typeSuffix =
+//         viewType === "classTest"
+//           ? "class_test"
+//           : viewType === "ntseTest"
+//           ? "ntse_test"
+//           : "report_card";
+//       const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
 
-//   //     console.log("Uploading file:", fileName);
-//   //     const formData = new FormData();
-//   //     formData.append("file", blob, fileName);
+//       console.log("Uploading file:", fileName);
+//       const formData = new FormData();
+//       formData.append("file", blob, fileName);
 
-//   //     const endpoint =
-//   //       viewType === "classTest"
-//   //         ? `${API_URL}/students/${studentIdToSave}/class-test-report`
-//   //         : `${API_URL}/students/${studentIdToSave}/report-card`;
+//       const endpoint =
+//         viewType === "classTest"
+//           ? `${API_URL}/students/${studentIdToSave}/class-test-report`
+//           : viewType === "ntseTest"
+//           ? `${API_URL}/students/${studentIdToSave}/ntse-report`
+//           : `${API_URL}/students/${studentIdToSave}/report-card`;
 
-//   //     await axios.post(endpoint, formData, {
-//   //       headers: { "Content-Type": "multipart/form-data" },
-//   //     });
+//       await axios.post(endpoint, formData, {
+//         headers: { "Content-Type": "multipart/form-data" },
+//       });
 
-//   //     alert(
-//   //       `${
-//   //         viewType === "classTest" ? "Class test report" : "Report card"
-//   //       } uploaded successfully!`
-//   //     );
-//   //     window.location.reload();
-//   //   } catch (err) {
-//   //     console.error("Upload error:", err);
-//   //     alert("Upload failed!");
-//   //   }
-//   //   setUploading(false);
-//   // };
-
-//   // 🔧 Helper to capture consistent desktop layout even on mobile
-// const generateReportCardImage = async () => {
-//   // Temporarily force desktop layout
-//   const originalMeta = document.querySelector("meta[name=viewport]");
-//   const newMeta = document.createElement("meta");
-//   newMeta.name = "viewport";
-//   newMeta.content = "width=1100"; // force desktop width
-//   document.head.appendChild(newMeta);
-//   if (originalMeta) originalMeta.remove();
-
-//   // Wait for layout re-render
-//   await new Promise((r) => setTimeout(r, 300));
-
-//   const node = document.getElementById("reportCard");
-//   if (!node) throw new Error("Report card element not found");
-
-//   // Capture full-quality image
-//   const dataUrl = await domtoimage.toPng(node, {
-//     quality: 1,
-//     bgcolor: "white",
-//     width: node.scrollWidth * 2,
-//     height: node.scrollHeight * 2,
-//     style: {
-//       transform: "scale(2)",
-//       transformOrigin: "top left",
-//       width: `${node.scrollWidth}px`,
-//       height: `${node.scrollHeight}px`,
-//     },
-//   });
-
-//   // Restore viewport
-//   document.head.removeChild(newMeta);
-//   if (originalMeta) document.head.appendChild(originalMeta);
-
-//   return dataUrl;
-// };
-
-// // 🖼️ Download as PNG (consistent layout)
-// const handleCapture = async () => {
-//   try {
-//     const dataUrl = await generateReportCardImage();
-//     const link = document.createElement("a");
-//     link.href = dataUrl;
-//     link.download = `${student?.fullName || "report-card"}.png`;
-//     link.click();
-//   } catch (err) {
-//     console.error("Capture failed:", err);
-//   }
-// };
-
-// // ☁️ Upload to Cloudinary or API (consistent layout)
-// const saveReportCardToCloud = async (studentIdToSave) => {
-//   setUploading(true);
-//   try {
-//     const dataUrl = await generateReportCardImage();
-//     const blob = await (await fetch(dataUrl)).blob();
-
-//     const now = new Date();
-//     const timestamp = now
-//       .toLocaleString("en-IN", {
-//         year: "numeric",
-//         month: "short",
-//         day: "2-digit",
-//         hour: "2-digit",
-//         minute: "2-digit",
-//         hour12: false,
-//         timeZone: "Asia/Kolkata",
-//       })
-//       .replace(/, /g, "_")
-//       .replace(/ /g, "_")
-//       .replace(/:/g, "");
-
-//     const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
-//     const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
-//     const year = (
-//       allReports.find((r) => r.semester === "First Semester")?.academicYear ||
-//       "year"
-//     ).replace(/\s+/g, "_");
-
-//     const typeSuffix =
-//       viewType === "classTest" ? "class_test" : "report_card";
-//     const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
-
-//     console.log("Uploading file:", fileName);
-//     const formData = new FormData();
-//     formData.append("file", blob, fileName);
-
-//     const endpoint =
-//       viewType === "classTest"
-//         ? `${API_URL}/students/${studentIdToSave}/class-test-report`
-//         : `${API_URL}/students/${studentIdToSave}/report-card`;
-
-//     await axios.post(endpoint, formData, {
-//       headers: { "Content-Type": "multipart/form-data" },
-//     });
-
-//     alert(
-//       `${
-//         viewType === "classTest" ? "Class test report" : "Report card"
-//       } uploaded successfully!`
-//     );
-//     window.location.reload();
-//   } catch (err) {
-//     console.error("Upload error:", err);
-//     alert("Upload failed!");
-//   } finally {
-//     setUploading(false);
-//   }
-// };
+//       alert(
+//         `${
+//           viewType === "classTest"
+//             ? "Class test report"
+//             : viewType === "ntseTest"
+//             ? "NTSE test report"
+//             : "Report card"
+//         } uploaded successfully!`
+//       );
+//       window.location.reload();
+//     } catch (err) {
+//       console.error("Upload error:", err);
+//       alert("Upload failed!");
+//     } finally {
+//       setUploading(false);
+//     }
+//   };
 
 //   if (loading)
 //     return <p className="loading">Generating Authentic Report Card...</p>;
@@ -738,10 +663,14 @@
 //     (grade) => grade.semester === "Second Semester"
 //   );
 
-//   // Delete uploaded report (works for both types)
+//   // Delete uploaded report (works for all types)
 //   const handleDeleteUploadedReport = async (studentIdToDelete) => {
 //     const label =
-//       viewType === "classTest" ? "class test report" : "report card";
+//       viewType === "classTest"
+//         ? "class test report"
+//         : viewType === "ntseTest"
+//         ? "NTSE test report"
+//         : "report card";
 //     if (!window.confirm(`Are you sure you want to delete this ${label}?`))
 //       return;
 
@@ -753,6 +682,8 @@
 //       const endpoint =
 //         viewType === "classTest"
 //           ? `${API_URL}/students/${studentIdToDelete}/class-test-report`
+//           : viewType === "ntseTest"
+//           ? `${API_URL}/students/${studentIdToDelete}/ntse-report`
 //           : `${API_URL}/students/${studentIdToDelete}/report-card`;
 
 //       await axios.delete(endpoint, {
@@ -774,6 +705,8 @@
 //   const dialogImageSrc =
 //     viewType === "classTest"
 //       ? student?.reportClassTestUrl
+//       : viewType === "ntseTest"
+//       ? student?.reportNTSEUrl
 //       : student?.reportCardUrl;
 
 //   return (
@@ -804,7 +737,7 @@
 //             marginRight: "auto",
 //           }}
 //         >
-//           {/* VIEW TOGGLE */}
+//           {/* VIEW TOGGLE - Now includes NTSE */}
 //           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
 //             <button
 //               className={`btn ${
@@ -812,7 +745,7 @@
 //               }`}
 //               onClick={() => setViewType("reportCard")}
 //               type="button"
-//               title="Show full report card (excludes class test assessments)"
+//               title="Show full report card (excludes class test & NTSE assessments)"
 //             >
 //               Full Report Card
 //             </button>
@@ -825,6 +758,16 @@
 //               title="Show class test report (only class test assessments)"
 //             >
 //               Class Test Report
+//             </button>
+//             <button
+//               className={`btn ${
+//                 viewType === "ntseTest" ? "btn-primary" : "btn-outline"
+//               }`}
+//               onClick={() => setViewType("ntseTest")}
+//               type="button"
+//               title="Show NTSE test report (only NTSE assessments)"
+//             >
+//               🧠 NTSE Report
 //             </button>
 //           </div>
 
@@ -860,8 +803,6 @@
 
 //           {(userRole === "teacher" || userRole === "admin") && (
 //             <>
-//               {/* When viewing reportCard -> use reportCard fields.
-//                   When viewing classTest -> use reportClasstest fields. */}
 //               {viewType === "reportCard" ? (
 //                 <>
 //                   {student?.reportCardUrl ? (
@@ -928,24 +869,25 @@
 //                       )}
 //                     </button>
 //                   )}
-
-//                   <button
-//                     className="btn btn-red"
-//                     disabled={uploading}
-//                     onClick={() => handleDeleteUploadedReport(student._id)}
-//                     style={{
-//                       flex: "1 1 auto",
-//                       minWidth: 70,
-//                       fontSize: "0.85rem",
-//                       padding: "6px 8px",
-//                     }}
-//                     title="Delete Uploaded Report Card"
-//                     type="button"
-//                   >
-//                     Delete
-//                   </button>
+//                   {student?.reportCardUrl && (
+//                     <button
+//                       className="btn btn-red"
+//                       disabled={uploading}
+//                       onClick={() => handleDeleteUploadedReport(student._id)}
+//                       style={{
+//                         flex: "1 1 auto",
+//                         minWidth: 70,
+//                         fontSize: "0.85rem",
+//                         padding: "6px 8px",
+//                       }}
+//                       title="Delete Uploaded Report Card"
+//                       type="button"
+//                     >
+//                       Delete
+//                     </button>
+//                   )}
 //                 </>
-//               ) : (
+//               ) : viewType === "classTest" ? (
 //                 <>
 //                   {student?.reportClassTestUrl ? (
 //                     <>
@@ -1011,93 +953,180 @@
 //                       )}
 //                     </button>
 //                   )}
+//                   {student?.reportClassTestUrl && (
+//                     <button
+//                       className="btn btn-red"
+//                       disabled={uploading}
+//                       onClick={() => handleDeleteUploadedReport(student._id)}
+//                       style={{
+//                         flex: "1 1 auto",
+//                         minWidth: 70,
+//                         fontSize: "0.85rem",
+//                         padding: "6px 8px",
+//                       }}
+//                       title="Delete Uploaded Class Test Report"
+//                       type="button"
+//                     >
+//                       Delete
+//                     </button>
+//                   )}
+//                 </>
+//               ) : (
+//                 // NTSE Test buttons
+//                 <>
+//                   {student?.reportNTSEUrl ? (
+//                     <>
+//                       <button
+//                         className="btn btn-green"
+//                         disabled={uploading}
+//                         onClick={() => setDialogOpen(true)}
+//                         style={{
+//                           flex: "1 1 auto",
+//                           minWidth: 80,
+//                           fontSize: "0.85rem",
+//                           padding: "6px 8px",
+//                         }}
+//                         title="View Uploaded NTSE Report"
+//                         type="button"
+//                       >
+//                         <span
+//                           style={{
+//                             fontSize: "1.05em",
+//                             color: "#28a745",
+//                             marginRight: 4,
+//                           }}
+//                         >
+//                           &#10003;
+//                         </span>
+//                         Uploaded
+//                       </button>
 
-//                   <button
-//                     className="btn btn-red"
-//                     disabled={uploading}
-//                     onClick={() => handleDeleteUploadedReport(student._id)}
-//                     style={{
-//                       flex: "1 1 auto",
-//                       minWidth: 70,
-//                       fontSize: "0.85rem",
-//                       padding: "6px 8px",
-//                     }}
-//                     title="Delete Uploaded Class Test Report"
-//                     type="button"
-//                   >
-//                     Delete
-//                   </button>
+//                       <button
+//                         className="btn btn-primary"
+//                         disabled={uploading}
+//                         onClick={() => saveReportCardToCloud(id)}
+//                         style={{
+//                           flex: "1 1 auto",
+//                           minWidth: 90,
+//                           fontSize: "0.85rem",
+//                           padding: "6px 8px",
+//                         }}
+//                         title="Re-upload NTSE Report"
+//                         type="button"
+//                       >
+//                         {uploading ? <span className="spin" /> : "Re-upload"}
+//                       </button>
+//                     </>
+//                   ) : (
+//                     <button
+//                       className="btn btn-primary"
+//                       disabled={uploading}
+//                       onClick={() => saveReportCardToCloud(id)}
+//                       style={{
+//                         flex: "1 1 auto",
+//                         minWidth: 120,
+//                         fontSize: "0.85rem",
+//                         padding: "6px 8px",
+//                       }}
+//                       title="Upload NTSE Report"
+//                       type="button"
+//                     >
+//                       {uploading ? <span className="spin" /> : "⬆ Upload NTSE"}
+//                     </button>
+//                   )}
+//                   {student?.reportNTSEUrl && (
+//                     <button
+//                       className="btn btn-red"
+//                       disabled={uploading}
+//                       onClick={() => handleDeleteUploadedReport(student._id)}
+//                       style={{
+//                         flex: "1 1 auto",
+//                         minWidth: 70,
+//                         fontSize: "0.85rem",
+//                         padding: "6px 8px",
+//                       }}
+//                       title="Delete Uploaded NTSE Report"
+//                       type="button"
+//                     >
+//                       Delete
+//                     </button>
+//                   )}
 //                 </>
 //               )}
 //             </>
 //           )}
 //         </div>
+//       </div>
 
-//         {dialogOpen && (
+//       {/* Dialog for viewing uploaded images */}
+//       {dialogOpen && (
+//         <div
+//           style={{
+//             position: "fixed",
+//             inset: 0,
+//             zIndex: 9999,
+//             background: "rgba(0,0,0,0.6)",
+//             display: "flex",
+//             justifyContent: "center",
+//             alignItems: "flex-start",
+//             padding: "20px",
+//             overflowY: "auto",
+//           }}
+//           onClick={() => setDialogOpen(false)}
+//         >
 //           <div
 //             style={{
-//               position: "fixed",
-//               inset: 0,
-//               zIndex: 9999,
-//               background: "rgba(0,0,0,0.6)",
-//               display: "flex",
-//               justifyContent: "center",
-//               alignItems: "flex-start",
-//               padding: "20px",
-//               overflowY: "auto",
+//               background: "#fff",
+//               borderRadius: 8,
+//               boxShadow: "0 3px 16px #444",
+//               maxWidth: 920,
+//               width: "100%",
+//               padding: 20,
+//               position: "relative",
 //             }}
-//             onClick={() => setDialogOpen(false)}
+//             onClick={(e) => e.stopPropagation()}
 //           >
-//             <div
-//               style={{
-//                 background: "#fff",
-//                 borderRadius: 8,
-//                 boxShadow: "0 3px 16px #444",
-//                 maxWidth: 920,
-//                 width: "100%",
-//                 padding: 20,
-//                 position: "relative",
-//               }}
-//               onClick={(e) => e.stopPropagation()}
+//             <h3 style={{ marginTop: 0 }}>
+//               {viewType === "classTest"
+//                 ? "Uploaded Class Test Report"
+//                 : viewType === "ntseTest"
+//                 ? "Uploaded NTSE Test Report"
+//                 : "Uploaded Report Card"}
+//             </h3>
+//             {dialogImageSrc ? (
+//               <img
+//                 src={dialogImageSrc}
+//                 alt={
+//                   viewType === "classTest"
+//                     ? "Uploaded Class Test Report"
+//                     : viewType === "ntseTest"
+//                     ? "Uploaded NTSE Test Report"
+//                     : "Uploaded Report Card"
+//                 }
+//                 style={{
+//                   maxHeight: 600,
+//                   maxWidth: "100%",
+//                   borderRadius: 6,
+//                   display: "block",
+//                   margin: "10px auto",
+//                 }}
+//               />
+//             ) : (
+//               <p style={{ textAlign: "center" }}>
+//                 No uploaded image available.
+//               </p>
+//             )}
+//             <button
+//               className="btn btn-primary"
+//               style={{ marginTop: 10, width: "100%" }}
+//               onClick={() => setDialogOpen(false)}
+//               type="button"
 //             >
-//               <h3 style={{ marginTop: 0 }}>
-//                 {viewType === "classTest"
-//                   ? "Uploaded Class Test Report"
-//                   : "Uploaded Report Card"}
-//               </h3>
-//               {dialogImageSrc ? (
-//                 <img
-//                   src={dialogImageSrc}
-//                   alt={
-//                     viewType === "classTest"
-//                       ? "Uploaded Class Test Report"
-//                       : "Uploaded Report Card"
-//                   }
-//                   style={{
-//                     maxHeight: 600,
-//                     maxWidth: "100%",
-//                     borderRadius: 6,
-//                     display: "block",
-//                     margin: "10px auto",
-//                   }}
-//                 />
-//               ) : (
-//                 <p style={{ textAlign: "center" }}>
-//                   No uploaded image available.
-//                 </p>
-//               )}
-//               <button
-//                 className="btn btn-primary"
-//                 style={{ marginTop: 10, width: "100%" }}
-//                 onClick={() => setDialogOpen(false)}
-//                 type="button"
-//               >
-//                 Close
-//               </button>
-//             </div>
+//               Close
+//             </button>
 //           </div>
-//         )}
-//       </div>
+//         </div>
+//       )}
 
 //       {/* Report card content with fade-in animation */}
 //       <div
@@ -1116,14 +1145,14 @@
 //               <div className="doc-title">
 //                 {viewType === "classTest"
 //                   ? "Class Test Report"
+//                   : viewType === "ntseTest"
+//                   ? "NTSE Test Report"
 //                   : "Progress Report Card"}
 //               </div>
 //               <div className="session">
-//                 {/* Academic Year: {firstSemesterReport?.academicYear || "-"} */}
 //                 Academic Year:{" "}
-// {firstSemesterReport?.academicYear ||
-//   `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}
-
+//                 {firstSemesterReport?.academicYear ||
+//                   `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}
 //               </div>
 //             </div>
 //             <div className="rc-right">
@@ -1205,23 +1234,10 @@
 //               <h4>
 //                 {viewType === "classTest"
 //                   ? "Class Test Results"
+//                   : viewType === "ntseTest"
+//                   ? "NTSE Test Results"
 //                   : "Academic Results"}
 //               </h4>
-//               {/* {viewType === "reportCard" && (
-//                 <div className="rank-badges">
-//                   <div className="badge">
-//                     Rank (1st Sem): <strong>{rank1stSem}</strong>
-//                   </div>
-//                   {hasTerm2Data && (
-//                     <div className="badge">
-//                       Rank (2nd Sem): <strong>{rank2ndSem}</strong>
-//                     </div>
-//                   )}
-//                   <div className="badge overall">
-//                     Overall: <strong>{overallRank}</strong>
-//                   </div>
-//                 </div>
-//               )} */}
 //             </div>
 
 //             <div className="table-scroll">
@@ -1403,38 +1419,7 @@
 //                       {hasTerm2Data && <td>&nbsp;</td>}
 //                     </tr>
 //                   ))}
-//                   {/*
-//                   <tr className="totals-row">
-//                     <td colSpan="2" className="left">
-//                       <strong>Total</strong>
-//                     </td>
 
-//                     {assessmentTypesByTerm.term1.map(() => (
-//                       <td className="score-cell"></td>
-//                     ))}
-//                     <td className="score-cell">
-//                       <b>
-//                         {grandTotals.term1.obtained.toFixed(2)} /{" "}
-//                         {grandTotals.term1.max.toFixed(2)}
-//                       </b>
-//                     </td>
-//                     <td className="score-cell"></td>
-
-//                     {hasTerm2Data && (
-//                       <>
-//                         {assessmentTypesByTerm.term2.map(() => (
-//                           <td className="score-cell"></td>
-//                         ))}
-//                         <td className="score-cell">
-//                           <b>
-//                             {grandTotals.term2.obtained.toFixed(2)} /{" "}
-//                             {grandTotals.term2.max.toFixed(2)}
-//                           </b>
-//                         </td>
-//                         <td className="score-cell"></td>
-//                       </>
-//                     )}
-//                   </tr> */}
 //                   <tr className="totals-row">
 //                     <td colSpan="2" className="left">
 //                       <strong>Total</strong>
@@ -1453,7 +1438,7 @@
 //                       </b>
 //                     </td>
 
-//                     {/* 🟢 Term 1 Percentage */}
+//                     {/* Term 1 Percentage */}
 //                     <td className="score-cell">
 //                       <b>
 //                         {grandTotals.term1.max > 0
@@ -1482,7 +1467,7 @@
 //                           </b>
 //                         </td>
 
-//                         {/* 🟢 Term 2 Percentage */}
+//                         {/* Term 2 Percentage */}
 //                         <td className="score-cell">
 //                           <b>
 //                             {grandTotals.term2.max > 0
@@ -1498,63 +1483,6 @@
 //                       </>
 //                     )}
 //                   </tr>
-
-//                   {/* {viewType === "reportCard" && (
-//                     <tr>
-//                       <td colSpan="2" className="left">
-//                         <strong>Rank</strong>
-//                       </td>
-//                       <td
-//                         colSpan={assessmentTypesByTerm.term1.length + 1}
-//                         className="score-cell"
-//                         style={{ textAlign: "center" }}
-//                       >
-//                         <strong>{rank1stSem}</strong>
-//                       </td>
-//                       <td className="score-cell">-</td>
-
-//                       {hasTerm2Data && (
-//                         <>
-//                           <td
-//                             colSpan={assessmentTypesByTerm.term2.length}
-//                             className="score-cell"
-//                             style={{ textAlign: "center" }}
-//                           >
-//                             <strong>{rank2ndSem}</strong>
-//                           </td>
-//                           <td className="score-cell">-</td>
-//                         </>
-//                       )}
-//                     </tr>
-//                   )}
-//                   {viewType === "reportCard" && (
-//                     <tr>
-//                       <td colSpan="2" className="left">
-//                         <strong>Conduct</strong>
-//                       </td>
-//                       <td
-//                         colSpan={assessmentTypesByTerm.term1.length + 1}
-//                         className="score-cell"
-//                         style={{ textAlign: "center" }}
-//                       >
-//                         {firstSemesterReport?.conduct ?? "-"}
-//                       </td>
-//                       <td className="score-cell">-</td>
-
-//                       {hasTerm2Data && (
-//                         <>
-//                           <td
-//                             colSpan={assessmentTypesByTerm.term2.length}
-//                             className="score-cell"
-//                             style={{ textAlign: "center" }}
-//                           >
-//                             {secondSemesterReport?.conduct ?? "-"}
-//                           </td>
-//                           <td className="score-cell">-</td>
-//                         </>
-//                       )}
-//                     </tr>
-//                   )} */}
 //                 </tbody>
 //               </table>
 //             </div>
@@ -1619,19 +1547,15 @@
 //           {/* Signatures */}
 //           <section className="signatures">
 //             <div className="sig-col">
-//               {/* <div className="sig-box">
-//                 <p className="sig-label">{teacher}</p>
-//                 <div className="sig-label">Class Teacher</div>
-//               </div> */}
 //               <div className="sig-box">
-//   <p className="sig-label">
-//     {teacher
-//       ? teacher.charAt(0).toUpperCase() + teacher.slice(1).toLowerCase()
-//       : ""}
-//   </p>
-//   <div className="sig-label">Class Teacher</div>
-// </div>
-
+//                 <p className="sig-label">
+//                   {teacher
+//                     ? teacher.charAt(0).toUpperCase() +
+//                       teacher.slice(1).toLowerCase()
+//                     : ""}
+//                 </p>
+//                 <div className="sig-label">Class Teacher</div>
+//               </div>
 //             </div>
 
 //             <div className="sig-col">
@@ -1675,16 +1599,13 @@
 //   "Cooperation",
 //   "Initiative",
 //   "Completes Work",
-//   // "Co-Curricular Activities ",
-//   // "Art Education (Visual & Performing Arts) ",
-//   // "Class decorum (Discipline)"
 // ];
 
 // export default ReportCardPage;
 
-// ReportCardPage.jsx - Complete code with NTSE Class Test added
+// ReportCardPage.jsx - with Class Test, NTSE and Periodic Test report views
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import studentService from "../services/studentService";
 import gradeService from "../services/gradeService";
 import behavioralReportService from "../services/behavioralReportService";
@@ -1695,6 +1616,16 @@ import axios from "axios";
 
 const LOGO_URL =
   "https://res.cloudinary.com/dityqhoqp/image/upload/v1757673591/UNMARK_LOGO_copy_1_nonp8j.png";
+
+const EVALUATION_AREAS = [
+  "Punctuality",
+  "Attendance",
+  "Responsibility",
+  "Respect",
+  "Cooperation",
+  "Initiative",
+  "Completes Work",
+];
 
 const ReportCardPage = ({ studentId }) => {
   const { id: routeId } = useParams();
@@ -1716,16 +1647,13 @@ const ReportCardPage = ({ studentId }) => {
   const [uploading, setUploading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Theme toggle: false = light, true = dark
   const [darkTheme, setDarkTheme] = useState(false);
-
-  // Fade-in animation trigger
   const [visible, setVisible] = useState(false);
 
-  // View toggle options: reportCard, classTest, ntseTest
+  // View types: full report, class test, NTSE, Periodic Test
   const [viewType, setViewType] = useState("reportCard");
 
-  // Digital signatures (Base64 data URLs)
+  // Digital signatures (Base64 data URLs) – optional
   const [signatures, setSignatures] = useState({
     classTeacher: null,
     principal: null,
@@ -1744,7 +1672,6 @@ const ReportCardPage = ({ studentId }) => {
     return "E";
   };
 
-  // Render numeric score or Arts grade based on subject
   const renderScoreOrGrade = (score, subjectName) => {
     if (
       subjectName === "Arts" ||
@@ -1863,46 +1790,57 @@ const ReportCardPage = ({ studentId }) => {
     }
   }, []);
 
-  // Trigger fade-in after mount
   useEffect(() => {
     setVisible(true);
   }, []);
 
   // --- FILTER GRADES BASED ON viewType ---
-  // reportCard: exclude Class Test & NTSE assessments
-  // classTest: keep only Class Test assessments
-  // ntseTest: keep only NTSE assessments
+  // reportCard: exclude Class Test & NTSE (keeps PT + SA, etc.)
+  // classTest: only Class Test assessments
+  // ntseTest: only NTSE assessments
+  // ptTest: only Periodic Test-I..IV
   const filteredGrades = useMemo(() => {
     if (!allGrades || allGrades.length === 0) return [];
 
-    const mapGrades = allGrades.map((gradeRecord) => {
+    const isPTName = (name) =>
+      name === "Periodic Test-I" ||
+      name === "Periodic Test-II" ||
+      name === "Periodic Test-III" ||
+      name === "Periodic Test-IV";
+
+    const mapped = allGrades.map((gradeRecord) => {
       const cloned = { ...gradeRecord };
       if (Array.isArray(cloned.assessments)) {
         cloned.assessments = cloned.assessments.filter((a) => {
           const name = a.assessmentType?.name ?? "";
           const isClassTest = /class\s*test/i.test(name);
           const isNTSE = /ntse/i.test(name);
+          const isPT = isPTName(name);
 
           if (viewType === "classTest") return isClassTest;
           if (viewType === "ntseTest") return isNTSE;
-          // reportCard: exclude both
+          if (viewType === "ptTest") return isPT;
+
+          // full reportCard mode: hide class test & NTSE only
           return !isClassTest && !isNTSE;
         });
       }
       return cloned;
     });
 
-    // For classTest/ntseTest views, remove gradeRecords with no remaining assessments
-    if (viewType === "classTest" || viewType === "ntseTest") {
-      return mapGrades.filter(
+    if (
+      viewType === "classTest" ||
+      viewType === "ntseTest" ||
+      viewType === "ptTest"
+    ) {
+      return mapped.filter(
         (g) => Array.isArray(g.assessments) && g.assessments.length > 0
       );
     }
-    // For full report, keep all gradeRecords (with class tests/NTSE removed)
-    return mapGrades;
+    return mapped;
   }, [allGrades, viewType]);
 
-  // Group grades by subject with semester buckets (uses filteredGrades now)
+  // Group grades by subject with semester buckets
   const groupedGrades = useMemo(() => {
     if (!filteredGrades || filteredGrades.length === 0) return [];
     const subjectMap = new Map();
@@ -1924,6 +1862,7 @@ const ReportCardPage = ({ studentId }) => {
     return Array.from(subjectMap.values());
   }, [filteredGrades]);
 
+  // Grand totals for each term
   const grandTotals = useMemo(() => {
     let term1 = { obtained: 0, max: 0 };
     let term2 = { obtained: 0, max: 0 };
@@ -1946,7 +1885,7 @@ const ReportCardPage = ({ studentId }) => {
     return { term1, term2 };
   }, [groupedGrades]);
 
-  // Extract unique assessment types and totals per term (uses filteredGrades)
+  // Assessment types by term
   const assessmentTypesByTerm = useMemo(() => {
     const term1Types = new Map();
     const term2Types = new Map();
@@ -1970,6 +1909,10 @@ const ReportCardPage = ({ studentId }) => {
     });
 
     const sortOrder = [
+      "Periodic Test-I",
+      "Periodic Test-II",
+      "Periodic Test-III",
+      "Periodic Test-IV",
       "PT-I",
       "PT-I (20)",
       "PT-I (10)",
@@ -1982,7 +1925,7 @@ const ReportCardPage = ({ studentId }) => {
       "SA-II",
       "SA - II",
       "SA-II (80)",
-      "NTSE", // Added NTSE to sort order
+      "NTSE",
     ];
     const sortMap = (entries) =>
       Array.from(entries.entries()).sort(([a], [b]) => {
@@ -2004,7 +1947,6 @@ const ReportCardPage = ({ studentId }) => {
     };
   }, [filteredGrades]);
 
-  // Compute totals and averages for footer summary
   const totalsAndAverages = useMemo(() => {
     const totals = {
       term1: new Map(),
@@ -2092,34 +2034,30 @@ const ReportCardPage = ({ studentId }) => {
     };
   }, [groupedGrades, assessmentTypesByTerm]);
 
-  // --- Helpers ---
-
-  // Grade color coding class
+    // --- Helpers ---
   const gradeColorClass = (grade) => {
     switch (grade) {
       case "A1":
       case "A2":
-        return "grade-excellent"; // green
+        return "grade-excellent";
       case "B1":
       case "B2":
-        return "grade-good"; // blue
+        return "grade-good";
       case "C1":
       case "C2":
-        return "grade-average"; // yellow
+        return "grade-average";
       case "D":
-        return "grade-below"; // orange
+        return "grade-below";
       case "E":
-        return "grade-poor"; // red
+        return "grade-poor";
       default:
         return "grade-none";
     }
   };
 
-  // Convert score and max to grade letter
   const calculateGrade = (score, maxScore) => {
     if (maxScore === 0) return "-";
     const percent = (score / maxScore) * 100;
-
     if (percent >= 91) return "A1";
     if (percent >= 81) return "A2";
     if (percent >= 71) return "B1";
@@ -2130,13 +2068,11 @@ const ReportCardPage = ({ studentId }) => {
     return "E";
   };
 
-  // Sum total marks obtained this semester
   const calculateTotalMarks = (semesterData) => {
     if (!semesterData || !semesterData.assessments) return 0;
     return semesterData.assessments.reduce((acc, a) => acc + (a.score ?? 0), 0);
   };
 
-  // Sum max marks this semester
   const calculateMaxMarks = (semesterData) => {
     if (!semesterData || !semesterData.assessments) return 0;
     return semesterData.assessments.reduce(
@@ -2145,7 +2081,6 @@ const ReportCardPage = ({ studentId }) => {
     );
   };
 
-  // Get individual assessment score by name
   const getDynamicScore = (subjectSemData, assessmentName) => {
     if (!subjectSemData || !subjectSemData.assessments) return "-";
     const assess = subjectSemData.assessments.find(
@@ -2154,7 +2089,6 @@ const ReportCardPage = ({ studentId }) => {
     return assess ? assess.score ?? "-" : "-";
   };
 
-  // Calculate age from DOB
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return "N/A";
     const today = new Date();
@@ -2165,7 +2099,6 @@ const ReportCardPage = ({ studentId }) => {
     return age;
   };
 
-  // Handle signature picture upload
   const handleSignatureChange = (e, key) => {
     const file = e.target.files[0];
     if (file) {
@@ -2177,26 +2110,22 @@ const ReportCardPage = ({ studentId }) => {
     }
   };
 
-  // Theme toggle handler
   const toggleTheme = () => setDarkTheme((prev) => !prev);
 
-  // Helper to capture consistent desktop layout even on mobile
+  // Capture report as image
   const generateReportCardImage = async () => {
-    // Temporarily force desktop layout
     const originalMeta = document.querySelector("meta[name=viewport]");
     const newMeta = document.createElement("meta");
     newMeta.name = "viewport";
-    newMeta.content = "width=1100"; // force desktop width
+    newMeta.content = "width=1100";
     document.head.appendChild(newMeta);
     if (originalMeta) originalMeta.remove();
 
-    // Wait for layout re-render
     await new Promise((r) => setTimeout(r, 300));
 
     const node = document.getElementById("reportCard");
     if (!node) throw new Error("Report card element not found");
 
-    // Capture full-quality image
     const dataUrl = await domtoimage.toPng(node, {
       quality: 1,
       bgcolor: "white",
@@ -2210,14 +2139,12 @@ const ReportCardPage = ({ studentId }) => {
       },
     });
 
-    // Restore viewport
     document.head.removeChild(newMeta);
     if (originalMeta) document.head.appendChild(originalMeta);
 
     return dataUrl;
   };
 
-  // Print function
   const handlePrint = () => {
     const printableContent = document.getElementById("printableArea");
     if (!printableContent) return;
@@ -2228,9 +2155,7 @@ const ReportCardPage = ({ studentId }) => {
         styles += Array.from(sheet.cssRules)
           .map((rule) => rule.cssText)
           .join("\n");
-      } catch (e) {
-        // ignore cross-origin styles
-      }
+      } catch (e) {}
     }
     const printWindow = window.open("", "", "height=800,width=1000");
     if (!printWindow) {
@@ -2248,7 +2173,6 @@ const ReportCardPage = ({ studentId }) => {
     }, 600);
   };
 
-  // Download as PNG (consistent layout)
   const handleCapture = async () => {
     try {
       const dataUrl = await generateReportCardImage();
@@ -2261,7 +2185,6 @@ const ReportCardPage = ({ studentId }) => {
     }
   };
 
-  // Save to Cloud (works for report card, class test, and NTSE reports)
   const saveReportCardToCloud = async (studentIdToSave) => {
     setUploading(true);
     try {
@@ -2283,7 +2206,10 @@ const ReportCardPage = ({ studentId }) => {
         .replace(/ /g, "_")
         .replace(/:/g, "");
 
-      const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
+      const studentName = (student?.fullName || "student").replace(
+        /\s+/g,
+        "_"
+      );
       const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
       const year = (
         allReports.find((r) => r.semester === "First Semester")?.academicYear ||
@@ -2295,10 +2221,12 @@ const ReportCardPage = ({ studentId }) => {
           ? "class_test"
           : viewType === "ntseTest"
           ? "ntse_test"
+          : viewType === "ptTest"
+          ? "pt_test"
           : "report_card";
+
       const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
 
-      console.log("Uploading file:", fileName);
       const formData = new FormData();
       formData.append("file", blob, fileName);
 
@@ -2307,6 +2235,8 @@ const ReportCardPage = ({ studentId }) => {
           ? `${API_URL}/students/${studentIdToSave}/class-test-report`
           : viewType === "ntseTest"
           ? `${API_URL}/students/${studentIdToSave}/ntse-report`
+          : viewType === "ptTest"
+          ? `${API_URL}/students/${studentIdToSave}/pt-report`
           : `${API_URL}/students/${studentIdToSave}/report-card`;
 
       await axios.post(endpoint, formData, {
@@ -2319,6 +2249,8 @@ const ReportCardPage = ({ studentId }) => {
             ? "Class test report"
             : viewType === "ntseTest"
             ? "NTSE test report"
+            : viewType === "ptTest"
+            ? "Periodic test report"
             : "Report card"
         } uploaded successfully!`
       );
@@ -2342,18 +2274,18 @@ const ReportCardPage = ({ studentId }) => {
     (r) => r.semester === "Second Semester"
   );
 
-  // Check if Term II data exists to conditionally render (based on filteredGrades)
   const hasTerm2Data = filteredGrades.some(
     (grade) => grade.semester === "Second Semester"
   );
 
-  // Delete uploaded report (works for all types)
   const handleDeleteUploadedReport = async (studentIdToDelete) => {
     const label =
       viewType === "classTest"
         ? "class test report"
         : viewType === "ntseTest"
         ? "NTSE test report"
+        : viewType === "ptTest"
+        ? "Periodic test report"
         : "report card";
     if (!window.confirm(`Are you sure you want to delete this ${label}?`))
       return;
@@ -2368,6 +2300,8 @@ const ReportCardPage = ({ studentId }) => {
           ? `${API_URL}/students/${studentIdToDelete}/class-test-report`
           : viewType === "ntseTest"
           ? `${API_URL}/students/${studentIdToDelete}/ntse-report`
+          : viewType === "ptTest"
+          ? `${API_URL}/students/${studentIdToDelete}/pt-report`
           : `${API_URL}/students/${studentIdToDelete}/report-card`;
 
       await axios.delete(endpoint, {
@@ -2385,12 +2319,13 @@ const ReportCardPage = ({ studentId }) => {
     setUploading(false);
   };
 
-  // Dialog image source depending on viewType
   const dialogImageSrc =
     viewType === "classTest"
       ? student?.reportClassTestUrl
       : viewType === "ntseTest"
       ? student?.reportNTSEUrl
+      : viewType === "ptTest"
+      ? student?.reportPTUrl
       : student?.reportCardUrl;
 
   return (
@@ -2404,9 +2339,7 @@ const ReportCardPage = ({ studentId }) => {
         className="controls no-print"
         style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}
       >
-        <div className="left-controls" style={{ display: "none" }}>
-          {/* Hidden Back Link for now */}
-        </div>
+        <div className="left-controls" style={{ display: "none" }} />
         <div
           className="right-controls"
           style={{
@@ -2421,7 +2354,6 @@ const ReportCardPage = ({ studentId }) => {
             marginRight: "auto",
           }}
         >
-          {/* VIEW TOGGLE - Now includes NTSE */}
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <button
               className={`btn ${
@@ -2429,7 +2361,6 @@ const ReportCardPage = ({ studentId }) => {
               }`}
               onClick={() => setViewType("reportCard")}
               type="button"
-              title="Show full report card (excludes class test & NTSE assessments)"
             >
               Full Report Card
             </button>
@@ -2439,7 +2370,6 @@ const ReportCardPage = ({ studentId }) => {
               }`}
               onClick={() => setViewType("classTest")}
               type="button"
-              title="Show class test report (only class test assessments)"
             >
               Class Test Report
             </button>
@@ -2449,11 +2379,33 @@ const ReportCardPage = ({ studentId }) => {
               }`}
               onClick={() => setViewType("ntseTest")}
               type="button"
-              title="Show NTSE test report (only NTSE assessments)"
             >
               🧠 NTSE Report
             </button>
+            <button
+              className={`btn ${
+                viewType === "ptTest" ? "btn-primary" : "btn-outline"
+              }`}
+              onClick={() => setViewType("ptTest")}
+              type="button"
+            >
+              Periodic Test Report
+            </button>
           </div>
+{/* 
+          <button
+            className="btn btn-outline"
+            onClick={toggleTheme}
+            style={{
+              flex: "1 1 auto",
+              minWidth: 60,
+              fontSize: "0.85rem",
+              padding: "6px 8px",
+            }}
+            type="button"
+          >
+            {darkTheme ? "Light" : "Dark"}
+          </button> */}
 
           <button
             className="btn btn-outline"
@@ -2464,7 +2416,6 @@ const ReportCardPage = ({ studentId }) => {
               fontSize: "0.85rem",
               padding: "6px 8px",
             }}
-            title="Print Report Card"
             type="button"
           >
             🖨 Print
@@ -2479,7 +2430,6 @@ const ReportCardPage = ({ studentId }) => {
               fontSize: "0.85rem",
               padding: "6px 8px",
             }}
-            title="Save as Image"
             type="button"
           >
             📸 Save
@@ -2501,7 +2451,6 @@ const ReportCardPage = ({ studentId }) => {
                           fontSize: "0.85rem",
                           padding: "6px 8px",
                         }}
-                        title="View Uploaded Report Card"
                         type="button"
                       >
                         <span
@@ -2515,7 +2464,6 @@ const ReportCardPage = ({ studentId }) => {
                         </span>
                         Uploaded
                       </button>
-
                       <button
                         className="btn btn-primary"
                         disabled={uploading}
@@ -2526,7 +2474,6 @@ const ReportCardPage = ({ studentId }) => {
                           fontSize: "0.85rem",
                           padding: "6px 8px",
                         }}
-                        title="Re-upload Report Card"
                         type="button"
                       >
                         {uploading ? <span className="spin" /> : "Re-upload"}
@@ -2543,7 +2490,6 @@ const ReportCardPage = ({ studentId }) => {
                         fontSize: "0.85rem",
                         padding: "6px 8px",
                       }}
-                      title="Upload Report Card"
                       type="button"
                     >
                       {uploading ? (
@@ -2564,7 +2510,6 @@ const ReportCardPage = ({ studentId }) => {
                         fontSize: "0.85rem",
                         padding: "6px 8px",
                       }}
-                      title="Delete Uploaded Report Card"
                       type="button"
                     >
                       Delete
@@ -2585,7 +2530,6 @@ const ReportCardPage = ({ studentId }) => {
                           fontSize: "0.85rem",
                           padding: "6px 8px",
                         }}
-                        title="View Uploaded Class Test Report"
                         type="button"
                       >
                         <span
@@ -2599,7 +2543,6 @@ const ReportCardPage = ({ studentId }) => {
                         </span>
                         Uploaded
                       </button>
-
                       <button
                         className="btn btn-primary"
                         disabled={uploading}
@@ -2610,7 +2553,6 @@ const ReportCardPage = ({ studentId }) => {
                           fontSize: "0.85rem",
                           padding: "6px 8px",
                         }}
-                        title="Re-upload Class Test Report"
                         type="button"
                       >
                         {uploading ? <span className="spin" /> : "Re-upload"}
@@ -2627,7 +2569,6 @@ const ReportCardPage = ({ studentId }) => {
                         fontSize: "0.85rem",
                         padding: "6px 8px",
                       }}
-                      title="Upload Class Test Report"
                       type="button"
                     >
                       {uploading ? (
@@ -2648,15 +2589,13 @@ const ReportCardPage = ({ studentId }) => {
                         fontSize: "0.85rem",
                         padding: "6px 8px",
                       }}
-                      title="Delete Uploaded Class Test Report"
                       type="button"
                     >
                       Delete
                     </button>
                   )}
                 </>
-              ) : (
-                // NTSE Test buttons
+              ) : viewType === "ntseTest" ? (
                 <>
                   {student?.reportNTSEUrl ? (
                     <>
@@ -2670,7 +2609,6 @@ const ReportCardPage = ({ studentId }) => {
                           fontSize: "0.85rem",
                           padding: "6px 8px",
                         }}
-                        title="View Uploaded NTSE Report"
                         type="button"
                       >
                         <span
@@ -2684,7 +2622,6 @@ const ReportCardPage = ({ studentId }) => {
                         </span>
                         Uploaded
                       </button>
-
                       <button
                         className="btn btn-primary"
                         disabled={uploading}
@@ -2695,7 +2632,6 @@ const ReportCardPage = ({ studentId }) => {
                           fontSize: "0.85rem",
                           padding: "6px 8px",
                         }}
-                        title="Re-upload NTSE Report"
                         type="button"
                       >
                         {uploading ? <span className="spin" /> : "Re-upload"}
@@ -2712,7 +2648,6 @@ const ReportCardPage = ({ studentId }) => {
                         fontSize: "0.85rem",
                         padding: "6px 8px",
                       }}
-                      title="Upload NTSE Report"
                       type="button"
                     >
                       {uploading ? <span className="spin" /> : "⬆ Upload NTSE"}
@@ -2729,7 +2664,86 @@ const ReportCardPage = ({ studentId }) => {
                         fontSize: "0.85rem",
                         padding: "6px 8px",
                       }}
-                      title="Delete Uploaded NTSE Report"
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </>
+              ) : (
+                // Periodic Test view
+                <>
+                  {student?.reportPTUrl ? (
+                    <>
+                      <button
+                        className="btn btn-green"
+                        disabled={uploading}
+                        onClick={() => setDialogOpen(true)}
+                        style={{
+                          flex: "1 1 auto",
+                          minWidth: 80,
+                          fontSize: "0.85rem",
+                          padding: "6px 8px",
+                        }}
+                        type="button"
+                      >
+                        <span
+                          style={{
+                            fontSize: "1.05em",
+                            color: "#28a745",
+                            marginRight: 4,
+                          }}
+                        >
+                          &#10003;
+                        </span>
+                        Uploaded
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        disabled={uploading}
+                        onClick={() => saveReportCardToCloud(id)}
+                        style={{
+                          flex: "1 1 auto",
+                          minWidth: 90,
+                          fontSize: "0.85rem",
+                          padding: "6px 8px",
+                        }}
+                        type="button"
+                      >
+                        {uploading ? <span className="spin" /> : "Re-upload"}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className="btn btn-primary"
+                      disabled={uploading}
+                      onClick={() => saveReportCardToCloud(id)}
+                      style={{
+                        flex: "1 1 auto",
+                        minWidth: 150,
+                        fontSize: "0.85rem",
+                        padding: "6px 8px",
+                      }}
+                      type="button"
+                    >
+                      {uploading ? (
+                        <span className="spin" />
+                      ) : (
+                        "⬆ Upload Periodic Test"
+                      )}
+                    </button>
+                  )}
+                  {student?.reportPTUrl && (
+                    <button
+                      className="btn btn-red"
+                      disabled={uploading}
+                      onClick={() => handleDeleteUploadedReport(student._id)}
+                      style={{
+                        flex: "1 1 auto",
+                        minWidth: 70,
+                        fontSize: "0.85rem",
+                        padding: "6px 8px",
+                      }}
                       type="button"
                     >
                       Delete
@@ -2741,7 +2755,6 @@ const ReportCardPage = ({ studentId }) => {
           )}
         </div>
       </div>
-
       {/* Dialog for viewing uploaded images */}
       {dialogOpen && (
         <div
@@ -2775,6 +2788,8 @@ const ReportCardPage = ({ studentId }) => {
                 ? "Uploaded Class Test Report"
                 : viewType === "ntseTest"
                 ? "Uploaded NTSE Test Report"
+                : viewType === "ptTest"
+                ? "Uploaded Periodic Test Report"
                 : "Uploaded Report Card"}
             </h3>
             {dialogImageSrc ? (
@@ -2785,6 +2800,8 @@ const ReportCardPage = ({ studentId }) => {
                     ? "Uploaded Class Test Report"
                     : viewType === "ntseTest"
                     ? "Uploaded NTSE Test Report"
+                    : viewType === "ptTest"
+                    ? "Uploaded Periodic Test Report"
                     : "Uploaded Report Card"
                 }
                 style={{
@@ -2812,7 +2829,7 @@ const ReportCardPage = ({ studentId }) => {
         </div>
       )}
 
-      {/* Report card content with fade-in animation */}
+      {/* Report card content */}
       <div
         id="reportCard"
         className={`paper-wrap fade-in ${visible ? "visible" : ""}`}
@@ -2831,12 +2848,16 @@ const ReportCardPage = ({ studentId }) => {
                   ? "Class Test Report"
                   : viewType === "ntseTest"
                   ? "NTSE Test Report"
+                  : viewType === "ptTest"
+                  ? "Periodic Test Report"
                   : "Progress Report Card"}
               </div>
               <div className="session">
                 Academic Year:{" "}
                 {firstSemesterReport?.academicYear ||
-                  `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}
+                  `${new Date().getFullYear()}-${
+                    new Date().getFullYear() + 1
+                  }`}
               </div>
             </div>
             <div className="rc-right">
@@ -2847,6 +2868,15 @@ const ReportCardPage = ({ studentId }) => {
                 <div>
                   <strong>ID:</strong> {student?.studentId || "-"}
                 </div>
+                {/* <div>
+                  <strong>Rank I:</strong> {rank1stSem}
+                </div>
+                <div>
+                  <strong>Rank II:</strong> {rank2ndSem}
+                </div>
+                <div>
+                  <strong>Overall:</strong> {overallRank}
+                </div> */}
               </div>
             </div>
           </header>
@@ -2900,6 +2930,12 @@ const ReportCardPage = ({ studentId }) => {
                     {student?.parentContact?.phone || "-"}
                   </span>
                 </div>
+                <div className="profile-item">
+                  <span className="label">Age</span>
+                  <span className="value">
+                    {calculateAge(student?.dateOfBirth)}
+                  </span>
+                </div>
                 {viewType === "reportCard" && (
                   <div className="profile-item">
                     <span className="label">Promotion Status</span>
@@ -2920,6 +2956,8 @@ const ReportCardPage = ({ studentId }) => {
                   ? "Class Test Results"
                   : viewType === "ntseTest"
                   ? "NTSE Test Results"
+                  : viewType === "ptTest"
+                  ? "Periodic Test Results"
                   : "Academic Results"}
               </h4>
             </div>
@@ -2930,14 +2968,12 @@ const ReportCardPage = ({ studentId }) => {
                   <tr>
                     <th className="col-num">#</th>
                     <th className="col-sub">SUBJECTS</th>
-
                     <th
                       colSpan={assessmentTypesByTerm.term1.length + 2}
                       className="term-head"
                     >
                       TERM I
                     </th>
-
                     {hasTerm2Data && (
                       <th
                         colSpan={assessmentTypesByTerm.term2.length + 2}
@@ -2947,11 +2983,9 @@ const ReportCardPage = ({ studentId }) => {
                       </th>
                     )}
                   </tr>
-
                   <tr>
-                    <th className="col-num subhead"></th>
-                    <th className="col-sub subhead"></th>
-
+                    <th className="col-num subhead" />
+                    <th className="col-sub subhead" />
                     {assessmentTypesByTerm.term1.map(([name], idx) => (
                       <th key={`t1-${idx}`} className="subhead">
                         {name}
@@ -2959,7 +2993,6 @@ const ReportCardPage = ({ studentId }) => {
                     ))}
                     <th className="subhead">Marks Obtained</th>
                     <th className="subhead">Grade</th>
-
                     {hasTerm2Data &&
                       assessmentTypesByTerm.term2.map(([name], idx) => (
                         <th key={`t2-${idx}`} className="subhead">
@@ -2971,42 +3004,36 @@ const ReportCardPage = ({ studentId }) => {
                     )}
                     {hasTerm2Data && <th className="subhead">Grade</th>}
                   </tr>
-
                   <tr>
                     <th className="col-num">Total</th>
-                    <th className="col-sub"></th>
-
+                    <th className="col-sub" />
                     {assessmentTypesByTerm.term1.map(([_, total], idx) => (
                       <th key={`tm1-${idx}`} className="sub-total">
                         {total ? `(${total})` : ""}
                       </th>
                     ))}
                     <th className="sub-total">Total</th>
-                    <th className="sub-total"></th>
-
+                    <th className="sub-total" />
                     {hasTerm2Data &&
                       assessmentTypesByTerm.term2.map(([_, total], idx) => (
                         <th key={`tm2-${idx}`} className="sub-total">
                           {total ? `(${total})` : ""}
                         </th>
                       ))}
-                    {hasTerm2Data && <th className="sub-total"></th>}
-                    {hasTerm2Data && <th className="sub-total"></th>}
+                    {hasTerm2Data && <th className="sub-total" />}
+                    {hasTerm2Data && <th className="sub-total" />}
                   </tr>
                 </thead>
-
                 <tbody>
                   {groupedGrades.map(({ subject, semesters }, idx) => (
                     <tr key={subject._id ?? subject.name ?? idx}>
                       <td className="col-num">{idx + 1}</td>
                       <td className="col-sub left">{subject?.name}</td>
-
                       {assessmentTypesByTerm.term1.map(([name], j) => (
                         <td key={`g-t1-${idx}-${j}`} className="score-cell">
                           {getDynamicScore(semesters["First Semester"], name)}
                         </td>
                       ))}
-
                       <td
                         className={`score-cell ${gradeColorClass(
                           calculateGrade(
@@ -3019,7 +3046,6 @@ const ReportCardPage = ({ studentId }) => {
                           semesters["First Semester"]
                         ).toFixed(2)}
                       </td>
-
                       <td
                         className={`score-cell ${gradeColorClass(
                           calculateGrade(
@@ -3037,14 +3063,16 @@ const ReportCardPage = ({ studentId }) => {
                       {hasTerm2Data && (
                         <>
                           {assessmentTypesByTerm.term2.map(([name], j) => (
-                            <td key={`g-t2-${idx}-${j}`} className="score-cell">
+                            <td
+                              key={`g-t2-${idx}-${j}`}
+                              className="score-cell"
+                            >
                               {getDynamicScore(
                                 semesters["Second Semester"],
                                 name
                               )}
                             </td>
                           ))}
-
                           <td
                             className={`score-cell ${gradeColorClass(
                               calculateGrade(
@@ -3059,7 +3087,6 @@ const ReportCardPage = ({ studentId }) => {
                               semesters["Second Semester"]
                             ).toFixed(2)}
                           </td>
-
                           <td
                             className={`score-cell ${gradeColorClass(
                               calculateGrade(
@@ -3071,7 +3098,9 @@ const ReportCardPage = ({ studentId }) => {
                             )}`}
                           >
                             {calculateGrade(
-                              calculateTotalMarks(semesters["Second Semester"]),
+                              calculateTotalMarks(
+                                semesters["Second Semester"]
+                              ),
                               calculateMaxMarks(semesters["Second Semester"])
                             )}
                           </td>
@@ -3088,13 +3117,11 @@ const ReportCardPage = ({ studentId }) => {
                         {groupedGrades.length + i + 1}
                       </td>
                       <td className="col-sub left">&nbsp;</td>
-
                       {assessmentTypesByTerm.term1.map((__, j) => (
                         <td key={`e1-${i}-${j}`}>&nbsp;</td>
                       ))}
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
-
                       {hasTerm2Data &&
                         assessmentTypesByTerm.term2.map((__, j) => (
                           <td key={`e2-${i}-${j}`}>&nbsp;</td>
@@ -3108,21 +3135,15 @@ const ReportCardPage = ({ studentId }) => {
                     <td colSpan="2" className="left">
                       <strong>Total</strong>
                     </td>
-
-                    {/* Term 1 Assessments */}
                     {assessmentTypesByTerm.term1.map(() => (
-                      <td className="score-cell"></td>
+                      <td className="score-cell" key={Math.random()} />
                     ))}
-
-                    {/* Term 1 Total */}
                     <td className="score-cell">
                       <b>
                         {grandTotals.term1.obtained.toFixed(2)} /{" "}
                         {grandTotals.term1.max.toFixed(2)}
                       </b>
                     </td>
-
-                    {/* Term 1 Percentage */}
                     <td className="score-cell">
                       <b>
                         {grandTotals.term1.max > 0
@@ -3135,23 +3156,17 @@ const ReportCardPage = ({ studentId }) => {
                         %
                       </b>
                     </td>
-
-                    {/* If Term 2 exists */}
                     {hasTerm2Data && (
                       <>
                         {assessmentTypesByTerm.term2.map(() => (
-                          <td className="score-cell"></td>
+                          <td className="score-cell" key={Math.random()} />
                         ))}
-
-                        {/* Term 2 Total */}
                         <td className="score-cell">
                           <b>
                             {grandTotals.term2.obtained.toFixed(2)} /{" "}
                             {grandTotals.term2.max.toFixed(2)}
                           </b>
                         </td>
-
-                        {/* Term 2 Percentage */}
                         <td className="score-cell">
                           <b>
                             {grandTotals.term2.max > 0
@@ -3172,7 +3187,7 @@ const ReportCardPage = ({ studentId }) => {
             </div>
           </section>
 
-          {viewType === "reportCard" && (
+          {(viewType === "reportCard") && (
             <section className="co-scholastic">
               <h4>Personality Traits & Skills</h4>
               <div className="traits-grid">
@@ -3241,14 +3256,12 @@ const ReportCardPage = ({ studentId }) => {
                 <div className="sig-label">Class Teacher</div>
               </div>
             </div>
-
             <div className="sig-col">
               <div className="sig-box">
                 <p className="sig-label">Nidhi Dhamija</p>
                 <div className="sig-label">Principal</div>
               </div>
             </div>
-
             <div className="sig-col">
               <div className="sig-box">
                 <p className="sig-label">
@@ -3259,11 +3272,10 @@ const ReportCardPage = ({ studentId }) => {
             </div>
           </section>
 
-          {/* Footer */}
           <footer className="rc-footer">
             <div className="footer-msg">
-              You leaped and crossed the hindrances & put a flag of victory with
-              great enthusiasm!
+              You leaped and crossed the hindrances & put a flag of victory
+              with great enthusiasm!
             </div>
             <div className="footer-sub">
               Wishing you a bright and successful future.
@@ -3274,15 +3286,5 @@ const ReportCardPage = ({ studentId }) => {
     </div>
   );
 };
-
-const EVALUATION_AREAS = [
-  "Punctuality",
-  "Attendance",
-  "Responsibility",
-  "Respect",
-  "Cooperation",
-  "Initiative",
-  "Completes Work",
-];
 
 export default ReportCardPage;

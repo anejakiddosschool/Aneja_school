@@ -1,4 +1,4 @@
-// // backend/routes/studentRoutes.js
+
 // const express = require("express");
 // const multer = require("multer");
 // const router = express.Router();
@@ -11,11 +11,15 @@
 //   bulkCreateStudents,
 //   uploadProfilePhoto,
 //   uploadClassTestReport,
-//   getClassTestReport,      // <- NEW: singular get handler
-//   deleteClassTestReport,   // <- NEW: delete handler
+//   getClassTestReport,
+//   deleteClassTestReport,
+//   uploadNtseReport,
+//   getNtseReport,
+//   deleteNtseReport,
 // } = require("../controllers/studentController");
 
 // const { uploadReportCard } = require("../controllers/studentController");
+// const { deleteReportCard } = require("../controllers/studentController");
 
 // const {
 //   protect,
@@ -25,7 +29,7 @@
 
 // // Import the main multer instance we just created
 // const upload = require("../middleware/upload");
-// const { deleteReportCard } = require("../controllers/studentController");
+
 // // Standard JSON routes
 // router
 //   .route("/")
@@ -58,6 +62,7 @@
 //   bulkCreateStudents
 // );
 
+// // Report Card routes
 // router.post("/:id/report-card", upload.single("file"), uploadReportCard);
 // router.delete(
 //   "/:id/report-card",
@@ -65,10 +70,9 @@
 //   authorize("admin", "teacher"),
 //   deleteReportCard
 // );
-// // Upload a class test report
-// router.post("/:id/class-test-report", upload.single("file"), uploadClassTestReport);
 
-// // Get all class test reports
+// // Class Test Report routes
+// router.post("/:id/class-test-report", upload.single("file"), uploadClassTestReport);
 // router.get("/:id/class-test-report", getClassTestReport);
 // router.delete(
 //   "/:id/class-test-report",
@@ -76,6 +80,17 @@
 //   authorize("admin", "teacher"),
 //   deleteClassTestReport
 // );
+
+// // NTSE Report routes
+// router.post("/:id/ntse-report", upload.single("file"), uploadNtseReport);
+// router.get("/:id/ntse-report", getNtseReport);
+// router.delete(
+//   "/:id/ntse-report",
+//   protect,
+//   authorize("admin", "teacher"),
+//   deleteNtseReport
+// );
+
 // module.exports = router;
 
 // backend/routes/studentRoutes.js
@@ -96,6 +111,10 @@ const {
   uploadNtseReport,
   getNtseReport,
   deleteNtseReport,
+  // NEW: Periodic Test handlers
+  uploadPtReport,
+  getPtReport,
+  deletePtReport,
 } = require("../controllers/studentController");
 
 const { uploadReportCard } = require("../controllers/studentController");
@@ -123,7 +142,6 @@ router
   .delete(protect, authorize("admin"), deleteStudent);
 
 // --- THE DEFINITIVE PHOTO UPLOAD ROUTE ---
-// We call upload.single() right here. This is the clearest and most direct way.
 router.post(
   "/photo/:id",
   protect,
@@ -152,7 +170,11 @@ router.delete(
 );
 
 // Class Test Report routes
-router.post("/:id/class-test-report", upload.single("file"), uploadClassTestReport);
+router.post(
+  "/:id/class-test-report",
+  upload.single("file"),
+  uploadClassTestReport
+);
 router.get("/:id/class-test-report", getClassTestReport);
 router.delete(
   "/:id/class-test-report",
@@ -169,6 +191,16 @@ router.delete(
   protect,
   authorize("admin", "teacher"),
   deleteNtseReport
+);
+
+// NEW: Periodic Test Report routes
+router.post("/:id/pt-report", upload.single("file"), uploadPtReport);
+router.get("/:id/pt-report", getPtReport);
+router.delete(
+  "/:id/pt-report",
+  protect,
+  authorize("admin", "teacher"),
+  deletePtReport
 );
 
 module.exports = router;

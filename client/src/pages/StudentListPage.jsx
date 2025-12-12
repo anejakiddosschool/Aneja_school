@@ -834,6 +834,7 @@ const StudentListPage = () => {
   const [classTestReportSendStatuses, setClassTestReportSendStatuses] =
     useState({});
   const [ntseReportSendStatuses, setNtseReportSendStatuses] = useState({});
+const [ptReportSendStatuses, setPtReportSendStatuses] = useState({});
 
   const [customMessage, setCustomMessage] = useState("");
   const [whatsappReady, setWhatsappReady] = useState(false);
@@ -900,6 +901,8 @@ const StudentListPage = () => {
         setPersonalMessageSendStatuses({ ...initialStatuses });
         setClassTestReportSendStatuses({ ...initialStatuses });
         setNtseReportSendStatuses({ ...initialStatuses });
+        setPtReportSendStatuses({ ...initialStatuses });
+
       } catch (err) {
         setError("Failed to load initial student data.");
       } finally {
@@ -1212,6 +1215,80 @@ const StudentListPage = () => {
     alert("Finished sending NTSE reports.");
   };
 
+  const sendPtReportsToParents = async () => {
+  const studentsToSend = filteredStudents.filter(
+    (s) =>
+      selectedStudentIds.includes(s._id) &&
+      s.reportPTUrl &&
+      s.reportPTUrl.trim() !== ""
+  );
+  if (studentsToSend.length === 0) {
+    alert("No students have uploaded Periodic Test reports or are selected.");
+    return;
+  }
+  const confirmed = window.confirm(
+    `Send Periodic Test report links to ${studentsToSend.length} selected parents?`
+  );
+  if (!confirmed) return;
+
+  const newStatuses = { ...ptReportSendStatuses };
+  for (const student of studentsToSend) {
+    try {
+      newStatuses[student._id] = "Sending...";
+      setPtReportSendStatuses({ ...newStatuses });
+
+      const ptReportMessage =
+        `Dear ${student.parentContact?.parentName || "Parent"},\n\n` +
+        `Greetings from Aneja Kiddos School.\n\n` +
+        `We are pleased to share the Periodic Test report of your child, ${student.fullName}:\n\n` +
+        `• Grade Level: ${student.gradeLevel || "N/A"}\n` +
+        `• Date of Birth: ${formatDate(student.dateOfBirth)}\n` +
+        `• Gender: ${student.gender || "N/A"}\n` +
+        `• Section: ${student.section || "N/A"}\n` +
+        `• Student ID: ${student.studentId || "N/A"}\n\n` +
+        `You can view the Periodic Test report securely via the link below:\n\n` +
+        `${window.location.origin}/students/${student._id}/pt-report\n\n` +
+        `Thank you for your continued support.\n\n` +
+        `Best regards,\nAneja Kiddos School`;
+
+      const payload = {
+        students: [
+          {
+            id: student._id,
+            fullName: student.fullName,
+            parentContact: student.parentContact,
+            parentPhone: student.parentContact?.phone,
+            gradeLevel: student.gradeLevel,
+            dateOfBirth: student.dateOfBirth,
+            gender: student.gender,
+            section: student.section,
+            studentId: student.studentId,
+            reportLink: student.reportPTUrl,
+            reportType: "ptTest",
+            message: ptReportMessage,
+          },
+        ],
+      };
+
+      const response = await fetch(`${API_URL}/whatsapp/send-report-links`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        newStatuses[student._id] = "Sent ✓";
+      } else {
+        newStatuses[student._id] = "Failed ✗";
+      }
+      setPtReportSendStatuses({ ...newStatuses });
+    } catch {
+      newStatuses[student._id] = "Failed ✗";
+      setPtReportSendStatuses({ ...newStatuses });
+    }
+  }
+  alert("Finished sending Periodic Test reports.");
+};
+
   const sendPersonalMessage = async (student) => {
     if (!personalMessageContent.trim()) return;
     const newStatuses = { ...personalMessageSendStatuses };
@@ -1405,7 +1482,17 @@ const StudentListPage = () => {
           >
             Send NTSE Reports
           </button>
+          <button
+  onClick={sendPtReportsToParents}
+  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow disabled:opacity-50"
+  disabled={selectedStudentIds.length === 0 || !whatsappReady}
+  type="button"
+>
+  Send Periodic Test Reports
+</button>
         </div>
+
+
 
         {selectedGrade && (
           <div className="mb-4 flex justify-end">

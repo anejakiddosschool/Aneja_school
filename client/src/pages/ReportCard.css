@@ -794,3 +794,32 @@ input[type="file"] {
 .btn-red:hover:not(:disabled) {
   background-color: #c82333;
 }
+
+
+.spin {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);   /* light outer ring */
+  border-top-color: #ffffff;                    /* bright top segment */
+  border-radius: 50%;
+  animation: spin-rotate 0.75s linear infinite;
+  vertical-align: middle;
+}
+
+/* slightly larger version for primary buttons (optional) */
+.btn-primary .spin {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+/* keyframes */
+@keyframes spin-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

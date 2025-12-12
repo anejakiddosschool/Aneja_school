@@ -120,6 +120,18 @@ router.post("/send-report-links", async (req, res) => {
       const waChatId = `${chatId}@c.us`;
 
       // Determine report type and create appropriate caption
+      // let reportTypeText = "";
+      // if (student.reportType === "reportCard") {
+      //   reportTypeText = "report card";
+      // } else if (student.reportType === "classTest") {
+      //   reportTypeText = "class test report";
+      // } else if (student.reportType === "ntse") {
+      //   reportTypeText = "NTSE report";
+      // } else {
+      //   reportTypeText = "report";
+      // }
+
+            // Determine report type and create appropriate caption
       let reportTypeText = "";
       if (student.reportType === "reportCard") {
         reportTypeText = "report card";
@@ -127,16 +139,19 @@ router.post("/send-report-links", async (req, res) => {
         reportTypeText = "class test report";
       } else if (student.reportType === "ntse") {
         reportTypeText = "NTSE report";
+      } else if (student.reportType === "ptTest") {
+        reportTypeText = "Periodic Test report";
       } else {
         reportTypeText = "report";
       }
+
 
       const caption =
         `Dear ${student.parentContact?.parentName || "Parent"},\n\n` +
         `Greetings from Aneja Kiddos School.\n\n` +
         `We are pleased to share the ${reportTypeText} of your child, ${student.fullName}, with the details below:\n\n` +
         `• Grade Level: ${student.gradeLevel || "N/A"}\n` +
-        `• Date of Birth: ${student.dateOfBirth || "N/A"}\n` +
+        // `• Date of Birth: ${student.dateOfBirth || "N/A"}\n` +
         `• Gender: ${student.gender || "N/A"}\n` +
         `• Section: ${student.section || "N/A"}\n` +
         `• Student ID: ${student.studentId || "N/A"}\n\n` +
