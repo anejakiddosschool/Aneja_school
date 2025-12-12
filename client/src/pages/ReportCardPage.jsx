@@ -2936,14 +2936,14 @@ const ReportCardPage = ({ studentId }) => {
                     {calculateAge(student?.dateOfBirth)}
                   </span>
                 </div>
-                {viewType === "reportCard" && (
+                {/* {viewType === "reportCard" && (
                   <div className="profile-item">
                     <span className="label">Promotion Status</span>
                     <span className="value">
                       {student?.promotionStatus || "-"}
                     </span>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </section>
