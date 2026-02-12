@@ -23,5 +23,43 @@ header {
   margin-bottom: 20px;
 }
 
+/* ---------------- */
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
 
+  .no-print {
+    display: none !important;
+  }
 
+  #printArea {
+    width: 100%;
+    max-width: 100%;
+    padding: 5mm;
+    margin: 0;
+  }
+
+  table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+
+  th,
+  td {
+    border: 1px solid black !important;
+    word-wrap: break-word;
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  h1 {
+    font-size: 20px !important;
+  }
+
+  h2 {
+    font-size: 14px !important;
+  }
+}

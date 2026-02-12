@@ -150,6 +150,14 @@ const Navbar = () => {
                     Yearly Roster
                   </NavLink>
                 )}
+
+                <NavLink
+                  to="/timetable"
+                  className={navLink}
+                  onClick={closeMobileMenu}
+                >
+                  Time Table
+                </NavLink>
                 <NavLink
                   to="/analytics"
                   className={navLink}

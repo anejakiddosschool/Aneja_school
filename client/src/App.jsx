@@ -12,7 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ParentRoute from './components/ParentRoute';
 import UniversalRoute from './components/UniversalRoute';
-
+import TimetablePage from "./pages/TimetablePage";
 // --- Page Imports (Cleaned and Organized) ---
 
 // 1. Public Pages
@@ -90,7 +90,7 @@ function App() {
            <Route path="/login" element={<LoginPage />} />
            <Route path="/parent-login" element={<ParentLoginPage />} />
             <Route path="/" element={<HomePage />} />
-
+<Route path="/timetable" element={<TimetablePage />} />
           {/* ===== 2. STAFF-ONLY ROUTES ====== */}
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
@@ -104,7 +104,7 @@ function App() {
             <Route path="/subject-roster" element={<SubjectRosterPage />} />
             <Route path="/manage-assessments" element={<AssessmentTypesPage />} />
             <Route path="/grade-sheet" element={<GradeSheetPage />} />
-            
+            <Route path="/timetable" element={<TimetablePage />} />
             {/* --- ADMIN-ONLY SUB-ROUTES --- */}
             <Route element={<AdminRoute />}>
                 <Route path="/subjects" element={<SubjectListPage />} />
