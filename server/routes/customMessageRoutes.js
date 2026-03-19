@@ -1,12 +1,12 @@
+// routes/customMessageRoutes.js
 const express = require("express");
 const router = express.Router();
-const { sendWhatsAppMessage, client } = require("../whatsappClient");
+const { sendWhatsAppMessage, getClientStatus } = require("../whatsappClient");
 
 router.post("/send-custom-message", async (req, res) => {
-  if (!client.info || !client.info.wid) {
-    return res
-      .status(503)
-      .json({ message: "WhatsApp client not ready. Please try again later." });
+  // 🌟 Naya Baileys logic. yahan bhi client.info nai ana chahye
+  if (getClientStatus() !== "connected") {
+    return res.status(503).json({ message: "WhatsApp client not ready. Please try again later." });
   }
 
   const students = req.body.students;

@@ -1,10 +1,11 @@
 // routes/personalMessageRoutes.js
 const express = require('express');
 const router = express.Router();
-const { sendWhatsAppMessage, client } = require('../whatsappClient');
+const { sendWhatsAppMessage, getClientStatus } = require('../whatsappClient');
 
 router.post('/send-personal-message', async (req, res) => {
-  if (!client.info || !client.info.wid) {
+  // 🌟 Error yahi se tha. "client.info" hata diya hai aur Baileys wala getClientStatus lagaya hai
+  if (getClientStatus() !== "connected") {
     return res.status(503).json({ message: 'WhatsApp client not ready. Please try again later.' });
   }
 

@@ -46,3 +46,6 @@ Thumbs.db
 # WhatsApp Web JS Auth / Session files
 server/.wwebjs_auth/
 server/.wwebjs_cache/
+
+
+server/auth_info_baileys/

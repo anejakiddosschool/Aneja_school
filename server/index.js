@@ -78,6 +78,7 @@ app.use("/api/notifications", notificationsRoutes);
 app.use("/api/whatsapp", whatsappRoutes);
 app.use("/api/whatsapp", customMessageRoutes);
 app.use("/api/whatsapp", personalMessageRoutes);
+
 const seedAdminUser = async () => {
   try {
     const adminExists = await User.findOne({ role: "admin" });
