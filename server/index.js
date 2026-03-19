@@ -79,6 +79,12 @@ app.use("/api/whatsapp", whatsappRoutes);
 app.use("/api/whatsapp", customMessageRoutes);
 app.use("/api/whatsapp", personalMessageRoutes);
 
+// Tumhare existing middleware (cors, express.json) ke baad ye line add kardo
+app.get("/", (req, res) => {
+  res.status(200).send("✅ Aneja Kiddos School Backend API is Live and Running!");
+});
+
+
 const seedAdminUser = async () => {
   try {
     const adminExists = await User.findOne({ role: "admin" });
