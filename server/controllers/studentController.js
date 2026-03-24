@@ -363,8 +363,8 @@ exports.bulkCreateStudents = async (req, res) => {
         rollNumber: studentRow["Roll No"] || studentRow["rollNumber"],
         motherName: studentRow["Mother's Name"] || studentRow["motherName"],
         address: studentRow["Address"] || studentRow["address"],
-        adhaarNumber:
-          studentRow["Aadhaar Card Number"] || studentRow["address"],
+               // ✅ NAYA CODE (Fixed):
+        adhaarNumber: studentRow["Aadhaar Card Number"] || studentRow["adhaarNumber"] || "",
       };
 
       const newStudent = new Student(studentData);

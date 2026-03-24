@@ -1,3 +1,4 @@
+
 // // src/pages/HomePage.js
 // import React, { useState, useEffect } from "react";
 // import { Link, useNavigate } from "react-router-dom";
@@ -7,31 +8,34 @@
 // import dashboardService from "../services/dashboardService";
 // import studentService from "../services/studentService";
 
-// // --- Reusable UI Components for the Dashboards ---
+// // --- Reusable UI Components ---
+
+// // 🎓 Stat Card
 // const StatCard = ({ title, value, icon }) => (
-//   <div className="bg-white p-6 rounded-lg shadow-md flex items-center border-l-4 border-pink-500">
-//     <div className="bg-pink-100 text-pink-600 p-3 rounded-full mr-4">
+//   <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-2xl shadow-lg flex items-center border-l-8 border-pink-400 transform hover:scale-105 transition duration-300">
+//     <div className="bg-white text-pink-500 p-4 rounded-full shadow-md mr-4 text-2xl">
 //       {icon}
 //     </div>
 //     <div>
-//       <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+//       <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
 //         {title}
 //       </p>
-//       <p className="text-3xl font-bold text-gray-900">{value}</p>
+//       <p className="text-3xl font-extrabold text-gray-900">{value}</p>
 //     </div>
 //   </div>
 // );
 
+// // 🎠 Action Card
 // const ActionCard = ({ to, title, description, state = {} }) => (
-//   <div className="bg-gray-50 p-6 rounded-lg border hover:shadow-lg hover:border-pink-300 transition-all duration-200 flex flex-col">
-//     <h3 className="font-bold text-lg text-gray-800">{title}</h3>
-//     <p className="text-gray-600 text-sm mb-4 mt-1 flex-grow">{description}</p>
+//   <div className="bg-white p-6 rounded-2xl border-2 border-pink-200 hover:shadow-2xl hover:border-pink-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
+//     <h3 className="font-extrabold text-lg text-pink-600">{title}</h3>
+//     <p className="text-gray-600 text-sm mb-4 mt-2 flex-grow">{description}</p>
 //     <Link
 //       to={to}
 //       state={state}
-//       className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200 text-center mt-auto"
+//       className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200 text-center mt-auto"
 //     >
-//       Go &rarr;
+//       Go →
 //     </Link>
 //   </div>
 // );
@@ -46,7 +50,7 @@
 //   const [loading, setLoading] = useState(true);
 //   const navigate = useNavigate();
 
-//   // --- Data Fetching for ALL Roles ---
+//   // --- Data Fetching ---
 //   useEffect(() => {
 //     const loadDashboardData = async () => {
 //       try {
@@ -73,40 +77,51 @@
 //   }, [currentUser, currentStudent]);
 
 //   if (loading)
-//     return <p className="text-center text-lg mt-8">Loading Dashboard...</p>;
+//     return (
+//       <p className="text-center text-lg mt-8 animate-pulse text-pink-600">
+//         Loading Dashboard...
+//       </p>
+//     );
 
 //   // --- 1. Admin Dashboard View ---
 //   if (profileData?.role === "admin") {
 //     return (
-//       <div className="space-y-8">
+//       <div className="space-y-10">
 //         <div>
-//           <h2 className="text-3xl font-bold text-gray-800">
-//             Welcome {currentUser.fullName}
+//           <h2 className="text-4xl font-extrabold text-gray-800">
+//              Welcome {currentUser.fullName}
 //           </h2>
-//           <Link to="/profile" className="text-gray-400 italic pb-2 font-bold">
-//             Change Username and password
+//           <Link
+//             to="/profile"
+//             className="text-pink-500 italic font-bold hover:underline"
+//           >
+//             Change Username and Password
 //           </Link>
 //         </div>
+
+//         {/* Stats */}
 //         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 //           <StatCard
 //             title="Active Students"
 //             value={stats?.students ?? "..."}
-//             icon={"🎓"}
+//             icon="🎓"
 //           />
 //           <StatCard
 //             title="Teachers"
 //             value={stats?.teachers ?? "..."}
-//             icon={"👩‍🏫"}
+//             icon="👩‍🏫"
 //           />
 //           <StatCard
 //             title="Subjects"
 //             value={stats?.subjects ?? "..."}
-//             icon={"📚"}
+//             icon="📚"
 //           />
 //         </div>
+
+//         {/* Quick Actions */}
 //         <div>
-//           <h3 className="text-xl font-bold text-gray-700 mb-4">
-//             Quick Actions
+//           <h3 className="text-2xl font-bold text-gray-700 mb-4">
+//             🚀 Quick Actions
 //           </h3>
 //           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 //             <ActionCard
@@ -119,7 +134,7 @@
 //               title="Subject Management"
 //               description="Define the subjects offered for each grade level."
 //             />
-//             <Action-card
+//             <ActionCard
 //               to="/manage-assessments"
 //               title="Assessment Management"
 //               description="Set the grading structure and assessments for each subject."
@@ -135,14 +150,28 @@
 //     );
 //   }
 
-//   // --- 2. Teacher & Homeroom Teacher Dashboard View ---
+//   // --- 2. Teacher Dashboard View ---
 //   if (profileData?.role === "teacher") {
 //     return (
-//       <div className="space-y-8">
-//         <h2 className="text-3xl font-bold text-gray-800">Teacher Dashboard</h2>
-//         <p className="text-lg text-gray-600">
-//           Welcome, {profileData.fullName}!
+//       <div className="space-y-10">
+//            <div>
+//           <h2 className="text-4xl font-extrabold text-gray-800">
+//              Welcome {currentUser.fullName}
+//           </h2>
+//           <Link
+//             to="/profile"
+//             className="text-pink-500 italic font-bold hover:underline"
+//           >
+//             Change Username and Password
+//           </Link>
+//         </div>
+//         <h2 className="text-4xl font-extrabold text-pink-600">
+//           👩‍🏫 Teacher Dashboard
+//         </h2>
+//         <p className="text-lg text-gray-700">
+//           Welcome, <span className="font-bold">{profileData.fullName}</span>!
 //         </p>
+
 //         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 //           {profileData.homeroomGrade && (
 //             <ActionCard
@@ -164,9 +193,10 @@
 //               )
 //           )}
 //         </div>
+
 //         {profileData.subjectsTaught?.length === 0 &&
 //           !profileData.homeroomGrade && (
-//             <p>
+//             <p className="text-red-500">
 //               You have not been assigned any duties yet. Please contact an
 //               administrator.
 //             </p>
@@ -178,16 +208,19 @@
 //   // --- 3. Parent Dashboard View ---
 //   if (studentData) {
 //     return (
-//       <div className="space-y-8">
-//         <h2 className="text-3xl font-bold text-gray-800">Parent Dashboard</h2>
-//         <p className="text-lg text-gray-600">
-//           Welcome! Viewing records for <strong>{studentData.fullName}</strong>.
+//       <div className="space-y-10">
+//         <h2 className="text-4xl font-extrabold text-pink-600">
+//           👪 Parent Dashboard
+//         </h2>
+//         <p className="text-lg text-gray-700">
+//           Viewing records for{" "}
+//           <strong className="text-pink-600">{studentData.fullName}</strong>.
 //         </p>
 
 //         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//           <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-pink-500">
+//           <div className="bg-gradient-to-r from-yellow-100 to-pink-100 p-6 rounded-2xl shadow-lg border-l-8 border-pink-400">
 //             <h3 className="text-xl font-bold text-gray-700 mb-3">
-//               Student Information
+//               🧒 Student Information
 //             </h3>
 //             <div className="space-y-2 text-sm">
 //               <p>
@@ -201,9 +234,10 @@
 //               </p>
 //             </div>
 //           </div>
+
 //           <ActionCard
 //             to={`/students/${studentData._id}/report`}
-//             title="Full Report Card"
+//             title="📄 Full Report Card"
 //             description="View and print the complete, official report card for the academic year."
 //           />
 //         </div>
@@ -211,119 +245,70 @@
 //     );
 //   }
 
-//   // --- 4. Logged-Out Visitor "Demo Portal" View ---
+//   // --- 4. Visitor View (Demo Portal) ---
 //   return (
-//     <div className="bg-gray-50">
-//       {/* --- Hero Section --- */}
-//       <div className="text-center py-20 md:py-32 px-4">
-//         <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 tracking-tight">
+//     <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100">
+//       {/* Hero Section */}
+//       <div className="text-center py-20 md:py-28 px-4">
+//         <h1 className="text-5xl md:text-7xl font-extrabold text-gray-800 tracking-tight drop-shadow-md">
 //           Welcome to <span className="text-pink-600">Aneja Kiddos School</span>
 //         </h1>
-//         <h2 className="text-4xl md:text-6xl font-extrabold text-gray-800 tracking-tight mt-2">
-//           School Management System
+//         <h2 className="text-2xl md:text-4xl font-bold text-gray-700 mt-3">
+//           Fun, Smart & Secure School Management
 //         </h2>
-//         <p className="mt-6 max-w-2xl mx-auto text-lg text-gray-600">
-//           A modern, real-time platform designed to seamlessly manage student
-//           academics, reports, and school-parent communications.
+//         <p className="mt-6 max-w-3xl mx-auto text-lg text-gray-600 leading-relaxed">
+//           A colorful, interactive platform designed for kids, parents, and
+//           teachers – making academics easy, engaging, and transparent!
 //         </p>
 //       </div>
 
-//       {/* --- Features Section --- */}
-//       <div className="py-16 bg-white">
+//       {/* Features Section */}
+//       <div className="py-16 bg-white rounded-t-3xl shadow-lg">
 //         <div className="container mx-auto px-6">
-//           <h3 className="text-3xl font-bold text-center text-gray-800 mb-12">
-//             Powerful Features for a Modern School
+//           <h3 className="text-3xl font-bold text-center text-pink-600 mb-12">
+//             🌟 Powerful Features
 //           </h3>
 //           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 //             {/* Feature 1 */}
-//             <div className="text-center p-6 border border-gray-200 rounded-lg">
-//               <div className="text-pink-500 mb-4">
-//                 <svg
-//                   className="w-12 h-12 mx-auto"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   viewBox="0 0 24 24"
-//                   xmlns="http://www.w3.org/2000/svg"
-//                 >
-//                   <path
-//                     strokeLinecap="round"
-//                     strokeLinejoin="round"
-//                     strokeWidth={2}
-//                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-//                   />
-//                 </svg>
-//               </div>
-//               <h4 className="font-bold text-xl mb-2">
-//                 Comprehensive Reporting
+//             <div className="text-center p-6 bg-pink-50 border-2 border-pink-200 rounded-2xl shadow hover:shadow-lg transition">
+//               <h4 className="font-bold text-xl mb-2 text-pink-600">
+//                 📊 Comprehensive Reporting
 //               </h4>
 //               <p className="text-gray-600">
 //                 Generate beautiful, printable report cards and detailed class
-//                 rosters with automatic calculations for totals, averages, and
-//                 ranks.
+//                 rosters with automatic calculations.
 //               </p>
 //             </div>
 //             {/* Feature 2 */}
-//             <div className="text-center p-6 border border-gray-200 rounded-lg">
-//               <div className="text-pink-500 mb-4">
-//                 <svg
-//                   className="w-12 h-12 mx-auto"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   viewBox="0 0 24 24"
-//                   xmlns="http://www.w3.org/2000/svg"
-//                 >
-//                   <path
-//                     strokeLinecap="round"
-//                     strokeLinejoin="round"
-//                     strokeWidth={2}
-//                     d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V7a2 2 0 012-2h2m8-4H5a2 2 0 00-2 2v10a2 2 0 002 2h11l4 4V7a2 2 0 00-2-2z"
-//                   />
-//                 </svg>
-//               </div>
-//               <h4 className="font-bold text-xl mb-2">
-//                 Real-Time Notifications
+//             <div className="text-center p-6 bg-blue-50 border-2 border-blue-200 rounded-2xl shadow hover:shadow-lg transition">
+//               <h4 className="font-bold text-xl mb-2 text-blue-600">
+//                 🔔 Real-Time Notifications
 //               </h4>
 //               <p className="text-gray-600">
-//                 Keep administrators and homeroom teachers instantly informed
-//                 with in-app and push notifications for important events like
-//                 grade updates.
+//                 Keep admins and teachers instantly informed with notifications
+//                 for grade updates & events.
 //               </p>
 //             </div>
 //             {/* Feature 3 */}
-//             <div className="text-center p-6 border border-gray-200 rounded-lg">
-//               <div className="text-pink-500 mb-4">
-//                 <svg
-//                   className="w-12 h-12 mx-auto"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   viewBox="0 0 24 24"
-//                   xmlns="http://www.w3.org/2000/svg"
-//                 >
-//                   <path
-//                     strokeLinecap="round"
-//                     strokeLinejoin="round"
-//                     strokeWidth={2}
-//                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-//                   />
-//                 </svg>
-//               </div>
-//               <h4 className="font-bold text-xl mb-2">Role-Based Security</h4>
+//             <div className="text-center p-6 bg-yellow-50 border-2 border-yellow-200 rounded-2xl shadow hover:shadow-lg transition">
+//               <h4 className="font-bold text-xl mb-2 text-yellow-600">
+//                 🔐 Role-Based Security
+//               </h4>
 //               <p className="text-gray-600">
 //                 A secure system with distinct roles for Admins, Teachers, and
-//                 Parents, ensuring users only see the information relevant to
-//                 them.
+//                 Parents.
 //               </p>
 //             </div>
 //           </div>
 //         </div>
 //       </div>
 
-//       {/* --- Demo Login Section --- */}
-//       <div className="bg-gray-800 text-white py-16">
+//       {/* Demo Login Section */}
+//       <div className="bg-gradient-to-r from-pink-500 to-pink-700 text-white py-16 mt-12 rounded-t-3xl">
 //         <div className="container mx-auto text-center px-6">
-//           <h2 className="text-3xl font-bold mb-4">Explore Now</h2>
-//           <p className="text-gray-300 mb-8">
-//             Click a button below to automatically log in and experience the system firsthand.
+//           <h2 className="text-3xl font-extrabold mb-4">🚀 Explore Now</h2>
+//           <p className="text-pink-100 mb-8">
+//             Click a button below to experience the system firsthand.
 //           </p>
 //           <div className="flex flex-col md:flex-row justify-center items-center gap-6">
 //             <button
@@ -332,7 +317,7 @@
 //                   state: { username: "", password: "" },
 //                 })
 //               }
-//               className="w-full md:w-auto bg-pink-600 hover:bg-pink-500 font-bold py-3 px-8 rounded-lg shadow-md transform hover:scale-105 transition-all duration-200"
+//               className="w-full md:w-auto bg-white text-pink-600 font-bold py-3 px-8 rounded-xl shadow-md transform hover:scale-105 transition-all duration-200"
 //             >
 //               Login as Administrator
 //             </button>
@@ -342,14 +327,14 @@
 //                   state: { username: "", password: "" },
 //                 })
 //               }
-//               className="w-full md:w-auto bg-gray-600 hover:bg-gray-500 font-bold py-3 px-8 rounded-lg shadow-md transform hover:scale-105 transition-all duration-200"
+//               className="w-full md:w-auto bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-xl shadow-md transform hover:scale-105 transition-all duration-200"
 //             >
 //               Login as Teacher
 //             </button>
 //           </div>
-//           <p className="text-sm text-gray-500 mt-8">
+//           <p className="text-sm text-pink-200 mt-8">
 //             (Parents can log in at the{" "}
-//             <Link to="/parent-login" className="text-pink-400 hover:underline">
+//             <Link to="/parent-login" className="text-white underline">
 //               Parent Portal
 //             </Link>
 //             )
@@ -362,6 +347,7 @@
 
 // export default HomePage;
 
+
 // src/pages/HomePage.js
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -373,42 +359,43 @@ import studentService from "../services/studentService";
 
 // --- Reusable UI Components ---
 
-// 🎓 Stat Card
-const StatCard = ({ title, value, icon }) => (
-  <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-2xl shadow-lg flex items-center border-l-8 border-pink-400 transform hover:scale-105 transition duration-300">
-    <div className="bg-white text-pink-500 p-4 rounded-full shadow-md mr-4 text-2xl">
+// 🎓 Stat Card (Modernized)
+const StatCard = ({ title, value, icon, colorClass = "from-pink-500 to-rose-400" }) => (
+  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition-shadow duration-300">
+    <div className={`w-14 h-14 rounded-xl bg-gradient-to-tr ${colorClass} flex items-center justify-center text-white text-2xl shadow-sm`}>
       {icon}
     </div>
     <div>
-      <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-        {title}
-      </p>
-      <p className="text-3xl font-extrabold text-gray-900">{value}</p>
+      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{title}</p>
+      <p className="text-3xl font-black text-gray-800 mt-1">{value}</p>
     </div>
   </div>
 );
 
-// 🎠 Action Card
-const ActionCard = ({ to, title, description, state = {} }) => (
-  <div className="bg-white p-6 rounded-2xl border-2 border-pink-200 hover:shadow-2xl hover:border-pink-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
-    <h3 className="font-extrabold text-lg text-pink-600">{title}</h3>
-    <p className="text-gray-600 text-sm mb-4 mt-2 flex-grow">{description}</p>
-    <Link
-      to={to}
-      state={state}
-      className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200 text-center mt-auto"
-    >
-      Go →
-    </Link>
-  </div>
+// 🚀 Action Card (Modernized)
+const ActionCard = ({ to, title, description, state = {}, icon = "→" }) => (
+  <Link
+    to={to}
+    state={state}
+    className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-pink-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+  >
+    <div className="absolute -right-6 -top-6 w-24 h-24 bg-pink-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+    <div className="relative z-10 flex-grow">
+      <h3 className="font-extrabold text-lg text-gray-800 group-hover:text-pink-600 transition-colors">{title}</h3>
+      <p className="text-gray-500 text-sm mt-2 leading-relaxed">{description}</p>
+    </div>
+    <div className="mt-6 flex items-center text-sm font-bold text-pink-600 group-hover:text-pink-700 relative z-10">
+      Access Portal <span className="ml-2 group-hover:translate-x-1 transition-transform">{icon}</span>
+    </div>
+  </Link>
 );
 
 const HomePage = () => {
   // --- State Management ---
   const [currentUser] = useState(authService.getCurrentUser());
   const [currentStudent] = useState(studentAuthService.getCurrentStudent());
-  const [profileData, setProfileData] = useState(null); // For teacher/admin
-  const [studentData, setStudentData] = useState(null); // For parent
+  const [profileData, setProfileData] = useState(null); 
+  const [studentData, setStudentData] = useState(null); 
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -425,9 +412,7 @@ const HomePage = () => {
             setStats(statsRes.data);
           }
         } else if (currentStudent) {
-          const studentRes = await studentService.getStudentById(
-            currentStudent._id
-          );
+          const studentRes = await studentService.getStudentById(currentStudent._id);
           setStudentData(studentRes.data.data);
         }
       } catch (error) {
@@ -439,74 +424,52 @@ const HomePage = () => {
     loadDashboardData();
   }, [currentUser, currentStudent]);
 
-  if (loading)
+  if (loading) {
     return (
-      <p className="text-center text-lg mt-8 animate-pulse text-pink-600">
-        Loading Dashboard...
-      </p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin"></div>
+        <p className="text-gray-500 font-medium animate-pulse">Loading Dashboard Space...</p>
+      </div>
     );
+  }
 
   // --- 1. Admin Dashboard View ---
   if (profileData?.role === "admin") {
     return (
-      <div className="space-y-10">
-        <div>
-          <h2 className="text-4xl font-extrabold text-gray-800">
-             Welcome {currentUser.fullName}
-          </h2>
-          <Link
-            to="/profile"
-            className="text-pink-500 italic font-bold hover:underline"
-          >
-            Change Username and Password
-          </Link>
+      <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-10 animate-fade-in">
+        {/* Welcome Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-pink-100 to-transparent rounded-bl-full opacity-50"></div>
+          <div className="relative z-10">
+            <span className="text-pink-600 font-bold tracking-wider uppercase text-sm mb-2 block">Administrator Panel</span>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900">
+               Welcome back, {currentUser.fullName}
+            </h2>
+          </div>
+          <div className="relative z-10">
+            <Link to="/profile" className="inline-flex items-center gap-2 bg-gray-50 hover:bg-pink-50 text-gray-700 hover:text-pink-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-gray-200">
+              <span>⚙️</span> Account Settings
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard
-            title="Active Students"
-            value={stats?.students ?? "..."}
-            icon="🎓"
-          />
-          <StatCard
-            title="Teachers"
-            value={stats?.teachers ?? "..."}
-            icon="👩‍🏫"
-          />
-          <StatCard
-            title="Subjects"
-            value={stats?.subjects ?? "..."}
-            icon="📚"
-          />
+          <StatCard title="Active Students" value={stats?.students ?? "..."} icon="👨‍🎓" colorClass="from-blue-500 to-cyan-400" />
+          <StatCard title="Teachers/Staff" value={stats?.teachers ?? "..."} icon="👩‍🏫" colorClass="from-purple-500 to-fuchsia-400" />
+          <StatCard title="Total Subjects" value={stats?.subjects ?? "..."} icon="📚" colorClass="from-pink-500 to-rose-400" />
         </div>
 
         {/* Quick Actions */}
         <div>
-          <h3 className="text-2xl font-bold text-gray-700 mb-4">
-            🚀 Quick Actions
+          <h3 className="text-xl font-extrabold text-gray-800 mb-6 flex items-center gap-2">
+            <span>⚡</span> Quick Launch
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <ActionCard
-              to="/admin/users"
-              title="User Management"
-              description="Add, view, and assign roles/subjects to all users."
-            />
-            <ActionCard
-              to="/subjects"
-              title="Subject Management"
-              description="Define the subjects offered for each grade level."
-            />
-            <ActionCard
-              to="/manage-assessments"
-              title="Assessment Management"
-              description="Set the grading structure and assessments for each subject."
-            />
-            <ActionCard
-              to="/students/import"
-              title="Bulk Import Students"
-              description="Quickly enroll a full class of students from an Excel file."
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ActionCard to="/admin/users" title="User Management" description="Add, view, and assign roles or subjects to all staff members." />
+            <ActionCard to="/subjects" title="Subject Setup" description="Define and manage the subjects offered for each grade level." />
+            <ActionCard to="/manage-assessments" title="Assessments" description="Configure the grading structure and academic terms." />
+            <ActionCard to="/students/import" title="Bulk Import" description="Quickly enroll a full class of students using an Excel sheet." icon="📥" />
           </div>
         </div>
       </div>
@@ -516,54 +479,59 @@ const HomePage = () => {
   // --- 2. Teacher Dashboard View ---
   if (profileData?.role === "teacher") {
     return (
-      <div className="space-y-10">
-           <div>
-          <h2 className="text-4xl font-extrabold text-gray-800">
-             Welcome {currentUser.fullName}
-          </h2>
-          <Link
-            to="/profile"
-            className="text-pink-500 italic font-bold hover:underline"
-          >
-            Change Username and Password
-          </Link>
-        </div>
-        <h2 className="text-4xl font-extrabold text-pink-600">
-          👩‍🏫 Teacher Dashboard
-        </h2>
-        <p className="text-lg text-gray-700">
-          Welcome, <span className="font-bold">{profileData.fullName}</span>!
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {profileData.homeroomGrade && (
-            <ActionCard
-              to="/roster"
-              title={`My Homeroom: ${profileData.homeroomGrade}`}
-              description="Generate the comprehensive yearly roster for your class."
-            />
-          )}
-          {profileData.subjectsTaught?.map(
-            (assignment) =>
-              assignment.subject && (
-                <ActionCard
-                  key={assignment.subject._id}
-                  to="/subject-roster"
-                  title={assignment.subject.name}
-                  description={`View detailed mark list for ${assignment.subject.gradeLevel}.`}
-                  state={{ subjectId: assignment.subject._id }}
-                />
-              )
-          )}
+      <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-10 animate-fade-in">
+        
+        {/* Welcome Header */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-purple-100 to-transparent rounded-bl-full opacity-50"></div>
+          <div className="relative z-10">
+             <span className="text-purple-600 font-bold tracking-wider uppercase text-sm mb-2 block">Teacher Workspace</span>
+             <h2 className="text-3xl md:text-4xl font-black text-gray-900">
+               Hello, {profileData.fullName}
+             </h2>
+             <p className="text-gray-500 mt-2 font-medium">Manage your classes, grades, and student rosters.</p>
+          </div>
+          <div className="relative z-10">
+            <Link to="/profile" className="inline-flex items-center gap-2 bg-gray-50 hover:bg-purple-50 text-gray-700 hover:text-purple-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-gray-200">
+              <span>⚙️</span> Edit Profile
+            </Link>
+          </div>
         </div>
 
-        {profileData.subjectsTaught?.length === 0 &&
-          !profileData.homeroomGrade && (
-            <p className="text-red-500">
-              You have not been assigned any duties yet. Please contact an
-              administrator.
-            </p>
+        <div>
+          <h3 className="text-xl font-extrabold text-gray-800 mb-6 flex items-center gap-2">
+            <span>📚</span> My Classes & Duties
+          </h3>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {profileData.homeroomGrade && (
+              <ActionCard
+                to="/roster"
+                title={`Homeroom: Grade ${profileData.homeroomGrade}`}
+                description="Manage and generate the comprehensive yearly roster for your primary class."
+              />
+            )}
+            {profileData.subjectsTaught?.map((assignment) =>
+                assignment.subject && (
+                  <ActionCard
+                    key={assignment.subject._id}
+                    to="/subject-roster"
+                    title={assignment.subject.name}
+                    description={`Manage grades and mark lists for ${assignment.subject.gradeLevel}.`}
+                    state={{ subjectId: assignment.subject._id }}
+                  />
+                )
+            )}
+          </div>
+
+          {profileData.subjectsTaught?.length === 0 && !profileData.homeroomGrade && (
+            <div className="bg-orange-50 border border-orange-200 p-6 rounded-2xl text-center">
+               <span className="text-3xl block mb-2">🚧</span>
+               <h4 className="text-lg font-bold text-orange-800">No Classes Assigned</h4>
+               <p className="text-orange-600 mt-1">You have not been assigned any homeroom or subjects yet. Please contact the administrator.</p>
+            </div>
           )}
+        </div>
       </div>
     );
   }
@@ -571,139 +539,131 @@ const HomePage = () => {
   // --- 3. Parent Dashboard View ---
   if (studentData) {
     return (
-      <div className="space-y-10">
-        <h2 className="text-4xl font-extrabold text-pink-600">
-          👪 Parent Dashboard
-        </h2>
-        <p className="text-lg text-gray-700">
-          Viewing records for{" "}
-          <strong className="text-pink-600">{studentData.fullName}</strong>.
-        </p>
+      <div className="max-w-[1200px] mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
+        
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-400 to-rose-500 flex items-center justify-center text-white text-3xl font-bold shadow-md z-10">
+             {studentData.fullName.charAt(0)}
+          </div>
+          <div className="text-center md:text-left z-10">
+             <span className="text-pink-600 font-bold tracking-wider uppercase text-xs mb-1 block">Parent Portal</span>
+             <h2 className="text-3xl font-black text-gray-900">{studentData.fullName}</h2>
+             <p className="text-gray-500 mt-1 font-medium">View academic progress and official school records.</p>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gradient-to-r from-yellow-100 to-pink-100 p-6 rounded-2xl shadow-lg border-l-8 border-pink-400">
-            <h3 className="text-xl font-bold text-gray-700 mb-3">
-              🧒 Student Information
-            </h3>
-            <div className="space-y-2 text-sm">
-              <p>
-                <strong>Student ID:</strong> {studentData.studentId}
-              </p>
-              <p>
-                <strong>Grade Level:</strong> {studentData.gradeLevel}
-              </p>
-              <p>
-                <strong>Status:</strong> {studentData.status}
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1 bg-gradient-to-b from-gray-50 to-gray-100 p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-center">
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Student Profile</h3>
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-bold text-gray-500">Student ID</p>
+                <p className="text-lg font-bold text-gray-900">{studentData.studentId}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500">Current Grade</p>
+                <p className="text-lg font-bold text-gray-900">{studentData.gradeLevel}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500">Enrollment Status</p>
+                <span className="inline-block mt-1 px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                  {studentData.status || "Active"}
+                </span>
+              </div>
             </div>
           </div>
 
-          <ActionCard
-            to={`/students/${studentData._id}/report`}
-            title="📄 Full Report Card"
-            description="View and print the complete, official report card for the academic year."
-          />
+          <div className="md:col-span-2">
+            <ActionCard
+              to={`/students/${studentData._id}/report`}
+              title="Official Report Card"
+              description="View, download, and print the complete academic report card for the current year. Includes all subject grades and behavioral assessments."
+              icon="📄"
+            />
+          </div>
         </div>
       </div>
     );
   }
 
-  // --- 4. Visitor View (Demo Portal) ---
+  // --- 4. Visitor View (Demo Portal / Landing Page) ---
   return (
-    <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100">
-      {/* Hero Section */}
-      <div className="text-center py-20 md:py-28 px-4">
-        <h1 className="text-5xl md:text-7xl font-extrabold text-gray-800 tracking-tight drop-shadow-md">
-          Welcome to <span className="text-pink-600">Aneja Kiddos School</span>
-        </h1>
-        <h2 className="text-2xl md:text-4xl font-bold text-gray-700 mt-3">
-          Fun, Smart & Secure School Management
-        </h2>
-        <p className="mt-6 max-w-3xl mx-auto text-lg text-gray-600 leading-relaxed">
-          A colorful, interactive platform designed for kids, parents, and
-          teachers – making academics easy, engaging, and transparent!
-        </p>
+    <div className="min-h-screen bg-gray-50 selection:bg-pink-200 selection:text-pink-900">
+      
+      {/* 🌟 Modern Hero Section */}
+      <div className="relative overflow-hidden bg-white border-b border-gray-200">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-pink-100 rounded-full blur-[100px] opacity-60"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-[100px] opacity-60"></div>
+
+        <div className="max-w-[1200px] mx-auto px-4 py-24 sm:py-32 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-100 text-pink-600 text-sm font-bold mb-8 shadow-sm">
+            <span>✨</span> Next-Gen School Management
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tight leading-[1.1]">
+            Welcome to <br className="hidden md:block"/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">Aneja Kiddos School</span>
+          </h1>
+          <p className="mt-8 max-w-2xl mx-auto text-lg md:text-xl text-gray-500 font-medium leading-relaxed">
+            A secure, seamless, and colorful platform designed to bring administration, teachers, and parents together in one place.
+          </p>
+          
+          <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <button
+              onClick={() => navigate("/login", { state: { username: "", password: "" } })}
+              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-8 rounded-xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Staff Portal Login
+            </button>
+            <button
+              onClick={() => navigate("/parent-login")}
+              className="w-full sm:w-auto bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 font-bold py-4 px-8 rounded-xl shadow-sm transition-all hover:shadow hover:-translate-y-0.5"
+            >
+              Parent Portal Login
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Features Section */}
-      <div className="py-16 bg-white rounded-t-3xl shadow-lg">
-        <div className="container mx-auto px-6">
-          <h3 className="text-3xl font-bold text-center text-pink-600 mb-12">
-            🌟 Powerful Features
-          </h3>
+      {/* 🌟 Features Section */}
+      <div className="py-24 bg-gray-50">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Why choose our platform?</h2>
+            <p className="text-gray-500 mt-4 font-medium">Everything you need to run your institution efficiently.</p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="text-center p-6 bg-pink-50 border-2 border-pink-200 rounded-2xl shadow hover:shadow-lg transition">
-              <h4 className="font-bold text-xl mb-2 text-pink-600">
-                📊 Comprehensive Reporting
-              </h4>
-              <p className="text-gray-600">
-                Generate beautiful, printable report cards and detailed class
-                rosters with automatic calculations.
+            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-300">
+              <div className="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner">📊</div>
+              <h4 className="font-extrabold text-xl mb-3 text-gray-900">Smart Reporting</h4>
+              <p className="text-gray-500 leading-relaxed font-medium">
+                Generate beautiful, printable report cards, automated timetables, and detailed class rosters instantly.
               </p>
             </div>
+            
             {/* Feature 2 */}
-            <div className="text-center p-6 bg-blue-50 border-2 border-blue-200 rounded-2xl shadow hover:shadow-lg transition">
-              <h4 className="font-bold text-xl mb-2 text-blue-600">
-                🔔 Real-Time Notifications
-              </h4>
-              <p className="text-gray-600">
-                Keep admins and teachers instantly informed with notifications
-                for grade updates & events.
+            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-300">
+              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner">💬</div>
+              <h4 className="font-extrabold text-xl mb-3 text-gray-900">WhatsApp Integration</h4>
+              <p className="text-gray-500 leading-relaxed font-medium">
+                Send report cards, test results, and important reminders directly to parents' WhatsApp automatically.
               </p>
             </div>
+            
             {/* Feature 3 */}
-            <div className="text-center p-6 bg-yellow-50 border-2 border-yellow-200 rounded-2xl shadow hover:shadow-lg transition">
-              <h4 className="font-bold text-xl mb-2 text-yellow-600">
-                🔐 Role-Based Security
-              </h4>
-              <p className="text-gray-600">
-                A secure system with distinct roles for Admins, Teachers, and
-                Parents.
+            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-300">
+              <div className="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner">🔐</div>
+              <h4 className="font-extrabold text-xl mb-3 text-gray-900">Role-Based Security</h4>
+              <p className="text-gray-500 leading-relaxed font-medium">
+                A highly secure system ensuring distinct, restricted access for Admins, Teachers, and Parents.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Demo Login Section */}
-      <div className="bg-gradient-to-r from-pink-500 to-pink-700 text-white py-16 mt-12 rounded-t-3xl">
-        <div className="container mx-auto text-center px-6">
-          <h2 className="text-3xl font-extrabold mb-4">🚀 Explore Now</h2>
-          <p className="text-pink-100 mb-8">
-            Click a button below to experience the system firsthand.
-          </p>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-6">
-            <button
-              onClick={() =>
-                navigate("/login", {
-                  state: { username: "", password: "" },
-                })
-              }
-              className="w-full md:w-auto bg-white text-pink-600 font-bold py-3 px-8 rounded-xl shadow-md transform hover:scale-105 transition-all duration-200"
-            >
-              Login as Administrator
-            </button>
-            <button
-              onClick={() =>
-                navigate("/login", {
-                  state: { username: "", password: "" },
-                })
-              }
-              className="w-full md:w-auto bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-xl shadow-md transform hover:scale-105 transition-all duration-200"
-            >
-              Login as Teacher
-            </button>
-          </div>
-          <p className="text-sm text-pink-200 mt-8">
-            (Parents can log in at the{" "}
-            <Link to="/parent-login" className="text-white underline">
-              Parent Portal
-            </Link>
-            )
-          </p>
-        </div>
-      </div>
     </div>
   );
 };
