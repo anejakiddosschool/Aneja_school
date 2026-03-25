@@ -249,6 +249,75 @@ const ReportCardPage = ({ studentId }) => {
   }, [allGrades, viewType]);
 
   // Extract unique assessment types and max marks safely
+  // const assessmentTypesByTerm = useMemo(() => {
+  //   const term1Types = new Map();
+  //   const term2Types = new Map();
+
+  //   filteredGrades.forEach((gradeRecord) => {
+  //     if (
+  //       gradeRecord.assessments &&
+  //       Array.isArray(gradeRecord.assessments) &&
+  //       gradeRecord.semester
+  //     ) {
+  //       gradeRecord.assessments.forEach(({ assessmentType }) => {
+  //         const name = assessmentType?.name;
+  //         if (!name) return;
+  //         const mapTarget =
+  //           gradeRecord.semester === "First Semester" ? term1Types : term2Types;
+
+  //         if (
+  //           !mapTarget.has(name) ||
+  //           (assessmentType.totalMarks &&
+  //             assessmentType.totalMarks > mapTarget.get(name))
+  //         ) {
+  //           mapTarget.set(name, assessmentType.totalMarks ?? null);
+  //         }
+  //       });
+  //     }
+  //   });
+
+  //   const sortOrder = [
+  //     "Periodic Test-I",
+  //     "Periodic Test-II",
+  //     "Periodic Test-III",
+  //     "Periodic Test-IV",
+  //     "PT-I",
+  //     "PT-I (20)",
+  //     "PT-I (10)",
+  //     "PT-I (5)",
+  //     "PT-II",
+  //     "PT-II (20)",
+  //     "SA-I",
+  //     "SA - I",
+  //     "SA-I (80)",
+  //     "SA-II",
+  //     "SA - II",
+  //     "SA-II (80)",
+  //     "NTSE",
+  //   ];
+
+  //   const sortMap = (entries) =>
+  //     Array.from(entries.entries()).sort(([a], [b]) => {
+  //       const ia = sortOrder.findIndex((p) =>
+  //         a.toLowerCase().includes(p.toLowerCase()),
+  //       );
+  //       const ib = sortOrder.findIndex((p) =>
+  //         b.toLowerCase().includes(p.toLowerCase()),
+  //       );
+  //       if (ia === -1 && ib === -1) return a.localeCompare(b);
+  //       if (ia === -1) return 1;
+  //       if (ib === -1) return -1;
+  //       return ia - ib;
+  //     });
+
+  //   return {
+  //     term1: sortMap(term1Types),
+  //     term2: sortMap(term2Types),
+  //   };
+  // }, [filteredGrades]);
+
+
+    // Extract unique assessment types and max marks safely, and fix Sort Order
   const assessmentTypesByTerm = useMemo(() => {
     const term1Types = new Map();
     const term2Types = new Map();
@@ -276,38 +345,41 @@ const ReportCardPage = ({ studentId }) => {
       }
     });
 
+    // Strictly ordered sequence
     const sortOrder = [
-      "Periodic Test-I",
-      "Periodic Test-II",
-      "Periodic Test-III",
-      "Periodic Test-IV",
-      "PT-I",
-      "PT-I (20)",
-      "PT-I (10)",
-      "PT-I (5)",
-      "PT-II",
-      "PT-II (20)",
-      "SA-I",
-      "SA - I",
-      "SA-I (80)",
-      "SA-II",
-      "SA - II",
-      "SA-II (80)",
+      "Periodic Test-I", "Periodic Test - I", "Periodic Test I", "PT-I", "PT-1", "PT-I (20)", "PT-I (10)", "PT-I (5)",
+      "Periodic Test-II", "Periodic Test - II", "Periodic Test II", "PT-II", "PT-2", "PT-II (20)",
+      "SA-I", "SA - I", "SA-I (80)", "SA-1", "Half Yearly",
+      "Periodic Test-III", "Periodic Test - III", "Periodic Test III", "PT-III", "PT-3",
+      "Periodic Test-IV", "Periodic Test - IV", "Periodic Test IV", "PT-IV", "PT-4",
+      "SA-II", "SA - II", "SA-II (80)", "SA-2", "Annual",
       "NTSE",
     ];
 
     const sortMap = (entries) =>
       Array.from(entries.entries()).sort(([a], [b]) => {
-        const ia = sortOrder.findIndex((p) =>
-          a.toLowerCase().includes(p.toLowerCase()),
-        );
-        const ib = sortOrder.findIndex((p) =>
-          b.toLowerCase().includes(p.toLowerCase()),
-        );
-        if (ia === -1 && ib === -1) return a.localeCompare(b);
-        if (ia === -1) return 1;
-        if (ib === -1) return -1;
-        return ia - ib;
+        // Find Exact Match (Lower cased and trimmed)
+        const nameA = a.trim().toLowerCase();
+        const nameB = b.trim().toLowerCase();
+        
+        const ia = sortOrder.findIndex((p) => p.toLowerCase() === nameA);
+        const ib = sortOrder.findIndex((p) => p.toLowerCase() === nameB);
+
+        // If exact matches exist for both
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia !== -1) return -1;
+        if (ib !== -1) return 1;
+
+        // Fallback: Partial Match (Includes)
+        const iLooseA = sortOrder.findIndex((p) => nameA.includes(p.toLowerCase()));
+        const iLooseB = sortOrder.findIndex((p) => nameB.includes(p.toLowerCase()));
+
+        if (iLooseA !== -1 && iLooseB !== -1) return iLooseA - iLooseB;
+        if (iLooseA !== -1) return -1;
+        if (iLooseB !== -1) return 1;
+
+        // Alphabetical if not found in Sort Order at all
+        return a.localeCompare(b);
       });
 
     return {
