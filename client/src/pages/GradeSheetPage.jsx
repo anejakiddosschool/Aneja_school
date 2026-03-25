@@ -19,10 +19,15 @@ const GradeSheetPage = () => {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedAssessment, setSelectedAssessment] = useState("");
   
-  // Create dynamic years (Current Year and Next 4)
-  const currentYear = new Date().getFullYear();
-  const yearsList = Array.from({ length: 5 }, (_, i) => `${currentYear - i}-${currentYear - i + 1}`);
-  const [academicYear, setAcademicYear] = useState(yearsList[0]);
+  // // Create dynamic years (Current Year and Next 4)
+  // const currentYear = new Date().getFullYear();
+  // const yearsList = Array.from({ length: 5 }, (_, i) => `${currentYear - i}-${currentYear - i + 1}`);
+  // const [academicYear, setAcademicYear] = useState(yearsList[0]);
+
+    // Fix: Sirf session 2025-2026 hi rakho dropdown me
+  const yearsList = ["2025-2026"];
+  const [academicYear, setAcademicYear] = useState("2025-2026");
+
 
   const [assessmentTypes, setAssessmentTypes] = useState([]);
   const [sheetData, setSheetData] = useState(null);
