@@ -1,7 +1,5 @@
 
-
-// src/pages/StudentDetailPage.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import studentService from "../services/studentService";
 import gradeService from "../services/gradeService";
@@ -104,6 +102,22 @@ const StudentDetailPage = () => {
     } catch { }
   };
 
+  // --- GROUP GRADES BY SEMESTER ---
+  const groupedGrades = useMemo(() => {
+    const groups = {};
+    grades.forEach((grade) => {
+      const sem = grade.semester || "Other";
+      if (!groups[sem]) groups[sem] = [];
+      groups[sem].push(grade);
+    });
+    
+    // Sort semesters (First Semester pehle aaye)
+    return Object.keys(groups).sort((a, b) => a.localeCompare(b)).map(sem => ({
+      semester: sem,
+      records: groups[sem]
+    }));
+  }, [grades]);
+
   // --- Render Logic ---
   if (loading) return <div className="flex justify-center mt-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div></div>;
   if (error) return <p className="text-center text-red-500 mt-8 font-semibold bg-red-50 p-4 rounded-xl max-w-lg mx-auto">{error}</p>;
@@ -117,9 +131,8 @@ const StudentDetailPage = () => {
         <span className="mr-1">←</span> Back to Directory
       </Link>
 
-      {/* STUDENT PROFILE HEADER CARD (Responsive) */}
+      {/* STUDENT PROFILE HEADER CARD */}
       <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
-        {/* Decorative background blur */}
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-50 rounded-full blur-3xl opacity-50 pointer-events-none hidden md:block"></div>
         
         <div className="flex flex-row items-center gap-4 md:gap-5 z-10 w-full md:w-auto border-b border-gray-100 md:border-none pb-4 md:pb-0">
@@ -155,82 +168,88 @@ const StudentDetailPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* LEFT COLUMN: ACADEMIC GRADES */}
+        {/* LEFT COLUMN: ACADEMIC GRADES (Grouped by Semester) */}
         <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-4 md:p-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                     <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2"><span>📊</span> Academic Records</h3>
                 </div>
                 
-                {grades.length > 0 ? (
-                <>
-                  {/* --- DESKTOP TABLE VIEW --- */}
-                  <div className="hidden md:block overflow-x-auto">
-                      <table className="w-full text-left text-sm border-collapse">
-                      <thead>
-                          <tr className="bg-white border-b border-gray-100 text-gray-400 uppercase tracking-wider text-[11px]">
-                          <th className="py-3 px-5 font-extrabold">Subject</th>
-                          <th className="py-3 px-4 font-extrabold">Term / Year</th>
-                          <th className="py-3 px-4 font-extrabold text-center">Score</th>
-                          <th className="py-3 px-4 font-extrabold text-right">Action</th>
-                          </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-50">
-                          {grades.map((grade) => (
-                          <tr key={grade._id} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="py-3 px-5 font-bold text-gray-800">
-                              {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
-                              </td>
-                              <td className="py-3 px-4">
-                                  <div className="text-gray-900 font-medium">{grade.semester}</div>
-                                  <div className="text-[10px] text-gray-400 font-bold tracking-wide">{grade.academicYear}</div>
-                              </td>
-                              <td className="py-3 px-4 text-center">
-                                  <span className="bg-green-50 text-green-700 font-extrabold px-3 py-1 rounded-lg border border-green-100">
-                                      {grade.finalScore ?? "-"}
-                                  </span>
-                              </td>
-                              <td className="py-3 px-4 text-right">
-                                  <div className="flex justify-end gap-2">
-                                      <button onClick={() => setEditingGradeId(grade._id)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-transparent hover:border-blue-200">Edit</button>
-                                      <button onClick={() => handleGradeDelete(grade._id)} className="text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-transparent hover:border-red-200">Delete</button>
-                                  </div>
-                              </td>
-                          </tr>
-                          ))}
-                      </tbody>
-                      </table>
-                  </div>
+                {groupedGrades.length > 0 ? (
+                  <div className="flex flex-col gap-6 p-4">
+                    {groupedGrades.map((group) => (
+                      <div key={group.semester} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                        <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
+                           <h4 className="font-bold text-gray-700 uppercase tracking-wider text-xs">{group.semester}</h4>
+                        </div>
+                        
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr className="bg-white border-b border-gray-100 text-gray-400 uppercase tracking-wider text-[11px]">
+                                <th className="py-3 px-5 font-extrabold">Subject</th>
+                                <th className="py-3 px-4 font-extrabold">Year</th>
+                                <th className="py-3 px-4 font-extrabold text-center">Score</th>
+                                <th className="py-3 px-4 font-extrabold text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50 bg-white">
+                                {group.records.map((grade) => (
+                                <tr key={grade._id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="py-3 px-5 font-bold text-gray-800">
+                                    {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        <div className="text-xs text-gray-600 font-bold">{grade.academicYear}</div>
+                                    </td>
+                                    <td className="py-3 px-4 text-center">
+                                        <span className="bg-green-50 text-green-700 font-extrabold px-3 py-1 rounded-lg border border-green-100">
+                                            {grade.finalScore ?? "-"}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <button onClick={() => setEditingGradeId(grade._id)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-transparent hover:border-blue-200">Edit</button>
+                                            <button onClick={() => handleGradeDelete(grade._id)} className="text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-transparent hover:border-red-200">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                ))}
+                            </tbody>
+                            </table>
+                        </div>
 
-                  {/* --- MOBILE CARD VIEW --- */}
-                  <div className="md:hidden flex flex-col divide-y divide-gray-100">
-                      {grades.map((grade) => (
-                          <div key={grade._id} className="p-4 bg-white hover:bg-gray-50 transition-colors">
-                              <div className="flex justify-between items-start mb-2">
-                                  <div>
-                                      <h4 className="font-bold text-gray-800 text-[15px]">
-                                          {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
-                                      </h4>
-                                      <div className="flex items-center gap-2 mt-1">
-                                          <span className="text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{grade.semester}</span>
-                                          <span className="text-[10px] text-gray-400 font-bold">{grade.academicYear}</span>
-                                      </div>
-                                  </div>
-                                  <div className="flex flex-col items-end">
-                                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Score</span>
-                                      <span className="bg-green-50 text-green-700 font-black px-2.5 py-1 rounded border border-green-100 text-sm">
-                                          {grade.finalScore ?? "-"}
-                                      </span>
-                                  </div>
-                              </div>
-                              <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-50">
-                                  <button onClick={() => setEditingGradeId(grade._id)} className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-100 flex-1 text-center">Edit</button>
-                                  <button onClick={() => handleGradeDelete(grade._id)} className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-100 flex-1 text-center">Delete</button>
-                              </div>
-                          </div>
-                      ))}
+                        {/* Mobile Card View */}
+                        <div className="md:hidden flex flex-col divide-y divide-gray-100 bg-white">
+                            {group.records.map((grade) => (
+                                <div key={grade._id} className="p-4 hover:bg-gray-50 transition-colors">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h4 className="font-bold text-gray-800 text-[15px]">
+                                                {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
+                                            </h4>
+                                            <div className="mt-1">
+                                                <span className="text-[10px] text-gray-400 font-bold">{grade.academicYear}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Score</span>
+                                            <span className="bg-green-50 text-green-700 font-black px-2.5 py-1 rounded border border-green-100 text-sm">
+                                                {grade.finalScore ?? "-"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-50">
+                                        <button onClick={() => setEditingGradeId(grade._id)} className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-100 flex-1 text-center">Edit</button>
+                                        <button onClick={() => handleGradeDelete(grade._id)} className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-100 flex-1 text-center">Delete</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </>
                 ) : (
                 <div className="p-10 text-center text-gray-400">
                     <div className="text-4xl mb-3 opacity-50">📝</div>
