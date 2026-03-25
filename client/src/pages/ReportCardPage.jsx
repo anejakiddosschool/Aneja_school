@@ -341,7 +341,7 @@ const ReportCardPage = ({ studentId }) => {
     return Array.from(subjectMap.values());
   }, [filteredGrades]);
 
-  // --- SAFE MARKS CALCULATOR HELPERS ---
+  // --- SAFE MARKS CALCULATOR HELPERS ---\n  
   const getDynamicAssessment = (subjectSemData, assessmentName) => {
     if (!subjectSemData || !subjectSemData.assessments) return null;
     return subjectSemData.assessments.find(
@@ -353,27 +353,31 @@ const ReportCardPage = ({ studentId }) => {
     let total = 0;
     let max = 0;
 
-    assessmentColumns.forEach(([name, colMax]) => {
+    assessmentColumns.forEach(([name]) => {
       const assess = getDynamicAssessment(semesterData, name);
-      if (
-        assess &&
-        assess.score !== null &&
-        assess.score !== undefined &&
-        assess.score !== ""
-      ) {
-        const scoreStr = String(assess.score).trim().toUpperCase();
-        let scoreNum = Number(assess.score);
+      // FIX: Rely on actual object's totalMarks/maxMarks, not the table column array
+      if (assess) {
+        const specificMax = assess.maxMarks ?? assess.assessmentType?.totalMarks ?? 0;
+        
+        if (
+          assess.score !== null &&
+          assess.score !== undefined &&
+          assess.score !== ""
+        ) {
+          const scoreStr = String(assess.score).trim().toUpperCase();
+          let scoreNum = Number(assess.score);
 
-        if (isNaN(scoreNum)) {
-          if (scoreStr === "AB" || scoreStr === "ABSENT") {
-            scoreNum = 0;
-          } else {
-            return;
+          if (isNaN(scoreNum)) {
+            if (scoreStr === "AB" || scoreStr === "ABSENT") {
+              scoreNum = 0;
+            } else {
+              return;
+            }
           }
-        }
 
-        total += scoreNum;
-        max += Number(colMax || 0);
+          total += scoreNum;
+          max += Number(specificMax); // Use true specific subject maximum mark!
+        }
       }
     });
 
@@ -406,6 +410,10 @@ const ReportCardPage = ({ studentId }) => {
 
     return { term1, term2 };
   }, [groupedGrades, assessmentTypesByTerm]);
+
+  
+  // Grand totals for each term (Excludes Arts and Crafts)
+
 
   // --- RENDERING HELPERS ---
   const renderScoreOrGrade = (score, maxScore, subjectName) => {
@@ -964,6 +972,7 @@ const ReportCardPage = ({ studentId }) => {
                               semesters["First Semester"],
                               name,
                             );
+                                                       const actualMaxMarks = assess?.maxMarks ?? assess?.assessmentType?.totalMarks ?? maxMarks;
                             return (
                               <td key={`g1-${idx}-${i}`} className="score-cell">
                                 {renderScoreOrGrade(
@@ -999,6 +1008,7 @@ const ReportCardPage = ({ studentId }) => {
                                   semesters["Second Semester"],
                                   name,
                                 );
+                                                           const actualMaxMarks = assess?.maxMarks ?? assess?.assessmentType?.totalMarks ?? maxMarks;
                                 return (
                                   <td
                                     key={`g2-${idx}-${i}`}
