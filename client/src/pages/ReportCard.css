@@ -19,7 +19,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-print-color-adjust: exact !important;
-  color-adjust: exact !important;
+  print-color-adjust: exact !important;
   background: #f3f6f9;
   margin: 0;
   padding: 0;
@@ -27,8 +27,10 @@ body {
 
 .report-card-container {
   max-width: 1100px;
+  width: 100%;
   margin: 16px auto;
   padding: 12px;
+  box-sizing: border-box;
 }
 
 /* Controls */
@@ -50,6 +52,7 @@ body {
   border-radius: 6px;
   background: #fff;
   cursor: pointer;
+  box-sizing: border-box;
 }
 .btn-primary {
   background: var(--navy);
@@ -59,15 +62,33 @@ body {
 .btn-outline {
   background: transparent;
 }
+.btn-red {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-red:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-red:hover:not(:disabled) {
+  background-color: #c82333;
+}
 
 /* Paper wrapper */
 .paper-wrap {
   background: transparent;
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 .sheet-paper {
-  width: calc(100% - 24px);
+  width: 100%;
+  max-width: 1000px;
   min-height: 297mm;
   background: var(--bg);
   box-shadow: 0 6px 18px rgba(7, 10, 25, 0.08);
@@ -76,6 +97,7 @@ body {
   padding: 18mm;
   box-sizing: border-box;
   color: var(--text);
+  margin: 0 auto;
 }
 
 /* Header */
@@ -86,7 +108,9 @@ body {
   gap: 18px;
   background-color: #ed8544 !important;
   border-bottom: 2px solid #e6eef9;
-  padding-bottom: 12px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  width: 100%;
 }
 .rc-logo {
   width: 82px;
@@ -106,7 +130,6 @@ body {
 }
 .school-sub {
   font-size: 16px;
-  color: var(--muted);
   margin-top: 4px;
   color: #e6eef9;
 }
@@ -118,7 +141,6 @@ body {
 }
 .session {
   font-size: 16px;
-  color: var(--muted);
   margin-top: 4px;
   color: #eef6ff;
 }
@@ -134,6 +156,8 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Left */
@@ -142,7 +166,6 @@ body {
   display: flex;
   justify-content: center;
 }
-
 .student-photo {
   width: 120px;
   height: 160px;
@@ -152,7 +175,6 @@ body {
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
-
 .student-photo.placeholder {
   display: flex;
   align-items: center;
@@ -166,13 +188,11 @@ body {
 .student-right {
   flex: 1;
 }
-
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px 24px;
 }
-
 .profile-item {
   display: flex;
   gap: 6px;
@@ -180,17 +200,14 @@ body {
   padding: 4px 0;
   border-bottom: 1px dashed var(--border);
 }
-
 .profile-item:last-child {
   border-bottom: none;
 }
-
 .label {
   font-weight: 600;
   color: var(--muted);
   min-width: 110px;
 }
-
 .value {
   font-weight: 700;
   color: var(--text);
@@ -199,6 +216,8 @@ body {
 /* Scholastic */
 .scholastic {
   margin-top: 18px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .section-header {
   display: flex;
@@ -212,31 +231,17 @@ body {
   font-size: 16px;
   color: var(--navy);
 }
-.rank-badges {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.badge {
-  background: #eef6ff;
-  color: var(--navy);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 13px;
-}
-.badge.overall {
-  background: linear-gradient(90deg, #fde68a, #fca5a5);
-  color: #111;
-}
 
 .table-scroll {
+  width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
 }
 
 /* rc-table */
 .rc-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
   font-size: 13px;
   background: #fff;
@@ -256,17 +261,19 @@ body {
 }
 .col-num {
   width: 56px;
+  min-width: 56px;
 }
 .col-sub {
   text-align: left;
   padding-left: 12px;
   width: 320px;
+  min-width: 220px;
   font-weight: 700;
+  word-break: break-word;
 }
 .left {
   text-align: left;
 }
-
 .subhead {
   font-size: 12px;
   font-weight: 600;
@@ -276,11 +283,9 @@ body {
   font-size: 11px;
   color: var(--muted);
 }
-
 .score-cell {
   font-weight: 600;
 }
-
 .totals-row td,
 .averages-row td {
   background: #fbfbfd;
@@ -291,18 +296,21 @@ body {
 /* Co-scholastic */
 .co-scholastic {
   margin-top: 18px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .traits-grid {
   display: flex;
   gap: 14px;
   align-items: flex-start;
+  width: 100%;
 }
-
 .traits-table {
   border-collapse: collapse;
   width: 54%;
   min-width: 220px;
-  max-width: 420px;
+  max-width: none;
+  flex: 1 1 54%;
 }
 .traits-table th,
 .traits-table td {
@@ -319,13 +327,13 @@ body {
 .co-cards {
   width: 46%;
   min-width: 200px;
-  max-width: 420px;
+  max-width: none;
   display: flex;
   flex-direction: column;
   gap: 12px;
   box-sizing: border-box;
+  flex: 1 1 46%;
 }
-
 .co-card {
   border: 1px solid var(--border);
   background: var(--card);
@@ -333,6 +341,14 @@ body {
   border-radius: 8px;
   width: 100%;
   box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+.co-card h5 {
+  margin: 0 0 6px 0;
+  color: var(--navy);
+}
+.co-card p {
+  margin: 0;
 }
 
 /* Signatures */
@@ -343,6 +359,8 @@ body {
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
 }
 .sig-col {
   flex: 1 1 140px;
@@ -356,6 +374,7 @@ body {
   text-align: center;
   min-height: 56px;
   margin: 15px 0 0 0;
+  box-sizing: border-box;
 }
 .sig-label {
   font-weight: 700;
@@ -386,6 +405,8 @@ input[type="file"] {
   color: #fff;
   border-radius: 8px;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Grade color coding */
@@ -441,47 +462,69 @@ input[type="file"] {
 
 /* Print specific rules */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
   body {
     background: #fff !important;
     color: #111 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+
   .report-card-container {
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     background: #fff !important;
     color: #111 !important;
+    max-width: 100% !important;
+    width: 100% !important;
   }
+
   .controls,
   .no-print {
     display: none !important;
   }
+
+  .paper-wrap {
+    width: 100% !important;
+    display: block !important;
+  }
+
   .sheet-paper {
     box-shadow: none !important;
     border-radius: 0 !important;
     width: 100% !important;
-    padding: 12mm !important;
-    max-height: 280mm !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    max-height: none !important;
+    padding: 10mm !important;
     overflow: visible !important;
     page-break-inside: avoid !important;
+    margin: 0 auto !important;
+    border: none !important;
   }
 
   .student-card,
   .scholastic,
   .co-scholastic,
-  .rc-footer {
+  .rc-footer,
+  .signatures {
     page-break-inside: avoid !important;
-    page-break-after: auto !important;
+    break-inside: avoid !important;
   }
 
   .rc-table th,
-  .rc-table td {
+  .rc-table td,
+  .traits-table th,
+  .traits-table td {
     page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
-  /* Remove shadows for print */
-  .sheet-paper,
   .student-card {
-    box-shadow: none !important;
     border: 1px solid var(--border) !important;
   }
 }
@@ -490,7 +533,7 @@ input[type="file"] {
 @media (max-width: 900px) {
   .sheet-paper {
     padding: 12mm;
-    width: calc(100% - 24px);
+    width: 100%;
   }
   .profile-grid {
     grid-template-columns: 1fr;
@@ -515,7 +558,7 @@ input[type="file"] {
   }
   .traits-grid {
     flex-direction: column;
-    gap: 7px;
+    gap: 14px;
   }
   .signatures {
     flex-direction: column;
@@ -546,16 +589,22 @@ input[type="file"] {
 /* Responsive styles below 600px */
 @media (max-width: 600px) {
   .report-card-container {
-    max-width: 100vw;
-    width: 100vw;
+    max-width: 100%;
+    width: 100%;
     margin: 0;
-    padding: 2vw 1vw;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  .paper-wrap {
+    width: 100%;
   }
   .sheet-paper {
-    width: 100vw;
-    padding: 3vw 1vw;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
     border-radius: 0;
     box-shadow: none;
+    margin: 0 auto;
   }
   .controls,
   .left-controls,
@@ -569,53 +618,57 @@ input[type="file"] {
   .right-controls .btn,
   .btn-green,
   .btn-primary,
-  .btn-outline {
+  .btn-outline,
+  .btn-red {
     margin-left: 0 !important;
     width: 100%;
-    font-size: 1rem;
-    padding: 11px 0;
+    font-size: 0.95rem;
+    padding: 10px 0;
+    box-sizing: border-box;
   }
   .controls .back-link {
     width: 100%;
     margin-bottom: 8px;
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
   .rc-header {
     flex-direction: column;
-    gap: 7px;
-    padding-bottom: 10px;
+    gap: 8px;
+    padding: 10px;
     width: 100%;
     text-align: center;
     align-items: center;
   }
   .rc-logo {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     margin: 0 auto;
   }
-  .school-name,
+  .school-name {
+    font-size: 1.1rem;
+  }
   .school-sub,
   .doc-title,
   .session {
-    font-size: 1.09rem;
+    font-size: 0.92rem;
   }
   .student-card {
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 10px 1vw;
+    gap: 10px;
+    padding: 10px;
     margin-top: 14px;
-    width: 100vw;
+    width: 100%;
   }
   .student-left {
     width: 100%;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .student-photo,
   .student-photo.placeholder {
-    width: 72px;
-    height: 72px;
+    width: 84px;
+    height: 84px;
     margin: 0 auto;
   }
   .student-right {
@@ -628,85 +681,84 @@ input[type="file"] {
     width: 100%;
   }
   .profile-item {
-    flex-direction: row;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     font-size: 0.94rem;
   }
   .label,
   .value {
-    min-width: 46px;
-    font-size: 1em;
+    min-width: 0;
+    font-size: 0.95rem;
   }
   .scholastic,
   .co-scholastic,
   .signatures,
   .rc-footer {
-    padding: 9px 2vw;
+    padding: 10px 0 0 0;
     margin-top: 10px;
-    width: 100vw;
+    width: 100%;
   }
   .table-scroll {
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     padding-bottom: 7px;
   }
   .rc-table {
-    width: 99vw;
-    min-width: 300px;
+    width: 100%;
+    min-width: 720px;
     font-size: 10px;
   }
   .col-num,
   .col-sub {
-    min-width: 30px;
-    width: 46px;
     padding-left: 4px;
   }
   .traits-grid {
-    display: flex;
-    flex-direction: row;
-    gap: 24px;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
     width: 100%;
   }
   .traits-table,
-  .co-cards {
-    width: 100vw;
+  .co-cards,
+  .co-card,
+  .sig-col {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
   .co-card {
-    width: 100vw;
-    padding: 8px 2vw;
+    padding: 10px;
     font-size: 0.94rem;
   }
   .signatures {
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     align-items: stretch;
-    margin-top: 1.2em;
-    width: 100vw;
-  }
-  .sig-col {
-    width: 100vw;
+    margin-top: 1.5em;
+    width: 100%;
   }
   .sig-box {
     min-height: 48px;
     padding-top: 10px;
   }
   .sig-label {
-    font-size: 1em;
+    font-size: 0.95rem;
   }
   .sig-line {
-    width: 90vw;
+    width: 100%;
     max-width: 160px;
     margin: 0 auto 3px;
   }
   .rc-footer {
-    padding: 8px 1vw;
+    padding: 10px;
     border-radius: 6px;
-    font-size: 0.97rem;
-    width: 100vw;
+    font-size: 0.95rem;
+    width: 100%;
   }
   .footer-msg,
   .footer-sub {
-    font-size: 0.97rem;
+    font-size: 0.95rem;
   }
 }
 
@@ -717,28 +769,32 @@ input[type="file"] {
   .scholastic,
   .co-scholastic,
   .rc-footer {
-    padding: 0 1vw;
+    padding-left: 6px;
+    padding-right: 6px;
     font-size: 0.93rem;
+    box-sizing: border-box;
   }
   .rc-table {
     font-size: 8.5px;
+    min-width: 680px;
   }
   .student-photo,
   .student-photo.placeholder {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
   }
   .profile-grid {
     font-size: 0.91rem;
   }
   .co-card,
-  .sig-box,
-  .sig-line {
-    width: 100vw;
-    padding: 6px 2vw;
+  .sig-box {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
   }
   .sig-line {
-    width: 94vw;
+    width: 100%;
+    max-width: 140px;
   }
 }
 
@@ -753,73 +809,23 @@ input[type="file"] {
   transform: translateY(0);
 }
 
-/* Signature Styling */
-.sig-box {
-  margin: 15px 10px;
-  text-align: center;
-}
-.sig-label {
-  font-weight: 700;
-  margin-bottom: 7px;
-}
-.sig-line {
-  width: 160px;
-  border-top: 2px solid #000;
-  margin: 0 auto 4px;
-  height: 2.5px;
-}
-.sig-image {
-  max-height: 60px;
-  max-width: 180px;
-  object-fit: contain;
-  margin-top: 5px;
-}
-input[type="file"] {
-  margin-top: 8px;
-}
-
-.btn-red {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-red:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.btn-red:hover:not(:disabled) {
-  background-color: #c82333;
-}
-
-
+/* Button Spinners */
 .spin {
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.4);   /* light outer ring */
-  border-top-color: #ffffff;                    /* bright top segment */
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin-rotate 0.75s linear infinite;
   vertical-align: middle;
 }
-
-/* slightly larger version for primary buttons (optional) */
 .btn-primary .spin {
   width: 16px;
   height: 16px;
   border-width: 2px;
 }
-
-/* keyframes */
 @keyframes spin-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
