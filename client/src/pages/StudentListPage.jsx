@@ -293,83 +293,73 @@ combinedHTML += `
             .join("\n");
         } catch (e) {}
       }
-      const printWindow = window.open("", "", "height=800,width=1200");
-      if (printWindow) {
-        // NAYA: CSS me Print-Color-Adjust aur Force Width dali gayi hai
-   printWindow.document.write(`
-  <html>
-    <head>
-      <title>Bulk Print Reports</title>
-      <meta name="viewport" content="width=900">
-      <style>${styles}</style>
-      <style>
-        html, body {
-          margin: 0;
-          padding: 0;
-          background: #ffffff;
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
+          const printWindow = window.open("", "", "height=800,width=1200");
+        if (printWindow) {
+            printWindow.document.write(`
+              <html>
+                <head>
+                  <title>Bulk Print Reports</title>
+                  <meta name="viewport" content="width=900">
+                  <style>${styles}</style>
+                  <style>
+                    html, body {
+                      margin: 0 !important;
+                      padding: 0 !important;
+                      background: #ffffff !important;
+                      -webkit-print-color-adjust: exact !important;
+                      print-color-adjust: exact !important;
+                      width: 100% !important;
+                    }
+                    
+                    /* Yahan magic hai jo use Center karega */
+                    .print-page-wrapper {
+                      width: 900px !important;
+                      max-width: 900px !important;
+                      min-width: 900px !important;
+                      margin: 0 auto !important; /* Horizontally Centered */
+                      padding: 0 !important;
+                      display: block !important;
+                    }
+
+                    @page {
+                      size: A4 portrait;
+                      margin: 10mm auto !important; /* Vertical margin with auto center */
+                    }
+
+                    @media print {
+                      html, body {
+                        width: 100% !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: center !important; /* Force center alignment */
+                      }
+
+                      .print-page-wrapper {
+                        width: 100% !important;
+                        max-width: 190mm !important; /* Exact A4 inner width */
+                        margin: 0 auto !important;
+                        page-break-after: always !important;
+                      }
+
+                      .no-print {
+                        display: none !important;
+                      }
+                    }
+                  </style>
+                </head>
+                <body>
+                  ${combinedHTML}
+                </body>
+              </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => {
+              printWindow.focus();
+              printWindow.print();
+            }, 2000); 
+        } else {
+            alert("Popup blocked! Please allow popups in your browser.");
         }
-
-        body {
-          width: 100%;
-        }
-
-        .print-page-wrapper {
-          width: 900px !important;
-          max-width: 900px !important;
-          min-width: 900px !important;
-          margin: 0 auto 0 auto !important;
-          padding: 0 !important;
-          background: #fff !important;
-          overflow: hidden !important;
-        }
-
-        @page {
-          size: A4 portrait;
-          margin: 10mm;
-        }
-
-        @media print {
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: #fff !important;
-          }
-
-          body {
-            width: auto !important;
-          }
-
-          .print-page-wrapper {
-            width: 100% !important;
-            max-width: 100% !important;
-            min-width: 0 !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
-            page-break-after: always !important;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-        }
-      </style>
-    </head>
-    <body>
-      ${combinedHTML}
-    </body>
-  </html>
-`);
-
-        printWindow.document.close();
-        setTimeout(() => {
-          printWindow.focus();
-          printWindow.print();
-        }, 2000); // Taki font/images render ho sakein
-      } else {
-        alert("Popup blocked! Please allow popups in your browser.");
-      }
     }
   };
 
