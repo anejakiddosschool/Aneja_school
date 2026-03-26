@@ -900,7 +900,7 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
                 </div>
                 <div className="session">
                   Academic Year:{" "}
-                  {firstSemesterReport?.academicYear || "2025-2026"}
+                  {firstSemesterReport?.academicYear}
                 </div>
               </div>
               <div className="rc-right">
@@ -1020,7 +1020,7 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
                       {hasTerm2Data && <th className="subhead">Grade</th>}
                     </tr>
                     <tr>
-                      <th className="col-num">Total</th>
+                      <th className="col-num">Sr No</th>
                       <th className="col-sub" />
                       {assessmentTypesByTerm.term1.map(([_, total], i) => (
                         <th key={`tm1-${i}`} className="sub-total">
