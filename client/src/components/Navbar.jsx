@@ -272,7 +272,7 @@ const Navbar = () => {
 
                         {qr ? (
                           <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 shadow-sm">
-                            <QRCodeSVG value={qr} size={180} level="H" />
+                            <QRCodeSVG value={qr} size={180} level="H" style={{margin:"Auto"}} />
                             <p className="mt-3 text-center text-[11px] font-medium text-gray-500">Scan from Linked Devices in WhatsApp app</p>
                           </div>
                         ) : whatsappStatus.toLowerCase().includes("connected") ? (

@@ -620,11 +620,100 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
     }
   };
 
-  const saveReportCardToCloud = async (studentIdToSave) => {
+  // const saveReportCardToCloud = async (studentIdToSave) => {
+  //   setUploading(true);
+  //   try {
+  //     const dataUrl = await generateReportCardImage();
+  //     const blob = await (await fetch(dataUrl)).blob();
+  //     const timestamp = new Date()
+  //       .toLocaleString("en-IN", {
+  //         year: "numeric",
+  //         month: "short",
+  //         day: "2-digit",
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         hour12: false,
+  //         timeZone: "Asia/Kolkata",
+  //       })
+  //       .replace(/, /g, "_")
+  //       .replace(/ /g, "_")
+  //       .replace(/:/g, "");
+  //     const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
+  //     const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
+
+  //     const typeSuffix =
+  //       viewType === "classTest"
+  //         ? "class_test"
+  //         : viewType === "ntseTest"
+  //           ? "ntse_test"
+  //           : viewType === "ptTest"
+  //             ? "pt_test"
+  //             : "report_card";
+  //     const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
+
+  //     const formData = new FormData();
+  //     formData.append("file", blob, fileName);
+
+  //     const endpoints = {
+  //       classTest: "/class-test-report",
+  //       ntseTest: "/ntse-report",
+  //       ptTest: "/pt-report",
+  //       reportCard: "/report-card",
+  //     };
+
+  //           await axios.post(
+  //       `${API_URL}/students/${studentIdToSave}${endpoints[viewType]}`,
+  //       formData,
+  //       { headers: { "Content-Type": "multipart/form-data" } },
+  //     );
+      
+  //     // 👇 NAYA LOGIC
+  //     if (!isAutoUploadMode) {
+  //       alert("Report uploaded successfully!");
+  //       window.location.reload();
+  //     }
+  //   } catch (err) {
+  //     if (!isAutoUploadMode) alert("Upload failed!");
+  //   } finally {
+  //     setUploading(false);
+  //   }
+
+  // }
+
+    const saveReportCardToCloud = async (studentIdToSave) => {
     setUploading(true);
     try {
+      // 🌟 NAYA LOGIC: PEHLE CHECK KARO KI KYA PURANI REPORT EXIST KARTI HAI?
+      const existingReportUrl =
+        viewType === "classTest" ? student?.reportClassTestUrl :
+        viewType === "ntseTest" ? student?.reportNTSEUrl :
+        viewType === "ptTest" ? student?.reportPTUrl :
+        student?.reportCardUrl;
+
+      // Agar pehle se url hai, to usko backend se delete karao Cloudinary pe
+      if (existingReportUrl) {
+        const token = JSON.parse(localStorage.getItem("user"))?.token;
+        const deleteEndpoints = {
+          classTest: "class-test-report",
+          ntseTest: "ntse-report",
+          ptTest: "pt-report",
+          reportCard: "report-card",
+        };
+        try {
+          await axios.delete(
+            `${API_URL}/students/${studentIdToSave}/${deleteEndpoints[viewType]}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          console.log("Old report successfully overwritten/deleted");
+        } catch (delErr) {
+          console.log("Old report delete skipped or failed:", delErr.message);
+        }
+      }
+
+      // Naya image capture aur Cloudinary pe upload ka normal logic
       const dataUrl = await generateReportCardImage();
       const blob = await (await fetch(dataUrl)).blob();
+
       const timestamp = new Date()
         .toLocaleString("en-IN", {
           year: "numeric",
@@ -635,50 +724,53 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
           hour12: false,
           timeZone: "Asia/Kolkata",
         })
-        .replace(/, /g, "_")
+        .replace(/,/g, "")
         .replace(/ /g, "_")
-        .replace(/:/g, "");
-      const studentName = (student?.fullName || "student").replace(/\s+/g, "_");
-      const grade = (student?.gradeLevel || "grade").replace(/\s+/g, "_");
+        .replace(/:/g, "-");
 
+      const studentName = student?.fullName ? student.fullName.replace(/ /g, "_") : "Student";
+      const grade = student?.gradeLevel ? student.gradeLevel.replace(/ /g, "_") : "Grade";
       const typeSuffix =
-        viewType === "classTest"
-          ? "class_test"
-          : viewType === "ntseTest"
-            ? "ntse_test"
-            : viewType === "ptTest"
-              ? "pt_test"
-              : "report_card";
+        viewType === "classTest" ? "classtest" :
+        viewType === "ntseTest" ? "ntsetest" :
+        viewType === "ptTest" ? "pttest" :
+        "reportcard";
+
       const fileName = `${studentName}_${grade}_${typeSuffix}_${timestamp}.png`;
 
       const formData = new FormData();
       formData.append("file", blob, fileName);
 
       const endpoints = {
-        classTest: "/class-test-report",
-        ntseTest: "/ntse-report",
-        ptTest: "/pt-report",
-        reportCard: "/report-card",
+        classTest: "class-test-report",
+        ntseTest: "ntse-report",
+        ptTest: "pt-report",
+        reportCard: "report-card",
       };
 
-            await axios.post(
-        `${API_URL}/students/${studentIdToSave}${endpoints[viewType]}`,
+      await axios.post(
+        `${API_URL}/students/${studentIdToSave}/${endpoints[viewType]}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } },
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
-      
-      // 👇 NAYA LOGIC
-      if (!isAutoUploadMode) {
+
+      if (isAutoUploadMode) {
+        if (onUploadSuccess) onUploadSuccess();
+      } else {
         alert("Report uploaded successfully!");
         window.location.reload();
       }
     } catch (err) {
-      if (!isAutoUploadMode) alert("Upload failed!");
+      if (isAutoUploadMode) {
+        if (onUploadSuccess) onUploadSuccess(err);
+      } else {
+        alert("Upload failed!");
+      }
     } finally {
       setUploading(false);
     }
+  };
 
-  }
 
   const handleDeleteUploadedReport = async (studentIdToDelete) => {
     if (!window.confirm("Are you sure you want to delete this report?")) return;
