@@ -264,7 +264,12 @@ const StudentListPage = () => {
       if (printArea) {
         await new Promise((r) => setTimeout(r, 1000)); // Layout set hone ka wait
         // NAYA: Page break add kiya hai perfect print ke liye
-        combinedHTML += `<div style="page-break-after: always; padding-bottom: 20px; width: 1000px; margin: 0 auto;">${printArea.innerHTML}</div>`;
+combinedHTML += `
+  <div class="print-page-wrapper" style="page-break-after: always;">
+    ${printArea.innerHTML}
+  </div>
+`;
+
         updateStatus(student._id, "Print Ready ✓");
       } else {
         updateStatus(student._id, "Failed ✗");
@@ -291,31 +296,72 @@ const StudentListPage = () => {
       const printWindow = window.open("", "", "height=800,width=1200");
       if (printWindow) {
         // NAYA: CSS me Print-Color-Adjust aur Force Width dali gayi hai
-        printWindow.document.write(`
-              <html>
-                <head>
-                  <title>Bulk Print Reports</title>
-                  <meta name="viewport" content="width=1200">
-                  <style>${styles}</style>
-                  <style>
-                    @media print {
-                      @page { size: A4 portrait; margin: 10mm; }
-                      body { 
-                        -webkit-print-color-adjust: exact !important; 
-                        print-color-adjust: exact !important; 
-                        background: white !important; 
-                        width: 1000px !important; 
-                        margin: 0 auto !important; 
-                      }
-                      .no-print { display: none !important; }
-                    }
-                  </style>
-                </head>
-                <body style="background: white; padding: 20px;">
-                  ${combinedHTML}
-                </body>
-              </html>
-            `);
+   printWindow.document.write(`
+  <html>
+    <head>
+      <title>Bulk Print Reports</title>
+      <meta name="viewport" content="width=900">
+      <style>${styles}</style>
+      <style>
+        html, body {
+          margin: 0;
+          padding: 0;
+          background: #ffffff;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        body {
+          width: 100%;
+        }
+
+        .print-page-wrapper {
+          width: 900px !important;
+          max-width: 900px !important;
+          min-width: 900px !important;
+          margin: 0 auto 0 auto !important;
+          padding: 0 !important;
+          background: #fff !important;
+          overflow: hidden !important;
+        }
+
+        @page {
+          size: A4 portrait;
+          margin: 10mm;
+        }
+
+        @media print {
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+          }
+
+          body {
+            width: auto !important;
+          }
+
+          .print-page-wrapper {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            page-break-after: always !important;
+          }
+
+          .no-print {
+            display: none !important;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      ${combinedHTML}
+    </body>
+  </html>
+`);
+
         printWindow.document.close();
         setTimeout(() => {
           printWindow.focus();
@@ -489,25 +535,27 @@ const StudentListPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 p-3 md:p-8 animate-fade-in">
-      {/* 🌟 1. HIDDEN RENDERER FOR BULK (Zaroori style taaki domtoimage fail na ho) 🌟 */}
-      {hiddenStudentForReport && (
-        <div
-          style={{
-            position: "fixed", // 'absolute' ki jagah 'fixed' zaroori hai
-            top: 0,
-            left: "-9999px",
-            zIndex: -999,
-            width: "1200px", // Strict width
-            minWidth: "1200px",
-            backgroundColor: "white", // Transparency rokne ke liye
-          }}
-        >
-          <ReportCardPage
-            studentId={hiddenStudentForReport}
-            isAutoUploadMode={true}
-          />
-        </div>
-      )}
+     {hiddenStudentForReport && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: "-99999px",
+      zIndex: -999,
+      width: "900px",
+      minWidth: "900px",
+      maxWidth: "900px",
+      backgroundColor: "white",
+      overflow: "hidden",
+    }}
+  >
+    <ReportCardPage
+      studentId={hiddenStudentForReport}
+      isAutoUploadMode={true}
+    />
+  </div>
+)}
+
 
       {/* 🌟 2. LOADING PROGRESS OVERLAY 🌟 */}
       {isBulkUploading && (
