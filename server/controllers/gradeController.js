@@ -63,7 +63,7 @@ exports.getGradeDetails = async (req, res) => {
 
 exports.deleteGrade = async (req, res) => {
     const grade = await Grade.findById(req.params.id);
-    if (req.user.role === 'admin') return res.status(403).json({ message: "Forbidden" });
+    // if (req.user.role === 'admin') return res.status(403).json({ message: "Forbidden" });
     if (!grade) return res.status(404).json({ message: 'Grade not found' });
     
     await grade.deleteOne();
@@ -210,3 +210,4 @@ exports.saveGradeSheet = async (req, res) => {
         res.status(500).json({ message: "Server error saving grades." });
     }
 };
+
