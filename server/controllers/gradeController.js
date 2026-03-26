@@ -75,7 +75,7 @@ exports.updateGrade = async (req, res) => {
         const grade = await Grade.findById(req.params.id).populate('subject');
         if (!grade) return res.status(404).json({ message: 'Grade record not found' });
         
-        if (req.user.role === 'admin') return res.status(403).json({ message: "Admins cannot alter grade records." });
+        // if (req.user.role === 'admin') return res.status(403).json({ message: "Admins cannot alter grade records." });
 
         const { assessments } = req.body;
         let newFinalScore = 0;
