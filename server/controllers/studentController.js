@@ -815,3 +815,40 @@ exports.deletePtReport = async (req, res) => {
     });
   }
 };
+
+
+// ==========================================
+// BULK UPDATE CLASS & SECTION (For Promotions)
+// ==========================================
+exports.bulkUpdateClassSection = async (req, res) => {
+  try {
+    const { studentIds, newGradeLevel, newSection } = req.body;
+
+    if (!studentIds || !studentIds.length || !newGradeLevel) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please provide student IDs and new Class." 
+      });
+    }
+
+    // MongoDB UpdateMany Query
+    await Student.updateMany(
+      { _id: { $in: studentIds } },
+      { 
+        $set: { 
+          gradeLevel: newGradeLevel, 
+          section: newSection || "A" 
+        } 
+      }
+    );
+
+    res.status(200).json({ 
+      success: true, 
+      message: `${studentIds.length} students successfully updated to Class ${newGradeLevel}-${newSection || "A"}` 
+    });
+
+  } catch (error) {
+    console.error("Bulk update error:", error);
+    res.status(500).json({ success: false, message: "Server Error during bulk update" });
+  }
+};

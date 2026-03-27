@@ -21,6 +21,12 @@ const StudentListPage = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [reportStudentId, setReportStudentId] = useState(null);
+    // 🌟 Nayi States Bulk Update ke liye
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [newGrade, setNewGrade] = useState("");
+  const [newSection, setNewSection] = useState("");
+  
+  const [availableSections, setAvailableSections] = useState([]); // 🌟 Nayi state
 
   // Status & Logic States
   const [sendStatuses, setSendStatuses] = useState({});
@@ -71,41 +77,42 @@ const StudentListPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        const studentRes = await studentService.getAllStudents();
-        const allFetchedStudents = studentRes.data.data;
-        setAllStudents(allFetchedStudents);
+    // 🌟 NAYA: loadInitialData ko useEffect se bahar nikala taaki sab isko call kar sakein
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      const studentRes = await studentService.getAllStudents();
+      const allFetchedStudents = studentRes.data.data;
+      setAllStudents(allFetchedStudents);
 
-        if (currentUser.role === "admin") {
-          setAvailableGrades(
-            [...new Set(allFetchedStudents.map((s) => s.gradeLevel))].sort(),
-          );
-        } else {
-          const profileRes = await userService.getProfile();
-          setAvailableGrades(
-            [
-              ...new Set(
-                profileRes.data.subjectsTaught
-                  .map((a) => a.subject?.gradeLevel)
-                  .filter(Boolean),
-              ),
-            ].sort(),
-          );
-        }
-
-        const initialStatuses = {};
-        allFetchedStudents.forEach((s) => {
-          initialStatuses[s._id] = "Idle";
-        });
-        setSendStatuses(initialStatuses);
-      } catch (err) {
-        setError("Failed to load initial student data.");
-      } finally {
-        setLoading(false);
+      if (currentUser.role === "admin") {
+        setAvailableGrades([...new Set(allFetchedStudents.map((s) => s.gradeLevel))].sort());
+      } else {
+        const profileRes = await userService.getProfile();
+        setAvailableGrades(
+          [...new Set(profileRes.data.subjectsTaught.map((a) => a.subject?.gradeLevel).filter(Boolean))].sort()
+        );
       }
-    };
+
+      // Naya added section part bhi yahin rahega
+      const extractedSections = [...new Set(allFetchedStudents.map((s) => s.section))].filter(Boolean).sort();
+      if (extractedSections.length === 0) extractedSections.push('A', 'B', 'C');
+      setAvailableSections(extractedSections);
+
+      const initialStatuses = {};
+      allFetchedStudents.forEach((s) => {
+        initialStatuses[s.id || s._id] = "Idle";
+      });
+      setSendStatuses(initialStatuses);
+    } catch (err) {
+      setError("Failed to load initial student data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🌟 Puraane useEffect ko chhota kar diya, ab bas loadInitialData call karega
+  useEffect(() => {
     loadInitialData();
   }, [currentUser.role]);
 
@@ -211,7 +218,69 @@ const StudentListPage = () => {
     setIsBulkUploading(false);
     loadInitialData();
   };
+    // ==========================================
+  // 🔄 BULK UPDATE CLASS API CALL
+  // ==========================================
+  // ==========================================
+  // 🔄 BULK UPDATE CLASS API CALL (FIXED)
+  // ==========================================
+  const submitBulkClassUpdate = async () => {
+    if (!newGrade.trim()) return toast.error("Please select the new class!");
+    
+    // IDs properly map ho rahe hain ensure karo
+    const validStudents = filteredStudents.filter((s) => selectedStudentIds.includes(s.id || s._id));
+    if (validStudents.length === 0) return toast.error("No valid students selected.");
 
+    if (!window.confirm(`Are you sure you want to move ${validStudents.length} students to ${newGrade}-${newSection || "A"}?`)) return;
+
+    try {
+      setLoading(true);
+      
+      const token = JSON.parse(localStorage.getItem("user"))?.token;
+      if (!token) throw new Error("No authentication token found. Please login again.");
+
+      // Fetch request ko zyaada secure banaya gaya hai
+      const res = await fetch(`${API_URL}/students/bulk-update-class`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          // React usually id ko 'id' ya '_id' dono tarah se rakh sakta hai, we check both
+          studentIds: validStudents.map(s => s.id || s._id),
+          newGradeLevel: newGrade.trim(),
+          newSection: newSection.trim() || "A" // fallback section
+        })
+      });
+
+      // Agar server ne HTML/Text bheja instead of JSON, toh res.json() fat jayega.
+      // Isliye pehle text read karte hain, phir JSON parse karte hain.
+      const textResponse = await res.text();
+      let data;
+      try {
+        data = JSON.parse(textResponse);
+      } catch (e) {
+        throw new Error("Server returned an invalid response.");
+      }
+
+      if (res.ok && data.success !== false) {
+        toast.success(data.message || "Classes updated successfully!");
+        setIsUpdateModalOpen(false);
+        setNewGrade("");
+        setNewSection("");
+        setSelectedStudentIds([]); // Selection clear karein
+        await loadInitialData(); // Data refresh karo taaki nayi class UI me dikhe
+      } else {
+        toast.error(data.message || "Failed to update classes");
+      }
+    } catch (err) {
+      console.error("Bulk Update Error:", err);
+      toast.error(err.message || "Network error. Could not update.");
+    } finally {
+      setLoading(false);
+    }
+  };
   // ==========================================
   // 🖨️ NAYA: ALL REPORTS BULK PRINT LOGIC
   // ==========================================
@@ -691,6 +760,16 @@ combinedHTML += `
               >
                 ⚡ Auto-Upload
               </button>
+              {/* NAYA BULK UPDATE BUTTON */}
+{(currentUser.role === "admin" || currentUser.role === "principal") && (
+  <button 
+    onClick={() => setIsUpdateModalOpen(true)} 
+    disabled={isBulkUploading} 
+    className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm border border-orange-600 flex items-center gap-1"
+  >
+    🔄 Promote / Update Class
+  </button>
+)}
 
               <div className="w-px bg-indigo-200 shrink-0 mx-1 hidden sm:block h-6"></div>
               <input
@@ -1179,7 +1258,94 @@ combinedHTML += `
           </div>
         )}
       </div>
+          {/* ========================================== */}
+      {/* 🔄 BULK PROMOTE / UPDATE MODAL             */}
+      {/* ========================================== */}
+      {(() => {
+        // 🌟 YAHAN DYNAMIC SECTIONS CALCULATE HO RAHE HAIN
+        // Sirf wahi bachhe filter karo jo newly selected 'newGrade' me hain
+        // Fir unke unique sections nikal lo.
+        let dependentSections = [];
+        if (newGrade) {
+          dependentSections = [...new Set(
+            allStudents
+              .filter(s => s.gradeLevel === newGrade)
+              .map(s => s.section)
+          )].filter(Boolean).sort();
+        }
+        // Fallback: Agar nayi class khali hai to standard A, B dikha do as option
+        if (dependentSections.length === 0) dependentSections = ['A', 'B', 'C', 'D'];
+
+        return (
+          <Dialog.Root open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+            <Dialog.Portal>
+              <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
+              <Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white rounded-2xl shadow-2xl p-6 w-[90vw] max-w-md z-[60]">
+                <Dialog.Title className="text-xl font-bold text-gray-800 mb-2">
+                  Promote / Update Class
+                </Dialog.Title>
+                <p className="text-sm text-gray-500 mb-5">
+                  You are updating the class for <strong className="text-pink-600">{selectedStudentIds.length}</strong> selected students.
+                </p>
+                
+                <div className="flex flex-col gap-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">New Class / Grade <span className="text-red-500">*</span></label>
+                    <select 
+                      value={newGrade} 
+                      onChange={(e) => {
+                        setNewGrade(e.target.value);
+                        setNewSection(""); // Class badalne pe section reset kar do
+                      }} 
+                      className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select New Class --</option>
+                      {availableGrades.map((grade) => (
+                        <option key={grade} value={grade}>{grade}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">New Section <span className="text-gray-400 font-normal">(Optional)</span></label>
+                    <select 
+                      value={newSection} 
+                      onChange={(e) => setNewSection(e.target.value)} 
+                      disabled={!newGrade} // Class select hone se pehle disable rakho
+                      className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    >
+                      <option value="">
+                        {!newGrade ? "Select a class first..." : "-- Select Section --"}
+                      </option>
+                      {/* 🌟 DEPENDENT SECTIONS MAPPED HERE */}
+                      {dependentSections.map(sec => (
+                         <option key={sec} value={sec}>{sec}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3">
+                  <button 
+                    onClick={() => setIsUpdateModalOpen(false)} 
+                    className="px-4 py-2 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={submitBulkClassUpdate} 
+                    className="px-4 py-2 text-sm font-bold text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition flex items-center gap-2"
+                  >
+                    Update Students
+                  </button>
+                </div>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+        );
+      })()}
     </div>
+    
   );
 };
 
