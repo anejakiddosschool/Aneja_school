@@ -64,7 +64,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 
 
-const apiRouter = express.Router();
+
 
 
 app.use("/api/students", studentRoutes);
@@ -90,7 +90,7 @@ app.get("/", (req, res) => {
 });
 
 
-app.use("/apio", apiRouter);
+
 
 const seedAdminUser = async () => {
   try {
