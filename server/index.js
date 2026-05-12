@@ -85,6 +85,8 @@ app.get("/", (req, res) => {
 });
 
 
+app.use("/apio", apiRouter);
+
 const seedAdminUser = async () => {
   try {
     const adminExists = await User.findOne({ role: "admin" });
