@@ -7,7 +7,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import ReportCardPage from "./ReportCardPage";
 import { socket } from "../components/socket";
 import toast from "react-hot-toast";
-
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 const StudentListPage = () => {
@@ -21,11 +22,11 @@ const StudentListPage = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [reportStudentId, setReportStudentId] = useState(null);
-    // 🌟 Nayi States Bulk Update ke liye
+  // 🌟 Nayi States Bulk Update ke liye
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [newGrade, setNewGrade] = useState("");
   const [newSection, setNewSection] = useState("");
-  
+
   const [availableSections, setAvailableSections] = useState([]); // 🌟 Nayi state
 
   // Status & Logic States
@@ -77,7 +78,49 @@ const StudentListPage = () => {
     };
   }, []);
 
-    // 🌟 NAYA: loadInitialData ko useEffect se bahar nikala taaki sab isko call kar sakein
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["blockquote"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "blockquote",
+];
+
+  const htmlToWhatsappText = (html = "") => {
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+
+    temp.querySelectorAll("br").forEach((br) => br.replaceWith("\n"));
+
+    temp.querySelectorAll("p").forEach((p) => {
+      p.insertAdjacentText("beforeend", "\n\n");
+    });
+
+    temp.querySelectorAll("li").forEach((li) => {
+      li.insertAdjacentText("afterbegin", "• ");
+      li.insertAdjacentText("beforeend", "\n");
+    });
+
+    const text = temp.textContent || temp.innerText || "";
+    return text.replace(/\n{3,}/g, "\n\n").trim();
+  };
+
+  const isQuillEmpty = (html = "") => {
+    return !htmlToWhatsappText(html).trim();
+  };
+
+  // 🌟 NAYA: loadInitialData ko useEffect se bahar nikala taaki sab isko call kar sakein
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -86,17 +129,29 @@ const StudentListPage = () => {
       setAllStudents(allFetchedStudents);
 
       if (currentUser.role === "admin") {
-        setAvailableGrades([...new Set(allFetchedStudents.map((s) => s.gradeLevel))].sort());
+        setAvailableGrades(
+          [...new Set(allFetchedStudents.map((s) => s.gradeLevel))].sort(),
+        );
       } else {
         const profileRes = await userService.getProfile();
         setAvailableGrades(
-          [...new Set(profileRes.data.subjectsTaught.map((a) => a.subject?.gradeLevel).filter(Boolean))].sort()
+          [
+            ...new Set(
+              profileRes.data.subjectsTaught
+                .map((a) => a.subject?.gradeLevel)
+                .filter(Boolean),
+            ),
+          ].sort(),
         );
       }
 
       // Naya added section part bhi yahin rahega
-      const extractedSections = [...new Set(allFetchedStudents.map((s) => s.section))].filter(Boolean).sort();
-      if (extractedSections.length === 0) extractedSections.push('A', 'B', 'C');
+      const extractedSections = [
+        ...new Set(allFetchedStudents.map((s) => s.section)),
+      ]
+        .filter(Boolean)
+        .sort();
+      if (extractedSections.length === 0) extractedSections.push("A", "B", "C");
       setAvailableSections(extractedSections);
 
       const initialStatuses = {};
@@ -218,7 +273,7 @@ const StudentListPage = () => {
     setIsBulkUploading(false);
     loadInitialData();
   };
-    // ==========================================
+  // ==========================================
   // 🔄 BULK UPDATE CLASS API CALL
   // ==========================================
   // ==========================================
@@ -226,32 +281,41 @@ const StudentListPage = () => {
   // ==========================================
   const submitBulkClassUpdate = async () => {
     if (!newGrade.trim()) return toast.error("Please select the new class!");
-    
-    // IDs properly map ho rahe hain ensure karo
-    const validStudents = filteredStudents.filter((s) => selectedStudentIds.includes(s.id || s._id));
-    if (validStudents.length === 0) return toast.error("No valid students selected.");
 
-    if (!window.confirm(`Are you sure you want to move ${validStudents.length} students to ${newGrade}-${newSection || "A"}?`)) return;
+    // IDs properly map ho rahe hain ensure karo
+    const validStudents = filteredStudents.filter((s) =>
+      selectedStudentIds.includes(s.id || s._id),
+    );
+    if (validStudents.length === 0)
+      return toast.error("No valid students selected.");
+
+    if (
+      !window.confirm(
+        `Are you sure you want to move ${validStudents.length} students to ${newGrade}-${newSection || "A"}?`,
+      )
+    )
+      return;
 
     try {
       setLoading(true);
-      
+
       const token = JSON.parse(localStorage.getItem("user"))?.token;
-      if (!token) throw new Error("No authentication token found. Please login again.");
+      if (!token)
+        throw new Error("No authentication token found. Please login again.");
 
       // Fetch request ko zyaada secure banaya gaya hai
       const res = await fetch(`${API_URL}/students/bulk-update-class`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           // React usually id ko 'id' ya '_id' dono tarah se rakh sakta hai, we check both
-          studentIds: validStudents.map(s => s.id || s._id),
+          studentIds: validStudents.map((s) => s.id || s._id),
           newGradeLevel: newGrade.trim(),
-          newSection: newSection.trim() || "A" // fallback section
-        })
+          newSection: newSection.trim() || "A", // fallback section
+        }),
       });
 
       // Agar server ne HTML/Text bheja instead of JSON, toh res.json() fat jayega.
@@ -333,7 +397,7 @@ const StudentListPage = () => {
       if (printArea) {
         await new Promise((r) => setTimeout(r, 1000)); // Layout set hone ka wait
         // NAYA: Page break add kiya hai perfect print ke liye
-combinedHTML += `
+        combinedHTML += `
   <div class="print-page-wrapper" style="page-break-after: always;">
     ${printArea.innerHTML}
   </div>
@@ -362,9 +426,9 @@ combinedHTML += `
             .join("\n");
         } catch (e) {}
       }
-          const printWindow = window.open("", "", "height=800,width=1200");
-        if (printWindow) {
-            printWindow.document.write(`
+      const printWindow = window.open("", "", "height=800,width=1200");
+      if (printWindow) {
+        printWindow.document.write(`
               <html>
                 <head>
                   <title>Bulk Print Reports</title>
@@ -421,14 +485,14 @@ combinedHTML += `
                 </body>
               </html>
             `);
-            printWindow.document.close();
-            setTimeout(() => {
-              printWindow.focus();
-              printWindow.print();
-            }, 2000); 
-        } else {
-            alert("Popup blocked! Please allow popups in your browser.");
-        }
+        printWindow.document.close();
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
+        }, 2000);
+      } else {
+        alert("Popup blocked! Please allow popups in your browser.");
+      }
     }
   };
 
@@ -538,33 +602,89 @@ combinedHTML += `
     });
   };
 
+  // const sendCustomBulk = () => {
+  //   if (!customMessage.trim())
+  //     return toast.error("Please enter a custom message!");
+  //   processBroadcast("custom", "Custom Msg", (student) => ({
+  //     students: [
+  //       {
+  //         id: student._id,
+  //         parentPhone: student.parentContact?.phone,
+  //         message: customMessage.trim(),
+  //       },
+  //     ],
+  //   }));
+  // };
+
   const sendCustomBulk = () => {
-    if (!customMessage.trim())
+    const formattedMessage = htmlToWhatsappText(customMessage);
+
+    if (!formattedMessage.trim()) {
       return toast.error("Please enter a custom message!");
+    }
+
     processBroadcast("custom", "Custom Msg", (student) => ({
       students: [
         {
           id: student._id,
           parentPhone: student.parentContact?.phone,
-          message: customMessage.trim(),
+          message: formattedMessage,
         },
       ],
     }));
   };
 
+  // const sendPersonalMsg = async (student) => {
+  //   if (!personalMessageContent.trim()) return;
+  //   try {
+  //     updateStatus(student._id, "Personal: Sending...");
+  //     const payload = {
+  //       students: [
+  //         {
+  //           id: student._id,
+  //           parentPhone: student.parentContact?.phone,
+  //           message: personalMessageContent.trim(),
+  //         },
+  //       ],
+  //     };
+  //     const res = await fetch(`${API_URL}/whatsapp/send-personal-message`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(payload),
+  //     });
+
+  //     updateStatus(
+  //       student._id,
+  //       res.ok ? "Personal: Sent ✓" : "Personal: Failed ✗",
+  //     );
+  //     if (res.ok) {
+  //       setPersonalMessageStudentId(null);
+  //       setPersonalMessageContent("");
+  //       toast.success("Sent");
+  //     }
+  //   } catch {
+  //     updateStatus(student._id, "Personal: Failed ✗");
+  //   }
+  // };
+
   const sendPersonalMsg = async (student) => {
-    if (!personalMessageContent.trim()) return;
+    const formattedMessage = htmlToWhatsappText(personalMessageContent);
+
+    if (!formattedMessage.trim()) return;
+
     try {
       updateStatus(student._id, "Personal: Sending...");
+
       const payload = {
         students: [
           {
             id: student._id,
             parentPhone: student.parentContact?.phone,
-            message: personalMessageContent.trim(),
+            message: formattedMessage,
           },
         ],
       };
+
       const res = await fetch(`${API_URL}/whatsapp/send-personal-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -575,6 +695,7 @@ combinedHTML += `
         student._id,
         res.ok ? "Personal: Sent ✓" : "Personal: Failed ✗",
       );
+
       if (res.ok) {
         setPersonalMessageStudentId(null);
         setPersonalMessageContent("");
@@ -594,27 +715,26 @@ combinedHTML += `
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 p-3 md:p-8 animate-fade-in">
-     {hiddenStudentForReport && (
-  <div
-    style={{
-      position: "fixed",
-      top: 0,
-      left: "-99999px",
-      zIndex: -999,
-      width: "900px",
-      minWidth: "900px",
-      maxWidth: "900px",
-      backgroundColor: "white",
-      overflow: "hidden",
-    }}
-  >
-    <ReportCardPage
-      studentId={hiddenStudentForReport}
-      isAutoUploadMode={true}
-    />
-  </div>
-)}
-
+      {hiddenStudentForReport && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: "-99999px",
+            zIndex: -999,
+            width: "900px",
+            minWidth: "900px",
+            maxWidth: "900px",
+            backgroundColor: "white",
+            overflow: "hidden",
+          }}
+        >
+          <ReportCardPage
+            studentId={hiddenStudentForReport}
+            isAutoUploadMode={true}
+          />
+        </div>
+      )}
 
       {/* 🌟 2. LOADING PROGRESS OVERLAY 🌟 */}
       {isBulkUploading && (
@@ -761,27 +881,31 @@ combinedHTML += `
                 ⚡ Auto-Upload
               </button>
               {/* NAYA BULK UPDATE BUTTON */}
-{(currentUser.role === "admin" || currentUser.role === "principal") && (
-  <button 
-    onClick={() => setIsUpdateModalOpen(true)} 
-    disabled={isBulkUploading} 
-    className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm border border-orange-600 flex items-center gap-1"
-  >
-    🔄 Promote / Update Class
-  </button>
-)}
+              {(currentUser.role === "admin" ||
+                currentUser.role === "principal") && (
+                <button
+                  onClick={() => setIsUpdateModalOpen(true)}
+                  disabled={isBulkUploading}
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm border border-orange-600 flex items-center gap-1"
+                >
+                  🔄 Promote / Update Class
+                </button>
+              )}
 
               <div className="w-px bg-indigo-200 shrink-0 mx-1 hidden sm:block h-6"></div>
-              <input
-                type="text"
-                placeholder="Type custom msg..."
-                value={customMessage}
-                onChange={(e) => setCustomMessage(e.target.value)}
-                className="min-w-[150px] border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
-              />
+         <div className="min-w-[320px] max-w-[520px] bg-white rounded-lg border border-indigo-200 overflow-hidden">
+  <ReactQuill
+    theme="snow"
+    value={customMessage}
+    onChange={setCustomMessage}
+    modules={quillModules}
+    formats={quillFormats}
+    placeholder="Type custom message..."
+  />
+</div>
               <button
                 onClick={sendCustomBulk}
-                disabled={!whatsappReady}
+                disabled={!whatsappReady || isQuillEmpty(customMessage)}
                 className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap"
               >
                 💬 Send
@@ -956,20 +1080,20 @@ combinedHTML += `
                           <td className="py-4 px-4 text-right">
                             {personalMessageStudentId === student._id ? (
                               <div className="flex items-center gap-1 justify-end">
-                                <input
-                                  type="text"
-                                  value={personalMessageContent}
-                                  onChange={(e) =>
-                                    setPersonalMessageContent(e.target.value)
-                                  }
-                                  placeholder="Type..."
-                                  className="text-[11px] border border-pink-300 rounded px-2 py-1.5 w-32 focus:outline-none focus:ring-1 focus:ring-pink-500"
-                                  autoFocus
-                                />
+                                <div className="w-[340px] bg-white border border-pink-300 rounded-lg overflow-hidden text-left">
+                                  <ReactQuill
+                                    theme="snow"
+                                    value={personalMessageContent}
+                                    onChange={setPersonalMessageContent}
+                                    modules={quillModules}
+                                    formats={quillFormats}
+                                    placeholder="Write personal message..."
+                                  />
+                                </div>
                                 <button
                                   onClick={() => sendPersonalMsg(student)}
                                   disabled={
-                                    !personalMessageContent.trim() ||
+                                    isQuillEmpty(personalMessageContent) ||
                                     !whatsappReady
                                   }
                                   className="bg-green-100 text-green-700 border border-green-200 rounded font-bold px-2 py-1 text-xs hover:bg-green-200"
@@ -1258,7 +1382,7 @@ combinedHTML += `
           </div>
         )}
       </div>
-          {/* ========================================== */}
+      {/* ========================================== */}
       {/* 🔄 BULK PROMOTE / UPDATE MODAL             */}
       {/* ========================================== */}
       {(() => {
@@ -1267,17 +1391,25 @@ combinedHTML += `
         // Fir unke unique sections nikal lo.
         let dependentSections = [];
         if (newGrade) {
-          dependentSections = [...new Set(
-            allStudents
-              .filter(s => s.gradeLevel === newGrade)
-              .map(s => s.section)
-          )].filter(Boolean).sort();
+          dependentSections = [
+            ...new Set(
+              allStudents
+                .filter((s) => s.gradeLevel === newGrade)
+                .map((s) => s.section),
+            ),
+          ]
+            .filter(Boolean)
+            .sort();
         }
         // Fallback: Agar nayi class khali hai to standard A, B dikha do as option
-        if (dependentSections.length === 0) dependentSections = ['A', 'B', 'C', 'D'];
+        if (dependentSections.length === 0)
+          dependentSections = ["A", "B", "C", "D"];
 
         return (
-          <Dialog.Root open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+          <Dialog.Root
+            open={isUpdateModalOpen}
+            onOpenChange={setIsUpdateModalOpen}
+          >
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
               <Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white rounded-2xl shadow-2xl p-6 w-[90vw] max-w-md z-[60]">
@@ -1285,55 +1417,74 @@ combinedHTML += `
                   Promote / Update Class
                 </Dialog.Title>
                 <p className="text-sm text-gray-500 mb-5">
-                  You are updating the class for <strong className="text-pink-600">{selectedStudentIds.length}</strong> selected students.
+                  You are updating the class for{" "}
+                  <strong className="text-pink-600">
+                    {selectedStudentIds.length}
+                  </strong>{" "}
+                  selected students.
                 </p>
-                
+
                 <div className="flex flex-col gap-4 mb-6">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">New Class / Grade <span className="text-red-500">*</span></label>
-                    <select 
-                      value={newGrade} 
+                    <label className="block text-sm font-bold text-gray-700 mb-1">
+                      New Class / Grade <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={newGrade}
                       onChange={(e) => {
                         setNewGrade(e.target.value);
                         setNewSection(""); // Class badalne pe section reset kar do
-                      }} 
+                      }}
                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer"
                     >
-                      <option value="" disabled>-- Select New Class --</option>
+                      <option value="" disabled>
+                        -- Select New Class --
+                      </option>
                       {availableGrades.map((grade) => (
-                        <option key={grade} value={grade}>{grade}</option>
+                        <option key={grade} value={grade}>
+                          {grade}
+                        </option>
                       ))}
                     </select>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">New Section <span className="text-gray-400 font-normal">(Optional)</span></label>
-                    <select 
-                      value={newSection} 
-                      onChange={(e) => setNewSection(e.target.value)} 
+                    <label className="block text-sm font-bold text-gray-700 mb-1">
+                      New Section{" "}
+                      <span className="text-gray-400 font-normal">
+                        (Optional)
+                      </span>
+                    </label>
+                    <select
+                      value={newSection}
+                      onChange={(e) => setNewSection(e.target.value)}
                       disabled={!newGrade} // Class select hone se pehle disable rakho
                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       <option value="">
-                        {!newGrade ? "Select a class first..." : "-- Select Section --"}
+                        {!newGrade
+                          ? "Select a class first..."
+                          : "-- Select Section --"}
                       </option>
                       {/* 🌟 DEPENDENT SECTIONS MAPPED HERE */}
-                      {dependentSections.map(sec => (
-                         <option key={sec} value={sec}>{sec}</option>
+                      {dependentSections.map((sec) => (
+                        <option key={sec} value={sec}>
+                          {sec}
+                        </option>
                       ))}
                     </select>
                   </div>
                 </div>
 
                 <div className="flex justify-end gap-3">
-                  <button 
-                    onClick={() => setIsUpdateModalOpen(false)} 
+                  <button
+                    onClick={() => setIsUpdateModalOpen(false)}
                     className="px-4 py-2 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
                   >
                     Cancel
                   </button>
-                  <button 
-                    onClick={submitBulkClassUpdate} 
+                  <button
+                    onClick={submitBulkClassUpdate}
                     className="px-4 py-2 text-sm font-bold text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition flex items-center gap-2"
                   >
                     Update Students
@@ -1345,7 +1496,6 @@ combinedHTML += `
         );
       })()}
     </div>
-    
   );
 };
 
