@@ -1,4 +1,7 @@
 
+
+
+
 // import React, { useState, useEffect, useMemo } from "react";
 // import { useParams, Link, useNavigate } from "react-router-dom";
 // import studentService from "../services/studentService";
@@ -118,6 +121,33 @@
 //     }));
 //   }, [grades]);
 
+//   // --- Sort Assessments Logic (For rendering breakdown) ---
+//   const getSortedAssessments = (assessments) => {
+//     if (!assessments || !Array.isArray(assessments)) return [];
+    
+//     const sortOrder = [
+//       "Periodic Test-I", "PT-I", "PT-1", "PT-I (20)",
+//       "Periodic Test-II", "PT-II", "PT-2", "PT-II (20)",
+//       "SA-I", "SA - I", "SA-I (80)", "SA-1", "Half Yearly",
+//       "Periodic Test-III", "PT-III", "PT-3",
+//       "Periodic Test-IV", "PT-IV", "PT-4",
+//       "SA-II", "SA - II", "SA-II (80)", "SA-2", "Annual"
+//     ];
+
+//     return [...assessments].sort((a, b) => {
+//       const nameA = a.assessmentType?.name?.trim().toLowerCase() || "";
+//       const nameB = b.assessmentType?.name?.trim().toLowerCase() || "";
+      
+//       const ia = sortOrder.findIndex(p => p.toLowerCase() === nameA);
+//       const ib = sortOrder.findIndex(p => p.toLowerCase() === nameB);
+      
+//       if (ia !== -1 && ib !== -1) return ia - ib;
+//       if (ia !== -1) return -1;
+//       if (ib !== -1) return 1;
+//       return nameA.localeCompare(nameB);
+//     });
+//   };
+
 //   // --- Render Logic ---
 //   if (loading) return <div className="flex justify-center mt-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div></div>;
 //   if (error) return <p className="text-center text-red-500 mt-8 font-semibold bg-red-50 p-4 rounded-xl max-w-lg mx-auto">{error}</p>;
@@ -188,28 +218,43 @@
 //                             <table className="w-full text-left text-sm border-collapse">
 //                             <thead>
 //                                 <tr className="bg-white border-b border-gray-100 text-gray-400 uppercase tracking-wider text-[11px]">
-//                                 <th className="py-3 px-5 font-extrabold">Subject</th>
+//                                 <th className="py-3 px-5 font-extrabold w-2/5">Subject & Breakdown</th>
 //                                 <th className="py-3 px-4 font-extrabold">Year</th>
-//                                 <th className="py-3 px-4 font-extrabold text-center">Score</th>
+//                                 <th className="py-3 px-4 font-extrabold text-center">Total Score</th>
 //                                 <th className="py-3 px-4 font-extrabold text-right">Action</th>
 //                                 </tr>
 //                             </thead>
 //                             <tbody className="divide-y divide-gray-50 bg-white">
 //                                 {group.records.map((grade) => (
-//                                 <tr key={grade._id} className="hover:bg-gray-50/50 transition-colors">
-//                                     <td className="py-3 px-5 font-bold text-gray-800">
-//                                     {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
+//                                 <tr key={grade._id} className="hover:bg-gray-50/50 transition-colors align-top">
+//                                     <td className="py-3 px-5">
+//                                         <div className="font-bold text-gray-800 text-[15px] mb-1.5">
+//                                             {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
+//                                         </div>
+//                                         {/* Assessment Breakdown display */}
+//                                         {grade.assessments && grade.assessments.length > 0 && (
+//                                             <div className="flex flex-wrap gap-1.5">
+//                                                 {getSortedAssessments(grade.assessments).map((assess, idx) => (
+//                                                     <div key={idx} className="inline-flex items-center text-[10px] bg-gray-100 border border-gray-200 rounded px-1.5 py-0.5">
+//                                                         <span className="text-gray-500 font-medium mr-1">{assess.assessmentType?.name}:</span>
+//                                                         <span className="font-bold text-gray-800">{assess.score || "-"}</span>
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                         )}
 //                                     </td>
 //                                     <td className="py-3 px-4">
-//                                         <div className="text-xs text-gray-600 font-bold">{grade.academicYear}</div>
+//                                         <div className="text-xs text-gray-600 font-bold mt-1">{grade.academicYear}</div>
 //                                     </td>
 //                                     <td className="py-3 px-4 text-center">
-//                                         <span className="bg-green-50 text-green-700 font-extrabold px-3 py-1 rounded-lg border border-green-100">
-//                                             {grade.finalScore ?? "-"}
-//                                         </span>
+//                                         <div className="mt-1">
+//                                             <span className="bg-green-50 text-green-700 font-extrabold px-3 py-1 rounded-lg border border-green-100">
+//                                                 {grade.finalScore ?? "-"}
+//                                             </span>
+//                                         </div>
 //                                     </td>
 //                                     <td className="py-3 px-4 text-right">
-//                                         <div className="flex justify-end gap-2">
+//                                         <div className="flex justify-end gap-2 mt-1">
 //                                             <button onClick={() => setEditingGradeId(grade._id)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-transparent hover:border-blue-200">Edit</button>
 //                                             <button onClick={() => handleGradeDelete(grade._id)} className="text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-transparent hover:border-red-200">Delete</button>
 //                                         </div>
@@ -229,12 +274,24 @@
 //                                             <h4 className="font-bold text-gray-800 text-[15px]">
 //                                                 {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
 //                                             </h4>
-//                                             <div className="mt-1">
+//                                             <div className="mt-1 mb-2">
 //                                                 <span className="text-[10px] text-gray-400 font-bold">{grade.academicYear}</span>
 //                                             </div>
+                                            
+//                                             {/* Mobile Assessment Breakdown */}
+//                                             {grade.assessments && grade.assessments.length > 0 && (
+//                                                 <div className="flex flex-wrap gap-1 mb-2">
+//                                                     {getSortedAssessments(grade.assessments).map((assess, idx) => (
+//                                                         <div key={idx} className="inline-flex items-center text-[10px] bg-gray-100 border border-gray-200 rounded px-1.5 py-0.5">
+//                                                             <span className="text-gray-500 font-medium mr-1">{assess.assessmentType?.name}:</span>
+//                                                             <span className="font-bold text-gray-800">{assess.score || "-"}</span>
+//                                                         </div>
+//                                                     ))}
+//                                                 </div>
+//                                             )}
 //                                         </div>
 //                                         <div className="flex flex-col items-end">
-//                                             <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Score</span>
+//                                             <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Total</span>
 //                                             <span className="bg-green-50 text-green-700 font-black px-2.5 py-1 rounded border border-green-100 text-sm">
 //                                                 {grade.finalScore ?? "-"}
 //                                             </span>
@@ -358,7 +415,7 @@
 // export default StudentDetailPage;
 
 
-
+// src/pages/StudentDetailPage.js
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import studentService from "../services/studentService";
@@ -383,6 +440,9 @@ const StudentDetailPage = () => {
 
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [editingGradeId, setEditingGradeId] = useState(null);
+  
+  // 🌟 NEW: Session State for Report Card
+  const [selectedSession, setSelectedSession] = useState("");
 
   // --- Data Fetching ---
   useEffect(() => {
@@ -415,6 +475,25 @@ const StudentDetailPage = () => {
     };
     fetchAllData();
   }, [id]);
+
+  // 🌟 NEW: Extract Unique Sessions from Grades
+  const availableSessions = useMemo(() => {
+    const sessions = new Set(grades.map(g => g.academicYear).filter(Boolean));
+    if (sessions.size === 0) {
+      // Default to current year if no grades exist yet
+      const currentYear = new Date().getFullYear();
+      sessions.add(`${currentYear}-${currentYear + 1}`);
+    }
+    // Sort descending so the latest session comes first
+    return Array.from(sessions).sort().reverse();
+  }, [grades]);
+
+  // 🌟 NEW: Auto-select the most recent session on load
+  useEffect(() => {
+    if (availableSessions.length > 0 && !selectedSession) {
+      setSelectedSession(availableSessions[0]);
+    }
+  }, [availableSessions, selectedSession]);
 
   // --- Action Handlers ---
   const handleStudentDelete = async () => {
@@ -471,14 +550,13 @@ const StudentDetailPage = () => {
       groups[sem].push(grade);
     });
     
-    // Sort semesters (First Semester pehle aaye)
     return Object.keys(groups).sort((a, b) => a.localeCompare(b)).map(sem => ({
       semester: sem,
       records: groups[sem]
     }));
   }, [grades]);
 
-  // --- Sort Assessments Logic (For rendering breakdown) ---
+  // --- Sort Assessments Logic ---
   const getSortedAssessments = (assessments) => {
     if (!assessments || !Array.isArray(assessments)) return [];
     
@@ -537,9 +615,22 @@ const StudentDetailPage = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2.5 w-full md:w-auto z-10">
-            <button onClick={() => setIsReportOpen(true)} className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm">
-                📄 Generate Report
-            </button>
+            {/* 🌟 NEW: Session Dropdown + Generate Report Button in a group */}
+            <div className="flex items-center gap-2 w-full sm:w-auto bg-gray-50 p-1.5 rounded-xl border border-gray-200 shadow-sm">
+                <select 
+                    value={selectedSession} 
+                    onChange={(e) => setSelectedSession(e.target.value)}
+                    className="bg-transparent border-none text-gray-700 text-sm font-bold focus:ring-0 cursor-pointer pl-2 outline-none"
+                >
+                    {availableSessions.map(session => (
+                        <option key={session} value={session}>{session}</option>
+                    ))}
+                </select>
+                <button onClick={() => setIsReportOpen(true)} className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap">
+                    📄 Report
+                </button>
+            </div>
+
             {isAdmin && (
                 <div className="flex gap-2.5 w-full sm:w-auto">
                     <Link to={`/students/edit/${student._id}`} className="flex-1 sm:flex-none text-center bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-5 rounded-xl text-sm transition-all border border-gray-200 shadow-sm">
@@ -553,9 +644,9 @@ const StudentDetailPage = () => {
         </div>
       </div>
 
+      {/* Rest of your page content remains exactly the same... */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* LEFT COLUMN: ACADEMIC GRADES (Grouped by Semester) */}
+        {/* LEFT COLUMN: ACADEMIC GRADES */}
         <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-4 md:p-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
@@ -588,7 +679,6 @@ const StudentDetailPage = () => {
                                         <div className="font-bold text-gray-800 text-[15px] mb-1.5">
                                             {grade.subject?.name || <span className="text-red-400 italic">Deleted Subject</span>}
                                         </div>
-                                        {/* Assessment Breakdown display */}
                                         {grade.assessments && grade.assessments.length > 0 && (
                                             <div className="flex flex-wrap gap-1.5">
                                                 {getSortedAssessments(grade.assessments).map((assess, idx) => (
@@ -634,8 +724,6 @@ const StudentDetailPage = () => {
                                             <div className="mt-1 mb-2">
                                                 <span className="text-[10px] text-gray-400 font-bold">{grade.academicYear}</span>
                                             </div>
-                                            
-                                            {/* Mobile Assessment Breakdown */}
                                             {grade.assessments && grade.assessments.length > 0 && (
                                                 <div className="flex flex-wrap gap-1 mb-2">
                                                     {getSortedAssessments(grade.assessments).map((assess, idx) => (
@@ -733,7 +821,6 @@ const StudentDetailPage = () => {
       </div>
 
       {/* MODALS */}
-
       {/* 1. Report Card Modal */}
       <Dialog.Root open={isReportOpen} onOpenChange={setIsReportOpen}>
         <Dialog.Portal>
@@ -741,7 +828,7 @@ const StudentDetailPage = () => {
           <Dialog.Content className="fixed inset-2 md:inset-6 lg:inset-10 bg-gray-100 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col animate-fade-in">
             <div className="p-4 bg-white border-b border-gray-200 flex justify-between items-center shadow-sm z-10">
               <Dialog.Title className="text-lg md:text-xl font-extrabold text-gray-800 flex items-center gap-2">
-                  <span className="text-pink-600">📄</span> Report Card
+                  <span className="text-pink-600">📄</span> Report Card ({selectedSession})
               </Dialog.Title>
               <Dialog.Close asChild>
                 <button className="bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors border border-gray-200 hover:border-red-200">
@@ -750,7 +837,8 @@ const StudentDetailPage = () => {
               </Dialog.Close>
             </div>
             <div className="flex-1 overflow-y-auto p-2 md:p-6 bg-gray-200/50">
-                <ReportCardPage studentId={student._id} />
+                {/* 🌟 NEW: Passed academicYear prop to ReportCardPage */}
+                <ReportCardPage studentId={student._id} academicYear={selectedSession} />
             </div>
           </Dialog.Content>
         </Dialog.Portal>

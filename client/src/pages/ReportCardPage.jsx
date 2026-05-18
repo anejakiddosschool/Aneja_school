@@ -82,7 +82,7 @@ const formatScore = (num) => {
 //   const API_URL = import.meta.env.VITE_API_URL;
 
 
-const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
+const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear }) => {
   const { id: routeId } = useParams();
   const id = studentId || routeId;
   const API_URL = import.meta.env.VITE_API_URL;
@@ -130,34 +130,39 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
         setAllReports(reportsData);
 
         if (studentData) {
-          const firstReport = reportsData.find(
+          const currentYearReports = academicYear 
+            ? reportsData.filter((r) => r.academicYear === academicYear)
+            : reportsData;
+
+          const firstReport = currentYearReports.find(
             (r) => r.semester === "First Semester",
           );
-          const secondReport = reportsData.find(
+          const secondReport = currentYearReports.find(
             (r) => r.semester === "Second Semester",
           );
-          const academicYear = firstReport?.academicYear;
+
+          const rankYear = academicYear || firstReport?.academicYear;
           const gradeLevel = studentData.gradeLevel;
 
-          if (academicYear) {
+          if (rankYear) {
             const rankPromises = [
               rankService.getRank({
                 studentId: id,
-                academicYear,
+                academicYear: rankYear,
                 semester: "First Semester",
                 gradeLevel,
               }),
               secondReport
                 ? rankService.getRank({
                     studentId: id,
-                    academicYear,
+                    academicYear: rankYear,
                     semester: "Second Semester",
                     gradeLevel,
                   })
                 : Promise.resolve(null),
               rankService.getOverallRank({
                 studentId: id,
-                academicYear,
+                academicYear: rankYear,
                 gradeLevel,
               }),
             ];
@@ -191,7 +196,7 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
     };
 
     if (id) fetchAllData();
-  }, [id]);
+  }, [id, academicYear]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -210,7 +215,7 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
     setVisible(true);
   }, []);
 
-  // --- FILTER GRADES BASED ON viewType ---
+  // --- FILTER GRADES BASED ON viewType AND academicYear ---
   const filteredGrades = useMemo(() => {
     if (!allGrades || allGrades.length === 0) return [];
 
@@ -223,7 +228,11 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
       );
     };
 
-    const mapped = allGrades.map((gradeRecord) => {
+    const yearFilteredGrades = academicYear 
+      ? allGrades.filter(g => g.academicYear === academicYear)
+      : allGrades;
+
+    const mapped = yearFilteredGrades.map((gradeRecord) => {
       const cloned = { ...gradeRecord };
       if (Array.isArray(cloned.assessments)) {
         cloned.assessments = cloned.assessments.filter((a) => {
@@ -252,7 +261,7 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
       );
     }
     return mapped;
-  }, [allGrades, viewType]);
+  }, [allGrades, viewType, academicYear]);
 
   // Extract unique assessment types and max marks safely
   // const assessmentTypesByTerm = useMemo(() => {
@@ -799,10 +808,14 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false }) => {
     return <p className="loading">Generating Authentic Report Card...</p>;
   if (error) return <p className="error">{error}</p>;
 
-  const firstSemesterReport = allReports.find(
+  const currentYearReportsForRender = academicYear 
+    ? allReports.filter((r) => r.academicYear === academicYear)
+    : allReports;
+
+  const firstSemesterReport = currentYearReportsForRender.find(
     (r) => r.semester === "First Semester",
   );
-  const secondSemesterReport = allReports.find(
+  const secondSemesterReport = currentYearReportsForRender.find(
     (r) => r.semester === "Second Semester",
   );
   const hasTerm2Data = filteredGrades.some(

@@ -9,6 +9,7 @@
 // import toast from "react-hot-toast";
 // import ReactQuill from "react-quill-new";
 // import "react-quill-new/dist/quill.snow.css";
+
 // const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 // const StudentListPage = () => {
@@ -17,19 +18,23 @@
 //   const [selectedGrade, setSelectedGrade] = useState(
 //     () => localStorage.getItem("selectedGrade") || "",
 //   );
-//   const [availableGrades, setAvailableGrades] = useState([]);
+//   const [availableGrades, setAvailableGrades] = useState(() => {
+//     try {
+//       return JSON.parse(localStorage.getItem("availableGrades") || "[]");
+//     } catch {
+//       return [];
+//     }
+//   });
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 //   const [searchQuery, setSearchQuery] = useState("");
 //   const [reportStudentId, setReportStudentId] = useState(null);
-//   // 🌟 Nayi States Bulk Update ke liye
+
 //   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 //   const [newGrade, setNewGrade] = useState("");
 //   const [newSection, setNewSection] = useState("");
+//   const [availableSections, setAvailableSections] = useState([]);
 
-//   const [availableSections, setAvailableSections] = useState([]); // 🌟 Nayi state
-
-//   // Status & Logic States
 //   const [sendStatuses, setSendStatuses] = useState({});
 //   const [customMessage, setCustomMessage] = useState("");
 //   const [whatsappReady, setWhatsappReady] = useState(false);
@@ -40,13 +45,21 @@
 //   const [isBulkUploading, setIsBulkUploading] = useState(false);
 //   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
 //   const [hiddenStudentForReport, setHiddenStudentForReport] = useState(null);
-//   const [bulkActionType, setBulkActionType] = useState(""); // "upload" ya "print"
+//   const [bulkActionType, setBulkActionType] = useState("");
 
-//   // Helper for cleanly formatting dates
 //   const formatDate = (dateString) => {
 //     if (!dateString) return "No Data";
 //     const options = { day: "2-digit", month: "short", year: "numeric" };
 //     return new Date(dateString).toLocaleDateString("en-IN", options);
+//   };
+
+//   const sortGrades = (grades = []) => {
+//     return [...grades].sort((a, b) =>
+//       String(a).localeCompare(String(b), undefined, {
+//         numeric: true,
+//         sensitivity: "base",
+//       }),
+//     );
 //   };
 
 //   useEffect(() => {
@@ -54,7 +67,10 @@
 //     else localStorage.removeItem("selectedGrade");
 //   }, [selectedGrade]);
 
-//   // WhatsApp connection check
+//   useEffect(() => {
+//     localStorage.setItem("availableGrades", JSON.stringify(availableGrades));
+//   }, [availableGrades]);
+
 //   useEffect(() => {
 //     const fetchStatus = async () => {
 //       try {
@@ -65,6 +81,7 @@
 //         setWhatsappReady(false);
 //       }
 //     };
+
 //     fetchStatus();
 
 //     socket.on("ready", () => setWhatsappReady(true));
@@ -78,24 +95,24 @@
 //     };
 //   }, []);
 
-// const quillModules = {
-//   toolbar: [
-//     [{ header: [1, 2, false] }],
-//     ["bold", "italic", "underline"],
-//     [{ list: "ordered" }, { list: "bullet" }],
-//     ["blockquote"],
-//     ["clean"],
-//   ],
-// };
+//   const quillModules = {
+//     toolbar: [
+//       [{ header: [1, 2, false] }],
+//       ["bold", "italic", "underline"],
+//       [{ list: "ordered" }, { list: "bullet" }],
+//       ["blockquote"],
+//       ["clean"],
+//     ],
+//   };
 
-// const quillFormats = [
-//   "header",
-//   "bold",
-//   "italic",
-//   "underline",
-//   "list",
-//   "blockquote",
-// ];
+//   const quillFormats = [
+//     "header",
+//     "bold",
+//     "italic",
+//     "underline",
+//     "list",
+//     "blockquote",
+//   ];
 
 //   const htmlToWhatsappText = (html = "") => {
 //     const temp = document.createElement("div");
@@ -120,37 +137,49 @@
 //     return !htmlToWhatsappText(html).trim();
 //   };
 
-//   // 🌟 NAYA: loadInitialData ko useEffect se bahar nikala taaki sab isko call kar sakein
 //   const loadInitialData = async () => {
 //     try {
 //       setLoading(true);
+//       setError(null);
+
 //       const studentRes = await studentService.getAllStudents();
-//       const allFetchedStudents = studentRes.data.data;
+//       const allFetchedStudents = studentRes.data.data || [];
 //       setAllStudents(allFetchedStudents);
 
 //       if (currentUser.role === "admin") {
-//         setAvailableGrades(
-//           [...new Set(allFetchedStudents.map((s) => s.gradeLevel))].sort(),
-//         );
+//         setAvailableGrades((prev) => {
+//           const fetchedGrades = allFetchedStudents
+//             .map((s) => s.gradeLevel)
+//             .filter(Boolean);
+
+//           const mergedGrades = [
+//             ...new Set(
+//               [...prev, ...fetchedGrades, selectedGrade, newGrade].filter(
+//                 Boolean,
+//               ),
+//             ),
+//           ];
+
+//           return sortGrades(mergedGrades);
+//         });
 //       } else {
 //         const profileRes = await userService.getProfile();
-//         setAvailableGrades(
-//           [
-//             ...new Set(
-//               profileRes.data.subjectsTaught
-//                 .map((a) => a.subject?.gradeLevel)
-//                 .filter(Boolean),
-//             ),
-//           ].sort(),
-//         );
+//         const teacherGrades = [
+//           ...new Set(
+//             profileRes.data.subjectsTaught
+//               ?.map((a) => a.subject?.gradeLevel)
+//               .filter(Boolean) || [],
+//           ),
+//         ];
+//         setAvailableGrades(sortGrades(teacherGrades));
 //       }
 
-//       // Naya added section part bhi yahin rahega
 //       const extractedSections = [
 //         ...new Set(allFetchedStudents.map((s) => s.section)),
 //       ]
 //         .filter(Boolean)
 //         .sort();
+
 //       if (extractedSections.length === 0) extractedSections.push("A", "B", "C");
 //       setAvailableSections(extractedSections);
 
@@ -166,7 +195,6 @@
 //     }
 //   };
 
-//   // 🌟 Puraane useEffect ko chhota kar diya, ab bas loadInitialData call karega
 //   useEffect(() => {
 //     loadInitialData();
 //   }, [currentUser.role]);
@@ -201,15 +229,6 @@
 //     setSendStatuses((prev) => ({ ...prev, [id]: status }));
 //   };
 
-//   // ==========================================
-//   // 🌟 NAYA: BULK AUTO GENERATE & UPLOAD LOGIC 🌟
-//   // ==========================================
-//   // ==========================================
-//   // 🌟 BULK AUTO GENERATE & UPLOAD LOGIC 🌟
-//   // ==========================================
-//   // ==========================================
-//   // 🌟 BULK AUTO GENERATE & UPLOAD LOGIC 🌟
-//   // ==========================================
 //   const handleBulkGenerateReports = async () => {
 //     const validStudents = filteredStudents.filter((s) =>
 //       selectedStudentIds.includes(s._id),
@@ -223,7 +242,6 @@
 //     )
 //       return;
 
-//     // 🔒 NAYA: FORCE DESKTOP VIEWPORT FOR MOBILE
 //     const originalMeta = document.querySelector("meta[name=viewport]");
 //     const newMeta = document.createElement("meta");
 //     newMeta.name = "viewport";
@@ -265,7 +283,6 @@
 //       await new Promise((r) => setTimeout(r, 500));
 //     }
 
-//     // 🔓 NAYA: UNLOCK VIEWPORT
 //     document.head.removeChild(newMeta);
 //     if (originalMeta) document.head.appendChild(originalMeta);
 
@@ -273,16 +290,10 @@
 //     setIsBulkUploading(false);
 //     loadInitialData();
 //   };
-//   // ==========================================
-//   // 🔄 BULK UPDATE CLASS API CALL
-//   // ==========================================
-//   // ==========================================
-//   // 🔄 BULK UPDATE CLASS API CALL (FIXED)
-//   // ==========================================
+
 //   const submitBulkClassUpdate = async () => {
 //     if (!newGrade.trim()) return toast.error("Please select the new class!");
 
-//     // IDs properly map ho rahe hain ensure karo
 //     const validStudents = filteredStudents.filter((s) =>
 //       selectedStudentIds.includes(s.id || s._id),
 //     );
@@ -303,7 +314,8 @@
 //       if (!token)
 //         throw new Error("No authentication token found. Please login again.");
 
-//       // Fetch request ko zyaada secure banaya gaya hai
+//       const promotedGrade = newGrade.trim();
+
 //       const res = await fetch(`${API_URL}/students/bulk-update-class`, {
 //         method: "PUT",
 //         headers: {
@@ -311,15 +323,12 @@
 //           Authorization: `Bearer ${token}`,
 //         },
 //         body: JSON.stringify({
-//           // React usually id ko 'id' ya '_id' dono tarah se rakh sakta hai, we check both
 //           studentIds: validStudents.map((s) => s.id || s._id),
-//           newGradeLevel: newGrade.trim(),
-//           newSection: newSection.trim() || "A", // fallback section
+//           newGradeLevel: promotedGrade,
+//           newSection: newSection.trim() || "A",
 //         }),
 //       });
 
-//       // Agar server ne HTML/Text bheja instead of JSON, toh res.json() fat jayega.
-//       // Isliye pehle text read karte hain, phir JSON parse karte hain.
 //       const textResponse = await res.text();
 //       let data;
 //       try {
@@ -329,12 +338,19 @@
 //       }
 
 //       if (res.ok && data.success !== false) {
+//         setAvailableGrades((prev) =>
+//           sortGrades([
+//             ...new Set([...prev, selectedGrade, promotedGrade].filter(Boolean)),
+//           ]),
+//         );
+
 //         toast.success(data.message || "Classes updated successfully!");
 //         setIsUpdateModalOpen(false);
+//         setSelectedStudentIds([]);
+//         setSelectedGrade(promotedGrade);
 //         setNewGrade("");
 //         setNewSection("");
-//         setSelectedStudentIds([]); // Selection clear karein
-//         await loadInitialData(); // Data refresh karo taaki nayi class UI me dikhe
+//         await loadInitialData();
 //       } else {
 //         toast.error(data.message || "Failed to update classes");
 //       }
@@ -345,12 +361,7 @@
 //       setLoading(false);
 //     }
 //   };
-//   // ==========================================
-//   // 🖨️ NAYA: ALL REPORTS BULK PRINT LOGIC
-//   // ==========================================
-//   // ==========================================
-//   // 🖨️ ALL REPORTS BULK PRINT LOGIC
-//   // ==========================================
+
 //   const handleBulkPrint = async () => {
 //     const validStudents = filteredStudents.filter((s) =>
 //       selectedStudentIds.includes(s._id),
@@ -364,7 +375,6 @@
 //     )
 //       return;
 
-//     // 🔒 FORCE DESKTOP VIEWPORT
 //     const originalMeta = document.querySelector("meta[name=viewport]");
 //     const newMeta = document.createElement("meta");
 //     newMeta.name = "viewport";
@@ -395,23 +405,21 @@
 //       }
 
 //       if (printArea) {
-//         await new Promise((r) => setTimeout(r, 1000)); // Layout set hone ka wait
-//         // NAYA: Page break add kiya hai perfect print ke liye
+//         await new Promise((r) => setTimeout(r, 1000));
 //         combinedHTML += `
 //   <div class="print-page-wrapper" style="page-break-after: always;">
 //     ${printArea.innerHTML}
 //   </div>
 // `;
-
 //         updateStatus(student._id, "Print Ready ✓");
 //       } else {
 //         updateStatus(student._id, "Failed ✗");
 //       }
+
 //       setHiddenStudentForReport(null);
 //       await new Promise((r) => setTimeout(r, 300));
 //     }
 
-//     // 🔓 UNLOCK VIEWPORT
 //     document.head.removeChild(newMeta);
 //     if (originalMeta) document.head.appendChild(originalMeta);
 
@@ -426,65 +434,65 @@
 //             .join("\n");
 //         } catch (e) {}
 //       }
+
 //       const printWindow = window.open("", "", "height=800,width=1200");
 //       if (printWindow) {
 //         printWindow.document.write(`
-//               <html>
-//                 <head>
-//                   <title>Bulk Print Reports</title>
-//                   <meta name="viewport" content="width=900">
-//                   <style>${styles}</style>
-//                   <style>
-//                     html, body {
-//                       margin: 0 !important;
-//                       padding: 0 !important;
-//                       background: #ffffff !important;
-//                       -webkit-print-color-adjust: exact !important;
-//                       print-color-adjust: exact !important;
-//                       width: 100% !important;
-//                     }
-                    
-//                     /* Yahan magic hai jo use Center karega */
-//                     .print-page-wrapper {
-//                       width: 900px !important;
-//                       max-width: 900px !important;
-//                       min-width: 900px !important;
-//                       margin: 0 auto !important; /* Horizontally Centered */
-//                       padding: 0 !important;
-//                       display: block !important;
-//                     }
+//           <html>
+//             <head>
+//               <title>Bulk Print Reports</title>
+//               <meta name="viewport" content="width=900">
+//               <style>${styles}</style>
+//               <style>
+//                 html, body {
+//                   margin: 0 !important;
+//                   padding: 0 !important;
+//                   background: #ffffff !important;
+//                   -webkit-print-color-adjust: exact !important;
+//                   print-color-adjust: exact !important;
+//                   width: 100% !important;
+//                 }
 
-//                     @page {
-//                       size: A4 portrait;
-//                       margin: 10mm auto !important; /* Vertical margin with auto center */
-//                     }
+//                 .print-page-wrapper {
+//                   width: 900px !important;
+//                   max-width: 900px !important;
+//                   min-width: 900px !important;
+//                   margin: 0 auto !important;
+//                   padding: 0 !important;
+//                   display: block !important;
+//                 }
 
-//                     @media print {
-//                       html, body {
-//                         width: 100% !important;
-//                         display: flex !important;
-//                         flex-direction: column !important;
-//                         align-items: center !important; /* Force center alignment */
-//                       }
+//                 @page {
+//                   size: A4 portrait;
+//                   margin: 10mm auto !important;
+//                 }
 
-//                       .print-page-wrapper {
-//                         width: 100% !important;
-//                         max-width: 190mm !important; /* Exact A4 inner width */
-//                         margin: 0 auto !important;
-//                         page-break-after: always !important;
-//                       }
+//                 @media print {
+//                   html, body {
+//                     width: 100% !important;
+//                     display: flex !important;
+//                     flex-direction: column !important;
+//                     align-items: center !important;
+//                   }
 
-//                       .no-print {
-//                         display: none !important;
-//                       }
-//                     }
-//                   </style>
-//                 </head>
-//                 <body>
-//                   ${combinedHTML}
-//                 </body>
-//               </html>
-//             `);
+//                   .print-page-wrapper {
+//                     width: 100% !important;
+//                     max-width: 190mm !important;
+//                     margin: 0 auto !important;
+//                     page-break-after: always !important;
+//                   }
+
+//                   .no-print {
+//                     display: none !important;
+//                   }
+//                 }
+//               </style>
+//             </head>
+//             <body>
+//               ${combinedHTML}
+//             </body>
+//           </html>
+//         `);
 //         printWindow.document.close();
 //         setTimeout(() => {
 //           printWindow.focus();
@@ -496,7 +504,6 @@
 //     }
 //   };
 
-//   // Generic Broadcaster Logic
 //   const processBroadcast = async (reportType, labelName, payloadFn) => {
 //     const validStudents = filteredStudents.filter((s) =>
 //       selectedStudentIds.includes(s._id),
@@ -515,11 +522,13 @@
 //           reportType === "custom"
 //             ? "/whatsapp/send-custom-message"
 //             : "/whatsapp/send-report-links";
+
 //         const res = await fetch(`${API_URL}${route}`, {
 //           method: "POST",
 //           headers: { "Content-Type": "application/json" },
 //           body: JSON.stringify(payload),
 //         });
+
 //         updateStatus(
 //           student._id,
 //           res.ok ? `${labelName}: Sent ✓` : `${labelName}: Failed ✗`,
@@ -528,13 +537,14 @@
 //         updateStatus(student._id, `${labelName}: Failed ✗`);
 //       }
 //     }
+
 //     toast.success(`${labelName} Processed!`);
 //   };
 
-//   // --- DETAILED BROADCAST TRIGGERS ---
 //   const sendReportCardsToParents = () => {
 //     processBroadcast("reportCard", "Report Card", (student) => {
 //       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are pleased to share the academic report card for your ward, *${student.fullName}*.\n\n*Student Details:*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nPlease find the detailed report card attached with this message. We encourage you to review the academic progress and reach out to the class teacher for any queries.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
 //       return {
 //         students: [
 //           {
@@ -554,6 +564,7 @@
 //   const sendClassTestReportsToParents = () => {
 //     processBroadcast("classTest", "Class Test", (student) => {
 //       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the recent *Class Test Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nWe encourage you to review the scores to track their continuous academic progress. If you have any concerns, please feel free to connect with the respective subject teachers.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
 //       return {
 //         students: [
 //           {
@@ -571,6 +582,7 @@
 //   const sendNtseReportsToParents = () => {
 //     processBroadcast("ntse", "NTSE", (student) => {
 //       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are sharing the attached *NTSE (National Talent Search Examination) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nThis assessment helps us gauge their aptitude for competitive environments. Kindly go through the detailed report attached herewith.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
 //       return {
 //         students: [
 //           {
@@ -588,6 +600,7 @@
 //   const sendPtReportsToParents = () => {
 //     processBroadcast("ptTest", "PT Test", (student) => {
 //       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the *Periodic Test (PT) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nPeriodic assessments are crucial for identifying areas of improvement and strengths. We request you to review the attached document and guide them accordingly at home.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
 //       return {
 //         students: [
 //           {
@@ -601,20 +614,6 @@
 //       };
 //     });
 //   };
-
-//   // const sendCustomBulk = () => {
-//   //   if (!customMessage.trim())
-//   //     return toast.error("Please enter a custom message!");
-//   //   processBroadcast("custom", "Custom Msg", (student) => ({
-//   //     students: [
-//   //       {
-//   //         id: student._id,
-//   //         parentPhone: student.parentContact?.phone,
-//   //         message: customMessage.trim(),
-//   //       },
-//   //     ],
-//   //   }));
-//   // };
 
 //   const sendCustomBulk = () => {
 //     const formattedMessage = htmlToWhatsappText(customMessage);
@@ -633,39 +632,6 @@
 //       ],
 //     }));
 //   };
-
-//   // const sendPersonalMsg = async (student) => {
-//   //   if (!personalMessageContent.trim()) return;
-//   //   try {
-//   //     updateStatus(student._id, "Personal: Sending...");
-//   //     const payload = {
-//   //       students: [
-//   //         {
-//   //           id: student._id,
-//   //           parentPhone: student.parentContact?.phone,
-//   //           message: personalMessageContent.trim(),
-//   //         },
-//   //       ],
-//   //     };
-//   //     const res = await fetch(`${API_URL}/whatsapp/send-personal-message`, {
-//   //       method: "POST",
-//   //       headers: { "Content-Type": "application/json" },
-//   //       body: JSON.stringify(payload),
-//   //     });
-
-//   //     updateStatus(
-//   //       student._id,
-//   //       res.ok ? "Personal: Sent ✓" : "Personal: Failed ✗",
-//   //     );
-//   //     if (res.ok) {
-//   //       setPersonalMessageStudentId(null);
-//   //       setPersonalMessageContent("");
-//   //       toast.success("Sent");
-//   //     }
-//   //   } catch {
-//   //     updateStatus(student._id, "Personal: Failed ✗");
-//   //   }
-//   // };
 
 //   const sendPersonalMsg = async (student) => {
 //     const formattedMessage = htmlToWhatsappText(personalMessageContent);
@@ -736,7 +702,6 @@
 //         </div>
 //       )}
 
-//       {/* 🌟 2. LOADING PROGRESS OVERLAY 🌟 */}
 //       {isBulkUploading && (
 //         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center text-white">
 //           <div className="bg-white p-8 rounded-2xl text-center shadow-2xl max-w-sm w-full">
@@ -766,14 +731,17 @@
 //       )}
 
 //       <div className="max-w-[1300px] mx-auto space-y-4 md:space-y-6">
-//         {/* HEADER (Responsive) */}
 //         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 gap-4">
 //           <div className="flex items-center justify-between w-full sm:w-auto gap-3">
 //             <h1 className="text-xl md:text-2xl font-extrabold text-gray-800">
 //               Student Directory
 //             </h1>
 //             <div
-//               className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${whatsappReady ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+//               className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${
+//                 whatsappReady
+//                   ? "bg-green-100 text-green-700"
+//                   : "bg-red-100 text-red-700"
+//               }`}
 //             >
 //               {whatsappReady ? "● WA Online" : "● WA Offline"}
 //             </div>
@@ -799,7 +767,6 @@
 //           </div>
 //         </div>
 
-//         {/* TOP FILTER BAR (Responsive) */}
 //         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
 //           <div className="flex items-center gap-3 w-full md:w-auto">
 //             <span className="text-sm font-bold text-gray-500 uppercase whitespace-nowrap">
@@ -835,7 +802,6 @@
 //           )}
 //         </div>
 
-//         {/* ACTION BAR (Responsive - Horizontal Scroll on Mobile) */}
 //         {selectedGrade && selectedStudentIds.length > 0 && (
 //           <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
 //             <div className="flex items-center justify-between w-full sm:w-auto">
@@ -843,7 +809,6 @@
 //                 {selectedStudentIds.length} Selected
 //               </span>
 
-//               {/* Select All Checkbox for Mobile inside action bar */}
 //               <label className="sm:hidden flex items-center gap-2 text-xs font-bold text-indigo-700">
 //                 <input
 //                   type="checkbox"
@@ -860,10 +825,7 @@
 //               </label>
 //             </div>
 
-//             {/* 🌟 NAYA BULK UPLOAD BUTTON YAHAN AAYEGA 🌟 */}
-
 //             <div className="flex flex-row overflow-x-auto w-full pb-2 sm:pb-0 gap-2 hide-scrollbar">
-//               {/* 🌟 NAYA BULK PRINT BUTTON */}
 //               <button
 //                 onClick={handleBulkPrint}
 //                 disabled={isBulkUploading}
@@ -872,7 +834,6 @@
 //                 🖨️ Bulk Print
 //               </button>
 
-//               {/* 🌟 UPLOAD BUTTON */}
 //               <button
 //                 onClick={handleBulkGenerateReports}
 //                 disabled={isBulkUploading}
@@ -880,7 +841,7 @@
 //               >
 //                 ⚡ Auto-Upload
 //               </button>
-//               {/* NAYA BULK UPDATE BUTTON */}
+
 //               {(currentUser.role === "admin" ||
 //                 currentUser.role === "principal") && (
 //                 <button
@@ -893,16 +854,18 @@
 //               )}
 
 //               <div className="w-px bg-indigo-200 shrink-0 mx-1 hidden sm:block h-6"></div>
-//          <div className="min-w-[320px] max-w-[520px] bg-white rounded-lg border border-indigo-200 overflow-hidden">
-//   <ReactQuill
-//     theme="snow"
-//     value={customMessage}
-//     onChange={setCustomMessage}
-//     modules={quillModules}
-//     formats={quillFormats}
-//     placeholder="Type custom message..."
-//   />
-// </div>
+
+//               <div className="min-w-[320px] max-w-[520px] bg-white rounded-lg border border-indigo-200 overflow-hidden">
+//                 <ReactQuill
+//                   theme="snow"
+//                   value={customMessage}
+//                   onChange={setCustomMessage}
+//                   modules={quillModules}
+//                   formats={quillFormats}
+//                   placeholder="Type custom message..."
+//                 />
+//               </div>
+
 //               <button
 //                 onClick={sendCustomBulk}
 //                 disabled={!whatsappReady || isQuillEmpty(customMessage)}
@@ -910,7 +873,9 @@
 //               >
 //                 💬 Send
 //               </button>
+
 //               <div className="w-px bg-indigo-200 shrink-0 mx-1 hidden sm:block"></div>
+
 //               <button
 //                 onClick={sendReportCardsToParents}
 //                 disabled={!whatsappReady}
@@ -943,10 +908,8 @@
 //           </div>
 //         )}
 
-//         {/* MAIN DATA SECTION */}
 //         {selectedGrade ? (
 //           <>
-//             {/* --- DESKTOP VIEW (Hidden on Mobile) --- */}
 //             <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
 //               <table className="w-full text-left text-sm border-collapse">
 //                 <thead>
@@ -1007,6 +970,7 @@
 //                               className="cursor-pointer rounded text-pink-600 focus:ring-pink-500 w-4 h-4"
 //                             />
 //                           </td>
+
 //                           <td className="py-4 px-4">
 //                             <Link
 //                               to={`/students/${student._id}`}
@@ -1019,6 +983,7 @@
 //                               {student.rollNumber || "-"}
 //                             </div>
 //                           </td>
+
 //                           <td className="py-4 px-4 text-center">
 //                             <div className="flex flex-col gap-1 items-center justify-center bg-gray-50 border border-gray-100 rounded-lg p-2 min-w-[140px]">
 //                               {hasAnyDoc ? (
@@ -1068,15 +1033,23 @@
 //                               )}
 //                             </div>
 //                           </td>
+
 //                           <td className="py-4 px-2 text-center">
 //                             {currentStatus && currentStatus !== "Idle" && (
 //                               <span
-//                                 className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${currentStatus.includes("Sent") ? "bg-green-50 text-green-700 border-green-200" : currentStatus.includes("Failed") ? "bg-red-50 text-red-700 border-red-200" : "bg-yellow-50 text-yellow-700 border-yellow-200"}`}
+//                                 className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+//                                   currentStatus.includes("Sent")
+//                                     ? "bg-green-50 text-green-700 border-green-200"
+//                                     : currentStatus.includes("Failed")
+//                                       ? "bg-red-50 text-red-700 border-red-200"
+//                                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
+//                                 }`}
 //                               >
 //                                 {currentStatus}
 //                               </span>
 //                             )}
 //                           </td>
+
 //                           <td className="py-4 px-4 text-right">
 //                             {personalMessageStudentId === student._id ? (
 //                               <div className="flex items-center gap-1 justify-end">
@@ -1121,6 +1094,7 @@
 //                                 >
 //                                   💬
 //                                 </button>
+
 //                                 <Dialog.Root
 //                                   open={reportStudentId === student._id}
 //                                   onOpenChange={(open) =>
@@ -1132,7 +1106,11 @@
 //                                   <Dialog.Trigger asChild>
 //                                     <button
 //                                       disabled={!hasReportCard}
-//                                       className={`p-2 rounded-lg transition shadow-sm border ${hasReportCard ? "text-gray-500 hover:text-green-600 bg-gray-50 border-gray-200 hover:border-green-300 hover:bg-green-50" : "text-gray-300 bg-gray-50 border-gray-100 cursor-not-allowed"}`}
+//                                       className={`p-2 rounded-lg transition shadow-sm border ${
+//                                         hasReportCard
+//                                           ? "text-gray-500 hover:text-green-600 bg-gray-50 border-gray-200 hover:border-green-300 hover:bg-green-50"
+//                                           : "text-gray-300 bg-gray-50 border-gray-100 cursor-not-allowed"
+//                                       }`}
 //                                       title="View Report Card"
 //                                     >
 //                                       📄
@@ -1171,8 +1149,8 @@
 //                         colSpan={5}
 //                         className="text-center py-20 text-gray-400 font-medium"
 //                       >
-//                         <div className="text-4xl mb-3">📭</div>No students
-//                         found.
+//                         <div className="text-4xl mb-3">📭</div>
+//                         No students found.
 //                       </td>
 //                     </tr>
 //                   )}
@@ -1180,7 +1158,6 @@
 //               </table>
 //             </div>
 
-//             {/* --- MOBILE VIEW (Hidden on Desktop) --- */}
 //             <div className="md:hidden flex flex-col gap-3">
 //               {filteredStudents.length > 0 ? (
 //                 filteredStudents.map((student) => {
@@ -1196,7 +1173,11 @@
 //                   return (
 //                     <div
 //                       key={student._id}
-//                       className={`bg-white rounded-xl shadow-sm border p-4 transition-colors ${isSelected ? "border-pink-400 bg-pink-50/20" : "border-gray-200"}`}
+//                       className={`bg-white rounded-xl shadow-sm border p-4 transition-colors ${
+//                         isSelected
+//                           ? "border-pink-400 bg-pink-50/20"
+//                           : "border-gray-200"
+//                       }`}
 //                     >
 //                       <div className="flex justify-between items-start mb-3">
 //                         <div className="flex items-start gap-3">
@@ -1273,7 +1254,13 @@
 //                       {currentStatus && currentStatus !== "Idle" && (
 //                         <div className="mb-3">
 //                           <span
-//                             className={`text-[10px] font-bold px-2 py-1 rounded-full ${currentStatus.includes("Sent") ? "bg-green-50 text-green-700" : currentStatus.includes("Failed") ? "bg-red-50 text-red-700" : "bg-yellow-50 text-yellow-700"}`}
+//                             className={`text-[10px] font-bold px-2 py-1 rounded-full ${
+//                               currentStatus.includes("Sent")
+//                                 ? "bg-green-50 text-green-700"
+//                                 : currentStatus.includes("Failed")
+//                                   ? "bg-red-50 text-red-700"
+//                                   : "bg-yellow-50 text-yellow-700"
+//                             }`}
 //                           >
 //                             Status: {currentStatus}
 //                           </span>
@@ -1289,6 +1276,7 @@
 //                         >
 //                           💬 Msg
 //                         </button>
+
 //                         <Dialog.Root
 //                           open={reportStudentId === student._id}
 //                           onOpenChange={(open) =>
@@ -1298,7 +1286,11 @@
 //                           <Dialog.Trigger asChild>
 //                             <button
 //                               disabled={!hasReportCard}
-//                               className={`flex-1 flex justify-center items-center gap-1 py-2 rounded-lg text-sm font-bold transition ${hasReportCard ? "text-green-600 bg-green-50 hover:bg-green-100" : "text-gray-400 bg-gray-50 cursor-not-allowed"}`}
+//                               className={`flex-1 flex justify-center items-center gap-1 py-2 rounded-lg text-sm font-bold transition ${
+//                                 hasReportCard
+//                                   ? "text-green-600 bg-green-50 hover:bg-green-100"
+//                                   : "text-gray-400 bg-gray-50 cursor-not-allowed"
+//                               }`}
 //                             >
 //                               📄 Report
 //                             </button>
@@ -1324,18 +1316,18 @@
 //                         </Dialog.Root>
 //                       </div>
 
-//                       {/* Mobile Personal Message Inline Box */}
 //                       {personalMessageStudentId === student._id && (
 //                         <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-lg flex flex-col gap-2">
-//                           <input
-//                             type="text"
-//                             value={personalMessageContent}
-//                             onChange={(e) =>
-//                               setPersonalMessageContent(e.target.value)
-//                             }
-//                             placeholder="Type a message to parent..."
-//                             className="w-full text-sm border border-blue-200 rounded p-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
-//                           />
+//                           <div className="w-full bg-white border border-blue-200 rounded-lg overflow-hidden text-left">
+//                             <ReactQuill
+//                               theme="snow"
+//                               value={personalMessageContent}
+//                               onChange={setPersonalMessageContent}
+//                               modules={quillModules}
+//                               formats={quillFormats}
+//                               placeholder="Write personal message..."
+//                             />
+//                           </div>
 //                           <div className="flex justify-end gap-2">
 //                             <button
 //                               onClick={() => {
@@ -1349,7 +1341,8 @@
 //                             <button
 //                               onClick={() => sendPersonalMsg(student)}
 //                               disabled={
-//                                 !personalMessageContent.trim() || !whatsappReady
+//                                 isQuillEmpty(personalMessageContent) ||
+//                                 !whatsappReady
 //                               }
 //                               className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded disabled:opacity-50"
 //                             >
@@ -1382,13 +1375,8 @@
 //           </div>
 //         )}
 //       </div>
-//       {/* ========================================== */}
-//       {/* 🔄 BULK PROMOTE / UPDATE MODAL             */}
-//       {/* ========================================== */}
+
 //       {(() => {
-//         // 🌟 YAHAN DYNAMIC SECTIONS CALCULATE HO RAHE HAIN
-//         // Sirf wahi bachhe filter karo jo newly selected 'newGrade' me hain
-//         // Fir unke unique sections nikal lo.
 //         let dependentSections = [];
 //         if (newGrade) {
 //           dependentSections = [
@@ -1401,7 +1389,7 @@
 //             .filter(Boolean)
 //             .sort();
 //         }
-//         // Fallback: Agar nayi class khali hai to standard A, B dikha do as option
+
 //         if (dependentSections.length === 0)
 //           dependentSections = ["A", "B", "C", "D"];
 
@@ -1433,7 +1421,7 @@
 //                       value={newGrade}
 //                       onChange={(e) => {
 //                         setNewGrade(e.target.value);
-//                         setNewSection(""); // Class badalne pe section reset kar do
+//                         setNewSection("");
 //                       }}
 //                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer"
 //                     >
@@ -1458,7 +1446,7 @@
 //                     <select
 //                       value={newSection}
 //                       onChange={(e) => setNewSection(e.target.value)}
-//                       disabled={!newGrade} // Class select hone se pehle disable rakho
+//                       disabled={!newGrade}
 //                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
 //                     >
 //                       <option value="">
@@ -1466,7 +1454,6 @@
 //                           ? "Select a class first..."
 //                           : "-- Select Section --"}
 //                       </option>
-//                       {/* 🌟 DEPENDENT SECTIONS MAPPED HERE */}
 //                       {dependentSections.map((sec) => (
 //                         <option key={sec} value={sec}>
 //                           {sec}
@@ -1502,7 +1489,6 @@
 // export default StudentListPage;
 
 
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import studentService from "../services/studentService";
@@ -1530,6 +1516,18 @@ const StudentListPage = () => {
       return [];
     }
   });
+
+  const currentYear = new Date().getFullYear();
+  const sessionOptions = useMemo(() => {
+    return Array.from({ length: 5 }, (_, i) => {
+      const startYear = currentYear - 2 + i;
+      return `${startYear}-${startYear + 1}`;
+    });
+  }, [currentYear]);
+  const [selectedSession, setSelectedSession] = useState(
+    `${currentYear}-${currentYear + 1}`,
+  );
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1679,7 +1677,9 @@ const StudentListPage = () => {
         setAvailableGrades(sortGrades(teacherGrades));
       }
 
-      const extractedSections = [...new Set(allFetchedStudents.map((s) => s.section))]
+      const extractedSections = [
+        ...new Set(allFetchedStudents.map((s) => s.section)),
+      ]
         .filter(Boolean)
         .sort();
 
@@ -1740,7 +1740,7 @@ const StudentListPage = () => {
       return toast.error("Please select at least one student!");
     if (
       !window.confirm(
-        `Auto-Upload Report Cards for ${validStudents.length} students?`,
+        `Auto-Upload Report Cards for ${validStudents.length} students for session ${selectedSession}?`,
       )
     )
       return;
@@ -1842,9 +1842,9 @@ const StudentListPage = () => {
 
       if (res.ok && data.success !== false) {
         setAvailableGrades((prev) =>
-          sortGrades(
-            [...new Set([...prev, selectedGrade, promotedGrade].filter(Boolean))],
-          ),
+          sortGrades([
+            ...new Set([...prev, selectedGrade, promotedGrade].filter(Boolean)),
+          ]),
         );
 
         toast.success(data.message || "Classes updated successfully!");
@@ -1873,7 +1873,7 @@ const StudentListPage = () => {
       return toast.error("Please select students to print!");
     if (
       !window.confirm(
-        `Generate Print Preview for ${validStudents.length} students?`,
+        `Generate Print Preview for ${validStudents.length} students for session ${selectedSession}?`,
       )
     )
       return;
@@ -2046,7 +2046,7 @@ const StudentListPage = () => {
 
   const sendReportCardsToParents = () => {
     processBroadcast("reportCard", "Report Card", (student) => {
-      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are pleased to share the academic report card for your ward, *${student.fullName}*.\n\n*Student Details:*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nPlease find the detailed report card attached with this message. We encourage you to review the academic progress and reach out to the class teacher for any queries.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are pleased to share the academic report card for your ward, *${student.fullName}* for session *${selectedSession}*.\n\n*Student Details:*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nPlease find the detailed report card attached with this message. We encourage you to review the academic progress and reach out to the class teacher for any queries.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
 
       return {
         students: [
@@ -2066,7 +2066,7 @@ const StudentListPage = () => {
 
   const sendClassTestReportsToParents = () => {
     processBroadcast("classTest", "Class Test", (student) => {
-      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the recent *Class Test Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nWe encourage you to review the scores to track their continuous academic progress. If you have any concerns, please feel free to connect with the respective subject teachers.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the recent *Class Test Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n• Session: ${selectedSession}\n\nWe encourage you to review the scores to track their continuous academic progress. If you have any concerns, please feel free to connect with the respective subject teachers.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
 
       return {
         students: [
@@ -2084,7 +2084,7 @@ const StudentListPage = () => {
 
   const sendNtseReportsToParents = () => {
     processBroadcast("ntse", "NTSE", (student) => {
-      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are sharing the attached *NTSE (National Talent Search Examination) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nThis assessment helps us gauge their aptitude for competitive environments. Kindly go through the detailed report attached herewith.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are sharing the attached *NTSE (National Talent Search Examination) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n• Session: ${selectedSession}\n\nThis assessment helps us gauge their aptitude for competitive environments. Kindly go through the detailed report attached herewith.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
 
       return {
         students: [
@@ -2102,7 +2102,7 @@ const StudentListPage = () => {
 
   const sendPtReportsToParents = () => {
     processBroadcast("ptTest", "PT Test", (student) => {
-      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the *Periodic Test (PT) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nPeriodic assessments are crucial for identifying areas of improvement and strengths. We request you to review the attached document and guide them accordingly at home.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+      const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the *Periodic Test (PT) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n• Session: ${selectedSession}\n\nPeriodic assessments are crucial for identifying areas of improvement and strengths. We request you to review the attached document and guide them accordingly at home.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
 
       return {
         students: [
@@ -2201,6 +2201,7 @@ const StudentListPage = () => {
           <ReportCardPage
             studentId={hiddenStudentForReport}
             isAutoUploadMode={true}
+            academicYear={selectedSession}
           />
         </div>
       )}
@@ -2215,7 +2216,7 @@ const StudentListPage = () => {
                 : "Preparing Print..."}
             </h3>
             <p className="text-gray-500 font-medium text-sm mb-4">
-              Please do not close this window.
+              Session: {selectedSession}
             </p>
 
             <div className="bg-gray-100 rounded-full h-3 w-full overflow-hidden mb-2">
@@ -2292,6 +2293,23 @@ const StudentListPage = () => {
             </select>
           </div>
 
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <span className="text-sm font-bold text-gray-500 uppercase whitespace-nowrap">
+              Session:
+            </span>
+            <select
+              value={selectedSession}
+              onChange={(e) => setSelectedSession(e.target.value)}
+              className="w-full md:w-44 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-pink-500 outline-none cursor-pointer bg-gray-50"
+            >
+              {sessionOptions.map((session) => (
+                <option key={session} value={session}>
+                  {session}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {selectedGrade && (
             <div className="relative w-full md:w-72">
               <input
@@ -2309,7 +2327,7 @@ const StudentListPage = () => {
           <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
             <div className="flex items-center justify-between w-full sm:w-auto">
               <span className="text-indigo-800 font-bold text-xs bg-white px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap border border-indigo-100">
-                {selectedStudentIds.length} Selected
+                {selectedStudentIds.length} Selected • {selectedSession}
               </span>
 
               <label className="sm:hidden flex items-center gap-2 text-xs font-bold text-indigo-700">
@@ -2601,17 +2619,14 @@ const StudentListPage = () => {
                                 <Dialog.Root
                                   open={reportStudentId === student._id}
                                   onOpenChange={(open) =>
-                                    setReportStudentId(open ? student._id : null)
+                                    setReportStudentId(
+                                      open ? student._id : null,
+                                    )
                                   }
                                 >
                                   <Dialog.Trigger asChild>
                                     <button
-                                      disabled={!hasReportCard}
-                                      className={`p-2 rounded-lg transition shadow-sm border ${
-                                        hasReportCard
-                                          ? "text-gray-500 hover:text-green-600 bg-gray-50 border-gray-200 hover:border-green-300 hover:bg-green-50"
-                                          : "text-gray-300 bg-gray-50 border-gray-100 cursor-not-allowed"
-                                      }`}
+                                      className="p-2 rounded-lg transition shadow-sm border text-gray-500 hover:text-green-600 bg-gray-50 border-gray-200 hover:border-green-300 hover:bg-green-50"
                                       title="View Report Card"
                                     >
                                       📄
@@ -2622,7 +2637,7 @@ const StudentListPage = () => {
                                     <Dialog.Content className="fixed inset-4 md:inset-10 bg-white rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col">
                                       <div className="p-4 bg-gray-50 border-b flex justify-between items-center">
                                         <Dialog.Title className="text-lg font-bold text-gray-800">
-                                          Report Card: {student.fullName}
+                                          Report Card: {student.fullName} ({selectedSession})
                                         </Dialog.Title>
                                         <Dialog.Close asChild>
                                           <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition">
@@ -2631,7 +2646,10 @@ const StudentListPage = () => {
                                         </Dialog.Close>
                                       </div>
                                       <div className="flex-1 overflow-y-auto p-4">
-                                        <ReportCardPage studentId={student._id} />
+                                        <ReportCardPage
+                                          studentId={student._id}
+                                          academicYear={selectedSession}
+                                        />
                                       </div>
                                     </Dialog.Content>
                                   </Dialog.Portal>
@@ -2784,12 +2802,7 @@ const StudentListPage = () => {
                         >
                           <Dialog.Trigger asChild>
                             <button
-                              disabled={!hasReportCard}
-                              className={`flex-1 flex justify-center items-center gap-1 py-2 rounded-lg text-sm font-bold transition ${
-                                hasReportCard
-                                  ? "text-green-600 bg-green-50 hover:bg-green-100"
-                                  : "text-gray-400 bg-gray-50 cursor-not-allowed"
-                              }`}
+                              className="flex-1 flex justify-center items-center gap-1 py-2 rounded-lg text-sm font-bold transition text-green-600 bg-green-50 hover:bg-green-100"
                             >
                               📄 Report
                             </button>
@@ -2799,7 +2812,7 @@ const StudentListPage = () => {
                             <Dialog.Content className="fixed inset-2 bg-white rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col">
                               <div className="p-3 bg-gray-50 border-b flex justify-between items-center">
                                 <Dialog.Title className="text-sm font-bold text-gray-800 truncate pr-2">
-                                  Report: {student.fullName}
+                                  Report: {student.fullName} ({selectedSession})
                                 </Dialog.Title>
                                 <Dialog.Close asChild>
                                   <button className="bg-gray-200 text-gray-800 px-3 py-1.5 rounded-lg text-xs font-bold">
@@ -2808,7 +2821,10 @@ const StudentListPage = () => {
                                 </Dialog.Close>
                               </div>
                               <div className="flex-1 overflow-y-auto p-2">
-                                <ReportCardPage studentId={student._id} />
+                                <ReportCardPage
+                                  studentId={student._id}
+                                  academicYear={selectedSession}
+                                />
                               </div>
                             </Dialog.Content>
                           </Dialog.Portal>
