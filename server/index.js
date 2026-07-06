@@ -9,6 +9,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 const User = require("./models/User");
+const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
 // --- 1. Import ALL your routes first ---
 const studentRoutes = require("./routes/studentRoutes");
@@ -27,6 +28,7 @@ const notificationsRoutes = require("./routes/notificationRoutes");
 const whatsappRoutes = require("./routes/whatsappRoutes");
 const customMessageRoutes = require("./routes/customMessageRoutes");
 const personalMessageRoutes = require("./routes/personalMessageRoutes");
+const classRoutes = require("./routes/classRoutes");
 
 connectDB();
 
@@ -57,10 +59,22 @@ io.on("connection", (socket) => {
   });
 });
 // initialize WhatsApp client (after Socket.IO is ready)
-  initWhatsApp(io);
+initWhatsApp(io);
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, "public")));
+
+// Performance headers
+app.use((req, res, next) => {
+  // Cache static assets for 1 hour
+  if (req.url.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg)$/)) {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+  }
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  next();
+});
 
 
 
@@ -83,6 +97,11 @@ app.use("/api/notifications", notificationsRoutes);
 app.use("/api/whatsapp", whatsappRoutes);
 app.use("/api/whatsapp", customMessageRoutes);
 app.use("/api/whatsapp", personalMessageRoutes);
+app.use("/api/classes", classRoutes);
+
+// Error handling middleware (must be after routes)
+app.use(notFound);
+app.use(errorHandler);
 
 // Tumhare existing middleware (cors, express.json) ke baad ye line add kardo
 app.get("/", (req, res) => {

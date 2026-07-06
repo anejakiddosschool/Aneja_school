@@ -220,9 +220,8 @@ const Navbar = () => {
                   {currentUser.role === "admin" && (
                     <>
                       <NavLink to="/manage-assessments" className={navLinkClasses}>Assessments</NavLink>
-                      
+                      <NavLink to="/admin/classes" className={navLinkClasses}>Classes</NavLink>
                       <NavLink to="/subjects" className={navLinkClasses}>Subjects</NavLink>
-                      
                     </>
                   )}
                 </>
@@ -332,6 +331,7 @@ const Navbar = () => {
                     <div className="pt-2 pb-1 border-t border-gray-200 mt-1">
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-3 mb-1 block">Admin Tools</span>
                         <NavLink to="/manage-assessments" className={navLinkClasses} onClick={closeMobileMenu}>Assessments</NavLink>
+                        <NavLink to="/admin/classes" className={navLinkClasses} onClick={closeMobileMenu}>Classes</NavLink>
                         <NavLink to="/subjects" className={navLinkClasses} onClick={closeMobileMenu}>Subjects</NavLink>
                     </div>
                   )}

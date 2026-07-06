@@ -48,4 +48,10 @@ const gradeSchema = new mongoose.Schema({
 // and a year must be unique. No duplicates are allowed.
 gradeSchema.index({ student: 1, subject: 1, semester: 1, academicYear: 1 }, { unique: true });
 
+// Performance Indexes
+gradeSchema.index({ student: 1, academicYear: 1, semester: 1 });
+gradeSchema.index({ subject: 1, academicYear: 1, semester: 1 });
+gradeSchema.index({ 'assessments.assessmentType': 1 });
+gradeSchema.index({ academicYear: 1 });
+
 module.exports = mongoose.model('Grade', gradeSchema);

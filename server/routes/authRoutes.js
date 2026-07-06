@@ -4,9 +4,10 @@ const { register, login } = require('../controllers/authController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 
-router.post('/register', register);
+// Public routes
 router.post('/login', login);
 
-// This is the route our admin form will use. It is protected.
+// Protected admin routes
 router.post('/register/admin', protect, authorize('admin'), register);
+
 module.exports = router;

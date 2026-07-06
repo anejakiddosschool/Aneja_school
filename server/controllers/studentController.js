@@ -4,6 +4,7 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 const Student = require("../models/Student");
 const Grade = require("../models/Grade");
+const Subject = require("../models/Subject");
 const { cloudinary } = require("../config/cloudinary");
 
 // --- HELPER FUNCTIONS ---
@@ -27,15 +28,51 @@ const getMiddleName = (fullName) => {
 
 // --- CONTROLLER FUNCTIONS ---
 
-// @desc    Get all students, sorted
+// @desc    Get all students, sorted with pagination & search
 // @route   GET /api/students
 exports.getStudents = async (req, res) => {
   try {
-    const students = await Student.find({}).sort({
-      gradeLevel: 1,
-      fullName: 1,
+    const { 
+      page = 1, 
+      limit = 100, 
+      gradeLevel, 
+      status, 
+      search 
+    } = req.query;
+    
+    // Safe pagination defaults
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(2000, Math.max(1, parseInt(limit) || 100));
+    
+    // Build filter
+    const filter = {};
+    if (gradeLevel) filter.gradeLevel = gradeLevel;
+    if (status) filter.status = status;
+    if (search && search.length >= 2) {
+      filter.$or = [
+        { fullName: { $regex: search, $options: 'i' } },
+        { studentId: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const skip = (pageNum - 1) * limitNum;
+    
+    const [students, total] = await Promise.all([
+      Student.find(filter)
+        .sort({ gradeLevel: 1, fullName: 1 })
+        .skip(skip)
+        .limit(parseInt(limit)),
+      Student.countDocuments(filter)
+    ]);
+    
+    res.json({ 
+      success: true, 
+      count: students.length, 
+      total,
+      page: pageNum,
+      pages: Math.ceil(total / limitNum),
+      data: students 
     });
-    res.json({ success: true, count: students.length, data: students });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
   }
@@ -831,23 +868,42 @@ exports.bulkUpdateClassSection = async (req, res) => {
       });
     }
 
-    // MongoDB UpdateMany Query
+    const trimmedGrade = newGradeLevel.trim();
+
+    // First, update all students' grade and section
     await Student.updateMany(
       { _id: { $in: studentIds } },
       { 
         $set: { 
-          gradeLevel: newGradeLevel, 
+          gradeLevel: trimmedGrade, 
           section: newSection || "A" 
         } 
       }
     );
 
+    // CRITICAL: Ensure the new grade level has at least one subject so it appears
+    // in dropdowns even if no subjects were set up yet.
+    const existingSubject = await Subject.findOne({ gradeLevel: trimmedGrade });
+    if (!existingSubject) {
+      await Subject.create({
+        name: `Grade ${trimmedGrade} - General`,
+        gradeLevel: trimmedGrade,
+        code: `GEN-${trimmedGrade}`
+      });
+    }
+
     res.status(200).json({ 
       success: true, 
-      message: `${studentIds.length} students successfully updated to Class ${newGradeLevel}-${newSection || "A"}` 
+      message: `${studentIds.length} students successfully updated to Class ${trimmedGrade}-${newSection || "A"}` 
     });
 
   } catch (error) {
+    if (error.code === 11000) {
+      return res.json({ 
+        success: true, 
+        message: `${req.body.studentIds?.length || 0} students updated to Class ${req.body.newGradeLevel || ''}.`
+      });
+    }
     console.error("Bulk update error:", error);
     res.status(500).json({ success: false, message: "Server Error during bulk update" });
   }

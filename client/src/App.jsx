@@ -52,6 +52,7 @@ import EditStudentPage from './pages/EditStudentPage';
 import ImportStudentsPage from './pages/ImportStudentsPage';
 import ImportUsersPage from './pages/ImportUsersPage';
 import ImportSubjectsPage from './pages/ImportSubjectsPage';
+import ClassManagementPage from './pages/ClassManagementPage';
 
 const frontUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -118,6 +119,7 @@ function App() {
                 <Route path="/admin/users" element={<UserManagementPage />} />
                 <Route path="/admin/users/:id" element={<UserEditPage />} />
                 <Route path="/admin/users/import" element={<ImportUsersPage />} />
+                <Route path="/admin/classes" element={<ClassManagementPage />} />
             </Route>
           </Route>
           

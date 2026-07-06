@@ -1494,6 +1494,7 @@ import { Link } from "react-router-dom";
 import studentService from "../services/studentService";
 import authService from "../services/authService";
 import userService from "../services/userService";
+import classService from "../services/classService";
 import * as Dialog from "@radix-ui/react-dialog";
 import ReportCardPage from "./ReportCardPage";
 import { socket } from "../components/socket";
@@ -1645,26 +1646,22 @@ const StudentListPage = () => {
       setLoading(true);
       setError(null);
 
-      const studentRes = await studentService.getAllStudents();
-      const allFetchedStudents = studentRes.data.data || [];
+      // Fetch students AND all available grades in parallel
+      const [studentRes, gradesRes] = await Promise.allSettled([
+        studentService.getAllStudents({ limit: 1000 }),
+        classService.getAllGrades()
+      ]);
+      
+      const allFetchedStudents = studentRes.status === 'fulfilled' ? (studentRes.value.data.data || []) : [];
       setAllStudents(allFetchedStudents);
 
+      // Merge grades from API with grades from students (for fallback)
+      const apiGrades = gradesRes.status === 'fulfilled' ? (gradesRes.value.data.data || []) : [];
+      const studentGrades = allFetchedStudents.map((s) => s.gradeLevel).filter(Boolean);
+      const allMergedGrades = [...new Set([...apiGrades, ...studentGrades])];
+
       if (currentUser.role === "admin") {
-        setAvailableGrades((prev) => {
-          const fetchedGrades = allFetchedStudents
-            .map((s) => s.gradeLevel)
-            .filter(Boolean);
-
-          const mergedGrades = [
-            ...new Set(
-              [...prev, ...fetchedGrades, selectedGrade, newGrade].filter(
-                Boolean,
-              ),
-            ),
-          ];
-
-          return sortGrades(mergedGrades);
-        });
+        setAvailableGrades(sortGrades(allMergedGrades));
       } else {
         const profileRes = await userService.getProfile();
         const teacherGrades = [

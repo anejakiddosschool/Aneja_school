@@ -1,40 +1,97 @@
 /* src/index.css */
 @import "tailwindcss";
+
+/* ============================================
+   Aneja Kiddos School - Premium Design System
+   ============================================ */
+
+/* --- Base Styles --- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8f9fb;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+/* --- Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-header {
-  background-color: #ff158a;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  margin-bottom: 20px;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------------- */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* --- Print Styles --- */
 @media print {
   body {
     margin: 0;
     padding: 0;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .no-print {
     display: none !important;
   }
 
-  #printArea {
+  #printArea, 
+  .sheet-paper {
     width: 100%;
     max-width: 100%;
     padding: 5mm;
@@ -47,20 +104,95 @@ header {
     border-collapse: collapse !important;
   }
 
-  th,
-  td {
+  th, td {
     border: 1px solid black !important;
     word-wrap: break-word;
     font-size: 10px;
     padding: 4px;
   }
 
-  h1 {
-    font-size: 20px !important;
-  }
+  h1 { font-size: 20px !important; }
+  h2 { font-size: 14px !important; }
 
-  h2 {
-    font-size: 14px !important;
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
   }
 }
 
+/* --- Utility Classes --- */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #ec4899, #f43f5e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.12);
+}
+
+/* Input focus styles */
+.input-focus {
+  transition: all 0.2s ease;
+}
+
+.input-focus:focus {
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* Shimmer loading effect */
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Table styles */
+.table-container {
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+.table-header {
+  background: #f9fafb;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table-row {
+  transition: background-color 0.15s ease;
+}
+
+.table-row:hover {
+  background-color: #fdf2f8;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

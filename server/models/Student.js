@@ -72,4 +72,9 @@ studentSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Performance Indexes
+studentSchema.index({ gradeLevel: 1, status: 1 });
+studentSchema.index({ status: 1 });
+studentSchema.index({ fullName: 1 });
+
 module.exports = mongoose.model("Student", studentSchema);

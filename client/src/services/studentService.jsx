@@ -4,8 +4,8 @@ const API_URL = '/students';
 
 // --- Functions for Managing Student Data (CRUD) ---
 
-const getAllStudents = () => {
-    return api.get(API_URL);
+const getAllStudents = (params = {}) => {
+    return api.get(API_URL, { params });
 };
 
 const getStudentById = (id) => {

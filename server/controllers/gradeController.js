@@ -2,10 +2,19 @@ const Grade = require('../models/Grade');
 const Student = require('../models/Student');
 const Subject = require('../models/Subject');
 const AssessmentType = require('../models/AssessmentType');
-const User = require('../models/User');
-const Notification = require('../models/Notification');
-const Subscription = require('../models/Subscription');
-const webpush = require('web-push');
+
+// Get the academic year as a proper string for assignment, or a query for filtering
+const formatAcademicYear = (yearString) => {
+    if (!yearString) return null;
+    // Ensure format is "YYYY-YYYY" (e.g., "2025-2026")
+    const parts = yearString.split('-');
+    if (parts.length === 2 && parts[1].length === 4) {
+        return yearString; // Already proper format
+    }
+    // If only a single year is given (e.g., "2025"), convert to "2025-2026"
+    const baseYear = parts[0];
+    return `${baseYear}-${Number(baseYear) + 1}`;
+};
 
 const getAcademicYearQuery = (yearString) => {
     if (!yearString) return null;
@@ -25,8 +34,25 @@ exports.getGradeById = async (req, res) => {
 
 exports.getGrades = async (req, res) => {
     try {
-        const grades = await Grade.find({}).populate('student', 'fullName studentId').populate('subject', 'name'); 
-        res.status(200).json({ success: true, count: grades.length, data: grades });
+        const { page = 1, limit = 50 } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const [grades, total] = await Promise.all([
+            Grade.find({})
+                .populate('student', 'fullName studentId')
+                .populate('subject', 'name')
+                .sort({ updatedAt: -1 })
+                .skip(skip)
+                .limit(parseInt(limit)),
+            Grade.countDocuments({})
+        ]);
+        res.status(200).json({ 
+            success: true, 
+            count: grades.length, 
+            total,
+            page: parseInt(page),
+            pages: Math.ceil(total / parseInt(limit)),
+            data: grades 
+        });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -170,12 +196,25 @@ exports.saveGradeSheet = async (req, res) => {
             const scoreValue = Number(item.score);
 
             // Attempt to find the existing document to update
+            // FIX: Use the formatted year string for both query and assignment
+            const formattedYear = formatAcademicYear(academicYear);
+            
             let gradeDoc = await Grade.findOne({
                 student: item.studentId,
                 subject: subjectId,
                 semester,
-                academicYear: yearQuery
-            }).sort({ updatedAt: -1 }); // take the most recent if dupe exists
+                academicYear: formattedYear
+            }).sort({ updatedAt: -1 });
+
+            if (!gradeDoc) {
+                // Also try finding by base year for backward compatibility
+                gradeDoc = await Grade.findOne({
+                    student: item.studentId,
+                    subject: subjectId,
+                    semester,
+                    academicYear: academicYear.split('-')[0]
+                }).sort({ updatedAt: -1 });
+            }
 
             if (!gradeDoc) {
                 // Not found, create purely new
@@ -183,13 +222,13 @@ exports.saveGradeSheet = async (req, res) => {
                     student: item.studentId, 
                     subject: subjectId, 
                     semester, 
-                    academicYear: academicYear, 
+                    academicYear: formattedYear, 
                     assessments: [{ assessmentType: assessmentTypeId, score: scoreValue }],
                     finalScore: scoreValue 
                 });
             } else {
-                // Upgrade year to strict string (e.g. 2025 -> 2025-2026) to prevent dual entries
-                gradeDoc.academicYear = academicYear;
+                // Upgrade year to strict string format
+                gradeDoc.academicYear = formattedYear;
 
                 const assessmentIndex = gradeDoc.assessments.findIndex(a => a.assessmentType.equals(assessmentTypeId));
                 
