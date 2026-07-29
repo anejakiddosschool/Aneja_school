@@ -121,6 +121,7 @@ const HomePage = () => {
             <ActionCard to="/admin/users" title="User Management" description="Add, view, and assign roles or subjects to all staff members." />
             <ActionCard to="/subjects" title="Subject Setup" description="Define and manage the subjects offered for each grade level." />
             <ActionCard to="/manage-assessments" title="Assessments" description="Configure the grading structure and academic terms." />
+            <ActionCard to="/custom-tests" title="Custom Tests" description="Create flexible tests with custom names, subjects & marks. Auto-shares PDFs via WhatsApp and auto-deletes after 15 days." icon="🧪" />
             <ActionCard to="/students/import" title="Bulk Import" description="Quickly enroll a full class of students using an Excel sheet." icon="📥" />
           </div>
         </div>
@@ -174,6 +175,12 @@ const HomePage = () => {
                   />
                 )
             )}
+            <ActionCard
+              to="/custom-tests"
+              title="Custom Tests"
+              description="Create on-the-fly tests, enter marks, and send professional PDF results to parents via WhatsApp."
+              icon="🧪"
+            />
           </div>
 
           {profileData.subjectsTaught?.length === 0 && !profileData.homeroomGrade && (

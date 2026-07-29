@@ -393,13 +393,38 @@ async function sendWhatsAppMessage(phoneNumber, message) {
   console.log(`📩 Message sent to ${formattedPhone}`);
 }
 
+// Send a PDF document via WhatsApp
+async function sendWhatsAppDocument(phoneNumber, pdfBuffer, fileName, caption) {
+  if (clientStatus !== "connected" || !client) {
+    throw new Error("WhatsApp client not ready.");
+  }
+  
+  const formattedPhone = phoneNumber.replace(/\D/g, "");
+  const jid = `${formattedPhone.startsWith("91") ? formattedPhone : "91" + formattedPhone}@s.whatsapp.net`;
+
+  if (!pdfBuffer || !Buffer.isBuffer(pdfBuffer) || pdfBuffer.length === 0) {
+    throw new Error("Invalid PDF buffer.");
+  }
+
+  // Send raw buffer directly with fileLength — streamifier caused .toString() errors in Baileys
+  await client.sendMessage(jid, {
+    document: pdfBuffer,
+    mimetype: 'application/pdf',
+    fileName: fileName || 'test-result.pdf',
+    caption: caption || '📄 Test Result',
+    fileLength: pdfBuffer.length
+  });
+  console.log(`📎 PDF (${(pdfBuffer.length / 1024).toFixed(1)}KB) sent to ${formattedPhone}`);
+}
+
 function getClient() {
   return client;
 }
 
 module.exports = { 
   initWhatsApp, 
-  sendWhatsAppMessage, 
+  sendWhatsAppMessage,
+  sendWhatsAppDocument,
   getQrCode: () => currentQrCode, 
   getClientStatus: () => clientStatus, 
   logoutWhatsApp,

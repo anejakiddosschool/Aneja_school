@@ -53,6 +53,7 @@ import ImportStudentsPage from './pages/ImportStudentsPage';
 import ImportUsersPage from './pages/ImportUsersPage';
 import ImportSubjectsPage from './pages/ImportSubjectsPage';
 import ClassManagementPage from './pages/ClassManagementPage';
+import CustomTestPage from './pages/CustomTestPage';
 
 const frontUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -105,6 +106,7 @@ function App() {
             <Route path="/subject-roster" element={<SubjectRosterPage />} />
             <Route path="/manage-assessments" element={<AssessmentTypesPage />} />
             <Route path="/grade-sheet" element={<GradeSheetPage />} />
+            <Route path="/custom-tests" element={<CustomTestPage />} />
             <Route path="/timetable" element={<TimetablePage />} />
             {/* --- ADMIN-ONLY SUB-ROUTES --- */}
             <Route element={<AdminRoute />}>
