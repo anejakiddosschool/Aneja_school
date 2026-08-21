@@ -251,13 +251,13 @@ const FoundationTestPage = () => {
   // --- LIST VIEW ---
   if (view === "list") {
     return (
-      <div className="max-w-5xl mx-auto p-4">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-extrabold text-gray-900">🏛️ Foundation Tests</h1>
+      <div className="max-w-5xl mx-auto p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">🏛️ Foundation Tests</h1>
           {isAdmin && (
             <button
               onClick={() => setShowCreate(!showCreate)}
-              className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-sm transition-all"
+              className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-5 py-3 sm:py-2.5 rounded-xl shadow-sm transition-all text-sm sm:text-base w-full sm:w-auto"
             >
               {showCreate ? "✕ Cancel" : "+ New Foundation Test"}
             </button>
@@ -266,15 +266,15 @@ const FoundationTestPage = () => {
 
         {/* Create Form */}
         {showCreate && isAdmin && (
-          <div className="bg-white rounded-2xl border-2 border-pink-200 p-6 mb-6 shadow-md">
+          <div className="bg-white rounded-2xl border-2 border-pink-200 p-4 sm:p-6 mb-6 shadow-md">
             <h3 className="font-extrabold text-lg mb-4">Create Foundation Test</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1">Test Name</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
                   placeholder="e.g. Foundation Test - Unit 1"
                 />
               </div>
@@ -283,7 +283,7 @@ const FoundationTestPage = () => {
                 <select
                   value={form.gradeLevel}
                   onChange={(e) => setForm({ ...form, gradeLevel: e.target.value, subjects: [] })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
                 >
                   <option value="">Select Class</option>
                   {classes.map((c) => (
@@ -296,7 +296,7 @@ const FoundationTestPage = () => {
                 <select
                   value={form.semester}
                   onChange={(e) => setForm({ ...form, semester: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
                 >
                   <option>First Semester</option>
                   <option>Second Semester</option>
@@ -375,16 +375,16 @@ const FoundationTestPage = () => {
             {tests.map((t) => (
               <div
                 key={t._id}
-                className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all cursor-pointer"
+                className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => loadDetail(t._id)}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-extrabold text-gray-900">{t.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-extrabold text-gray-900 text-base sm:text-lg truncate">{t.name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
                       Class: {t.gradeLevel} • Total: {t.totalMarks} marks • {t.completedSubjects || 0}/{t.totalSubjects || t.subjects?.length || 0} subjects filled
                     </p>
-                    <div className="flex gap-2 mt-2 flex-wrap">
+                    <div className="flex gap-1.5 sm:gap-2 mt-2 flex-wrap">
                       {t.subjects?.map((s) => (
                         <span key={s._id || s.subject?._id} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
                           {s.subject?.name || "Subject"} ({s.marks})
@@ -392,9 +392,9 @@ const FoundationTestPage = () => {
                       ))}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between sm:justify-end gap-3">
                     <span
-                      className={`text-sm font-bold px-3 py-1 rounded-full ${
+                      className={`text-xs sm:text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap ${
                         t.status === "complete"
                           ? "bg-green-100 text-green-700"
                           : "bg-yellow-100 text-yellow-700"
@@ -408,7 +408,7 @@ const FoundationTestPage = () => {
                           e.stopPropagation();
                           handleDelete(t._id);
                         }}
-                        className="text-red-400 hover:text-red-600 text-lg px-2"
+                        className="text-red-400 hover:text-red-600 text-xl px-3 py-2 -my-1 rounded-lg active:bg-red-50"
                         title="Delete"
                       >
                         🗑️
@@ -439,45 +439,45 @@ const FoundationTestPage = () => {
   const allDone = detail.status === "complete";
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-3 sm:p-4">
       {/* Back + Title */}
-      <button onClick={() => setView("list")} className="text-pink-600 font-bold text-sm mb-4 hover:underline">
+      <button onClick={() => setView("list")} className="text-pink-600 font-bold text-sm mb-3 hover:underline">
         ← Back to List
       </button>
 
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">{detail.name}</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Class: {detail.gradeLevel} • Total: {detail.totalMarks} marks • {detail.completedSubjects}/{detail.totalSubjects} subjects filled
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">{detail.name}</h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          Class: {detail.gradeLevel} • Total: {detail.totalMarks} marks • {detail.completedSubjects}/{detail.totalSubjects} subjects filled
+        </p>
+      </div>
+
+      {/* Action buttons - full width on mobile */}
+      <div className="flex flex-col sm:flex-row gap-2 mb-5 sm:mb-6">
+        <button
+          onClick={() => handlePreview()}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-3 sm:py-2 rounded-xl text-sm transition-all w-full sm:w-auto text-center"
+        >
+          👁️ Preview PDF
+        </button>
+        {allDone && (
           <button
-            onClick={() => handlePreview()}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all"
+            onClick={() => handleSend()}
+            disabled={sending}
+            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-bold px-4 py-3 sm:py-2 rounded-xl text-sm transition-all w-full sm:w-auto text-center"
           >
-            👁️ Preview PDF
+            {sending ? "Sending..." : "📤 Send to All"}
           </button>
-          {allDone && (
-            <button
-              onClick={() => handleSend()}
-              disabled={sending}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all"
-            >
-              {sending ? "Sending..." : "📤 Send to All"}
-            </button>
-          )}
-          {!allDone && isAdmin && (
-            <span className="text-xs text-orange-600 bg-orange-50 px-3 py-2 rounded-xl font-medium">
-              ⚠️ All subjects must have marks to send
-            </span>
-          )}
-        </div>
+        )}
+        {!allDone && isAdmin && (
+          <span className="text-xs text-orange-600 bg-orange-50 px-3 py-2 rounded-xl font-medium text-center">
+            ⚠️ All subjects must have marks to send
+          </span>
+        )}
       </div>
 
       {/* Subject Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-5 sm:mb-6">
         {detail.subjectStatus?.map((sub) => {
           const isSelected = selectedSubjectId === sub.subjectId;
           const canEdit = canEditSubject(sub.subjectId);
@@ -519,15 +519,15 @@ const FoundationTestPage = () => {
 
       {/* Marks Entry Table */}
       {selectedSubjectId && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-extrabold text-lg">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 mb-5 sm:mb-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h3 className="font-extrabold text-base sm:text-lg">
               📝 {detail.subjectStatus?.find((s) => s.subjectId === selectedSubjectId)?.subjectName} — Enter Marks
             </h3>
             <button
               onClick={handleSaveMarks}
               disabled={saving}
-              className="bg-pink-600 hover:bg-pink-700 disabled:bg-gray-300 text-white font-bold px-5 py-2 rounded-xl text-sm transition-all"
+              className="bg-pink-600 hover:bg-pink-700 disabled:bg-gray-300 text-white font-bold px-5 py-3 sm:py-2 rounded-xl text-sm transition-all w-full sm:w-auto text-center"
             >
               {saving ? "Saving..." : "💾 Save Marks"}
             </button>
@@ -536,25 +536,26 @@ const FoundationTestPage = () => {
           {students.length === 0 ? (
             <p className="text-gray-400 text-center py-6">No students found</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full text-sm min-w-[320px]">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-2 px-3 font-bold text-gray-600">#</th>
-                    <th className="text-left py-2 px-3 font-bold text-gray-600">Name</th>
-                    <th className="text-left py-2 px-3 font-bold text-gray-600">Roll</th>
-                    <th className="text-right py-2 px-3 font-bold text-gray-600">Marks</th>
+                    <th className="text-left py-2.5 px-3 font-bold text-gray-600 w-10">#</th>
+                    <th className="text-left py-2.5 px-3 font-bold text-gray-600">Name</th>
+                    <th className="text-left py-2.5 px-3 font-bold text-gray-600 w-16">Roll</th>
+                    <th className="text-right py-2.5 px-3 font-bold text-gray-600 w-24">Marks</th>
                   </tr>
                 </thead>
                 <tbody>
                   {students.map((s, i) => (
-                    <tr key={s._id} className="border-b border-gray-50 hover:bg-gray-50">
-                      <td className="py-2 px-3 text-gray-400">{i + 1}</td>
-                      <td className="py-2 px-3 font-medium">{s.fullName}</td>
-                      <td className="py-2 px-3 text-gray-500">{s.rollNumber || "-"}</td>
-                      <td className="py-2 px-3 text-right">
+                    <tr key={s._id} className="border-b border-gray-50 active:bg-pink-50">
+                      <td className="py-3 sm:py-2 px-3 text-gray-400">{i + 1}</td>
+                      <td className="py-3 sm:py-2 px-3 font-medium text-sm">{s.fullName}</td>
+                      <td className="py-3 sm:py-2 px-3 text-gray-500 text-sm">{s.rollNumber || "-"}</td>
+                      <td className="py-3 sm:py-2 px-3 text-right">
                         <input
                           type="number"
+                          inputMode="numeric"
                           value={scores[s._id] || ""}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -573,7 +574,7 @@ const FoundationTestPage = () => {
                               }
                             }
                           }}
-                          className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-center text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                          className="w-20 border border-gray-300 rounded-lg px-2 py-2.5 sm:py-2 text-center text-base sm:text-sm focus:ring-2 focus:ring-pink-300 outline-none"
                           min="0"
                           max={detail.subjectStatus?.find((s) => s.subjectId === selectedSubjectId)?.totalMarks}
                           placeholder="—"
@@ -590,63 +591,141 @@ const FoundationTestPage = () => {
 
       {/* Merged Overview */}
       {!selectedSubjectId && detail.students && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <h3 className="font-extrabold text-lg mb-4">👥 All Students — Merged Overview</h3>
-          <p className="text-sm text-gray-400 mb-4">Click a subject card above to enter marks for that subject.</p>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+          <h3 className="font-extrabold text-base sm:text-lg mb-2 sm:mb-4">👥 All Students — Merged Overview</h3>
+          <p className="text-xs sm:text-sm text-gray-400 mb-4">Click a subject card above to enter marks for that subject.</p>
           {detail.students.length === 0 ? (
             <p className="text-gray-400 text-center py-6">No students in this class</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-2 px-3 font-bold text-gray-600">#</th>
-                    <th className="text-left py-2 px-3 font-bold text-gray-600">Name</th>
-                    <th className="text-left py-2 px-3 font-bold text-gray-600">Roll</th>
-                    {detail.subjectStatus?.map((sub) => (
-                      <th key={sub.subjectId} className="text-center py-2 px-2 font-bold text-gray-600 text-xs">
-                        {sub.subjectName}
-                      </th>
-                    ))}
-                    <th className="text-center py-2 px-3 font-bold text-gray-800">Total</th>
-                    <th className="text-center py-2 px-3 font-bold text-gray-600">%</th>
-                    <th className="text-center py-2 px-3 font-bold text-gray-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detail.students.map((st, i) => {
-                    const total = st.totalScored || 0;
-                    const pct = detail.totalMarks > 0 ? ((total / detail.totalMarks) * 100).toFixed(1) : 0;
-                    return (
-                      <tr key={st._id} className="border-b border-gray-50 hover:bg-gray-50">
-                        <td className="py-2 px-3 text-gray-400">{i + 1}</td>
-                        <td className="py-2 px-3 font-medium">{st.fullName}</td>
-                        <td className="py-2 px-3 text-gray-500">{st.rollNumber || "-"}</td>
+            <>
+              {/* ========== MOBILE: Card Layout ========== */}
+              <div className="sm:hidden space-y-3">
+                {detail.students.map((st, i) => {
+                  const total = st.totalScored || 0;
+                  const pct = detail.totalMarks > 0 ? ((total / detail.totalMarks) * 100).toFixed(1) : 0;
+                  return (
+                    <div key={st._id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      {/* Student header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400 font-bold">#{i + 1}</span>
+                          <span className="font-bold text-gray-900 text-sm">{st.fullName}</span>
+                          {st.rollNumber && <span className="text-xs text-gray-400">• Roll {st.rollNumber}</span>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-extrabold text-sm ${pct >= 80 ? "text-green-600" : pct >= 50 ? "text-yellow-600" : "text-red-600"}`}>
+                            {pct}%
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Subject scores grid */}
+                      <div className="grid grid-cols-3 gap-2 mb-3">
                         {detail.subjectStatus?.map((sub) => {
                           const val = st.subScores?.[sub.subjectId];
                           return (
-                            <td key={sub.subjectId} className="text-center py-2 px-2">
+                            <div key={sub.subjectId} className="bg-white rounded-lg p-2 text-center border border-gray-100">
+                              <p className="text-[10px] text-gray-400 truncate">{sub.subjectName}</p>
                               {val !== null && val !== undefined ? (
-                                <span className={`font-medium ${val >= sub.totalMarks * 0.5 ? "text-green-700" : "text-red-600"}`}>
+                                <p className={`font-bold text-sm ${val >= sub.totalMarks * 0.5 ? "text-green-700" : "text-red-600"}`}>
                                   {val}/{sub.totalMarks}
-                                </span>
+                                </p>
                               ) : (
-                                <span className="text-gray-300">—</span>
+                                <p className="font-bold text-sm text-gray-300">—</p>
                               )}
-                            </td>
+                            </div>
                           );
                         })}
-                        <td className="text-center py-2 px-3 font-extrabold">{total}/{detail.totalMarks}</td>
-                        <td className="text-center py-2 px-3">
-                          <span
-                            className={`font-bold ${
-                              pct >= 80 ? "text-green-600" : pct >= 50 ? "text-yellow-600" : "text-red-600"
-                            }`}
+                      </div>
+
+                      {/* Total + Action buttons */}
+                      <div className="flex items-center justify-between">
+                        <span className="font-extrabold text-sm">Total: {total}/{detail.totalMarks}</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handlePreview(st._id)}
+                            disabled={previewing === st._id}
+                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white text-xs font-bold px-3 py-2 rounded-lg transition-all active:scale-95"
+                            title="View PDF"
                           >
-                            {pct}%
-                          </span>
-                        </td>
-                            <td className="text-center py-2 px-2">
+                            {previewing === st._id ? "⏳" : "👁️ Preview"}
+                          </button>
+                          <button
+                            onClick={() => handleDownload(st._id)}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold px-3 py-2 rounded-lg transition-all active:scale-95"
+                            title="Download PDF"
+                          >
+                            📥
+                          </button>
+                          {allDone && (
+                            <button
+                              onClick={() => handleSend([st._id])}
+                              disabled={sending}
+                              className="bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white text-xs font-bold px-3 py-2 rounded-lg transition-all active:scale-95"
+                              title="Send to parent"
+                            >
+                              📤
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ========== DESKTOP: Table Layout ========== */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-3 font-bold text-gray-600">#</th>
+                      <th className="text-left py-2 px-3 font-bold text-gray-600">Name</th>
+                      <th className="text-left py-2 px-3 font-bold text-gray-600">Roll</th>
+                      {detail.subjectStatus?.map((sub) => (
+                        <th key={sub.subjectId} className="text-center py-2 px-2 font-bold text-gray-600 text-xs">
+                          {sub.subjectName}
+                        </th>
+                      ))}
+                      <th className="text-center py-2 px-3 font-bold text-gray-800">Total</th>
+                      <th className="text-center py-2 px-3 font-bold text-gray-600">%</th>
+                      <th className="text-center py-2 px-3 font-bold text-gray-600">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detail.students.map((st, i) => {
+                      const total = st.totalScored || 0;
+                      const pct = detail.totalMarks > 0 ? ((total / detail.totalMarks) * 100).toFixed(1) : 0;
+                      return (
+                        <tr key={st._id} className="border-b border-gray-50 hover:bg-gray-50">
+                          <td className="py-2 px-3 text-gray-400">{i + 1}</td>
+                          <td className="py-2 px-3 font-medium">{st.fullName}</td>
+                          <td className="py-2 px-3 text-gray-500">{st.rollNumber || "-"}</td>
+                          {detail.subjectStatus?.map((sub) => {
+                            const val = st.subScores?.[sub.subjectId];
+                            return (
+                              <td key={sub.subjectId} className="text-center py-2 px-2">
+                                {val !== null && val !== undefined ? (
+                                  <span className={`font-medium ${val >= sub.totalMarks * 0.5 ? "text-green-700" : "text-red-600"}`}>
+                                    {val}/{sub.totalMarks}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-300">—</span>
+                                )}
+                              </td>
+                            );
+                          })}
+                          <td className="text-center py-2 px-3 font-extrabold">{total}/{detail.totalMarks}</td>
+                          <td className="text-center py-2 px-3">
+                            <span
+                              className={`font-bold ${
+                                pct >= 80 ? "text-green-600" : pct >= 50 ? "text-yellow-600" : "text-red-600"
+                              }`}
+                            >
+                              {pct}%
+                            </span>
+                          </td>
+                          <td className="text-center py-2 px-2">
                             <div className="flex items-center justify-center gap-1">
                               <button
                                 onClick={() => handlePreview(st._id)}
@@ -675,27 +754,28 @@ const FoundationTestPage = () => {
                               )}
                             </div>
                           </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {/* Action buttons at bottom */}
           {allDone && (
-            <div className="mt-6 flex gap-3">
+            <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => handlePreview()}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-2.5 rounded-xl transition-all"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-3 sm:py-2.5 rounded-xl transition-all w-full sm:w-auto text-center"
               >
                 👁️ Preview PDF
               </button>
               <button
                 onClick={() => handleSend()}
                 disabled={sending}
-                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-bold px-6 py-2.5 rounded-xl transition-all"
+                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-bold px-6 py-3 sm:py-2.5 rounded-xl transition-all w-full sm:w-auto text-center"
               >
                 {sending ? "Sending..." : "📤 Send Merged PDF to All"}
               </button>
