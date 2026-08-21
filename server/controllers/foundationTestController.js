@@ -67,7 +67,6 @@ exports.createFoundationTest = async (req, res) => {
 // ===================== LIST =====================
 exports.getFoundationTests = async (req, res) => {
     try {
-        // Show ALL foundation tests (teachers need to see admin-created ones too)
         const filter = {};
         if (req.query.gradeLevel) filter.gradeLevel = req.query.gradeLevel;
 
@@ -76,21 +75,50 @@ exports.getFoundationTests = async (req, res) => {
             .populate('createdBy', 'fullName')
             .sort({ createdAt: -1 });
 
-        // Check completion for each test
-        const result = await Promise.all(tests.map(async (t) => {
-            const customTests = await CustomTest.find({ foundationGroup: t._id.toString() });
+        if (tests.length === 0) {
+            return res.json({ success: true, data: [] });
+        }
+
+        // Bulk fetch: collect all foundationGroup IDs
+        const groupIds = tests.map(t => t._id.toString());
+
+        // 1 query: get ALL customTests for ALL foundation tests at once
+        const allCustomTests = await CustomTest.find({ foundationGroup: { $in: groupIds } }).select('_id foundationGroup').lean();
+
+        // Build a map: foundationGroup -> [customTestIds]
+        const ctByGroup = {};
+        allCustomTests.forEach(ct => {
+            if (!ctByGroup[ct.foundationGroup]) ctByGroup[ct.foundationGroup] = [];
+            ctByGroup[ct.foundationGroup].push(ct._id);
+        });
+
+        // Collect all customTest IDs for grade count
+        const allCtIds = allCustomTests.map(ct => ct._id);
+
+        // 1 query: get grade counts for ALL custom tests at once
+        let gradeCounts = {};
+        if (allCtIds.length > 0) {
+            const counts = await CustomTestGrade.aggregate([
+                { $match: { customTest: { $in: allCtIds } } },
+                { $group: { _id: '$customTest', count: { $sum: 1 } } }
+            ]);
+            counts.forEach(c => { gradeCounts[c._id.toString()] = c.count; });
+        }
+
+        const result = tests.map(t => {
+            const gid = t._id.toString();
+            const cts = ctByGroup[gid] || [];
             let completed = 0;
-            for (const ct of customTests) {
-                const count = await CustomTestGrade.countDocuments({ customTest: ct._id });
-                if (count > 0) completed++;
+            for (const ctId of cts) {
+                if (gradeCounts[ctId.toString()] > 0) completed++;
             }
             return {
                 ...t.toObject(),
                 completedSubjects: completed,
-                totalSubjects: customTests.length,
-                status: completed === customTests.length && customTests.length > 0 ? 'complete' : 'pending'
+                totalSubjects: cts.length,
+                status: completed === cts.length && cts.length > 0 ? 'complete' : 'pending'
             };
-        }));
+        });
 
         res.json({ success: true, data: result });
     } catch (err) {
@@ -108,15 +136,37 @@ exports.getFoundationTestById = async (req, res) => {
 
         if (!ft) return res.status(404).json({ message: 'Not found.' });
 
+        // 1 query: get all customTests for this foundation test
         const customTests = await CustomTest.find({ foundationGroup: ft._id.toString() })
             .populate('subject', 'name gradeLevel');
 
-        // Build subject status
+        const ctIds = customTests.map(ct => ct._id);
+        const studentIds = [];
+        let students = [];
+
+        // 1 query: get all students for this grade level
+        if (ft.gradeLevel) {
+            students = await Student.find({ gradeLevel: ft.gradeLevel, status: 'Active' })
+                .sort({ fullName: 1 })
+                .select('fullName studentId parentContact rollNumber');
+            students.forEach(st => studentIds.push(st._id));
+        }
+
+        // Build subject status (count grades in bulk)
+        let gradeCountsMap = {};
+        if (ctIds.length > 0) {
+            const counts = await CustomTestGrade.aggregate([
+                { $match: { customTest: { $in: ctIds } } },
+                { $group: { _id: '$customTest', count: { $sum: 1 } } }
+            ]);
+            counts.forEach(c => { gradeCountsMap[c._id.toString()] = c.count; });
+        }
+
         const subjectStatus = [];
         let completed = 0;
         for (const sub of ft.subjects) {
             const ct = customTests.find(c => c.subject?._id?.toString() === sub.subject._id.toString());
-            const hasMarks = ct ? (await CustomTestGrade.countDocuments({ customTest: ct._id })) > 0 : false;
+            const hasMarks = ct ? (gradeCountsMap[ct._id.toString()] || 0) > 0 : false;
             if (hasMarks) completed++;
             subjectStatus.push({
                 subjectId: sub.subject._id,
@@ -127,26 +177,36 @@ exports.getFoundationTestById = async (req, res) => {
             });
         }
 
-        // Get students with all subject scores
-        const students = await Student.find({ gradeLevel: ft.gradeLevel, status: 'Active' })
-            .sort({ fullName: 1 })
-            .select('fullName studentId parentContact rollNumber');
+        // 1 query: get ALL grades for ALL customTests at once (instead of students × subjects queries)
+        let allGrades = [];
+        if (ctIds.length > 0 && studentIds.length > 0) {
+            allGrades = await CustomTestGrade.find({
+                customTest: { $in: ctIds },
+                student: { $in: studentIds }
+            }).select('customTest student score').lean();
+        }
 
-        const studentData = [];
-        for (const st of students) {
+        // Build lookup map: `customTestId_studentId` -> score
+        const gradeMap = {};
+        allGrades.forEach(g => {
+            gradeMap[`${g.customTest}_${g.student}`] = g.score;
+        });
+
+        const studentData = students.map(st => {
             const subScores = {};
             let totalScored = 0;
             for (const ss of subjectStatus) {
                 if (ss.customTestId) {
-                    const grade = await CustomTestGrade.findOne({ customTest: ss.customTestId, student: st._id });
-                    subScores[ss.subjectId.toString()] = grade ? grade.score : null;
-                    if (grade) totalScored += grade.score;
+                    const key = `${ss.customTestId}_${st._id}`;
+                    const score = gradeMap[key];
+                    subScores[ss.subjectId.toString()] = score !== undefined ? score : null;
+                    if (score !== undefined) totalScored += score;
                 } else {
                     subScores[ss.subjectId.toString()] = null;
                 }
             }
-            studentData.push({ ...st.toObject(), subScores, totalScored });
-        }
+            return { ...st.toObject(), subScores, totalScored };
+        });
 
         res.json({
             success: true,
@@ -216,26 +276,46 @@ exports.getFoundationTestStudents = async (req, res) => {
             });
         }
 
-        // No subjectId — return all students with all scores
+        // No subjectId — return all students with all scores (bulk fetch)
         const customTests = await CustomTest.find({ foundationGroup: ft._id.toString() });
+        const ctIds = customTests.map(ct => ct._id);
+        const studentIds = students.map(s => s._id);
+
+        // 1 query: get ALL grades at once
+        const allGrades = ctIds.length > 0 && studentIds.length > 0
+            ? await CustomTestGrade.find({ customTest: { $in: ctIds }, student: { $in: studentIds } }).select('customTest student score').lean()
+            : [];
+
+        // Build lookup map: `studentId_customTestId` -> score
         const allScores = {};
-        for (const ct of customTests) {
-            const grades = await CustomTestGrade.find({ customTest: ct._id });
-            grades.forEach(g => {
-                if (!allScores[g.student.toString()]) allScores[g.student.toString()] = {};
-                allScores[g.student.toString()][ct.subject.toString()] = g.score;
-            });
-        }
+        allGrades.forEach(g => {
+            const sid = g.student.toString();
+            if (!allScores[sid]) allScores[sid] = {};
+            allScores[sid][g.customTest.toString()] = g.score;
+        });
+
+        // Map customTestId -> subjectId for correct keying
+        const ctToSubject = {};
+        customTests.forEach(ct => { ctToSubject[ct._id.toString()] = ct.subject.toString(); });
 
         res.json({
             success: true,
-            data: students.map(s => ({
-                _id: s._id,
-                fullName: s.fullName,
-                studentId: s.studentId,
-                rollNumber: s.rollNumber,
-                scores: allScores[s._id.toString()] || {}
-            }))
+            data: students.map(s => {
+                const scores = {};
+                const sid = s._id.toString();
+                if (allScores[sid]) {
+                    for (const [ctId, score] of Object.entries(allScores[sid])) {
+                        scores[ctToSubject[ctId]] = score;
+                    }
+                }
+                return {
+                    _id: s._id,
+                    fullName: s.fullName,
+                    studentId: s.studentId,
+                    rollNumber: s.rollNumber,
+                    scores
+                };
+            })
         });
     } catch (err) {
         console.error('Get foundation students error:', err);
@@ -255,7 +335,7 @@ exports.saveFoundationTestMarks = async (req, res) => {
         const ct = await CustomTest.findOne({ foundationGroup: ft._id.toString(), subject: subjectId });
         if (!ct) return res.status(404).json({ message: 'Subject test not found.' });
 
-        let count = 0;
+        const validScores = [];
         for (const item of scores) {
             if (item.score === '' || item.score === null || item.score === undefined) continue;
             const val = Number(item.score);
@@ -263,16 +343,24 @@ exports.saveFoundationTestMarks = async (req, res) => {
             if (val > ct.totalMarks) {
                 return res.status(400).json({ message: `Marks for a student cannot exceed ${ct.totalMarks} (max for this subject).` });
             }
-
-            await CustomTestGrade.findOneAndUpdate(
-                { customTest: ct._id, student: item.studentId },
-                { $set: { score: val, subject: subjectId, gradeLevel: ft.gradeLevel } },
-                { upsert: true, new: true }
-            );
-            count++;
+            validScores.push({ studentId: item.studentId, val });
         }
 
-        res.json({ success: true, message: `Saved ${count} marks.` });
+        if (validScores.length === 0) {
+            return res.json({ success: true, message: 'No marks to save.' });
+        }
+
+        // Use bulkWrite for performance (1 query instead of N individual upserts)
+        const operations = validScores.map(s => ({
+            updateOne: {
+                filter: { customTest: ct._id, student: s.studentId },
+                update: { $set: { score: s.val, subject: subjectId, gradeLevel: ft.gradeLevel } },
+                upsert: true
+            }
+        }));
+        await CustomTestGrade.bulkWrite(operations, { ordered: false });
+
+        res.json({ success: true, message: `Saved ${validScores.length} marks.` });
     } catch (err) {
         console.error('Save foundation marks error:', err);
         res.status(500).json({ message: 'Server error.' });
@@ -521,12 +609,21 @@ exports.sendMergedPdf = async (req, res) => {
             .populate('createdBy', 'fullName');
         if (!ft) return res.status(404).json({ message: 'Not found.' });
 
-        // Check completion
-        const customTests = await CustomTest.find({ foundationGroup: ft._id.toString() });
-        for (const ct of customTests) {
-            const count = await CustomTestGrade.countDocuments({ customTest: ct._id });
-            if (count === 0) {
-                return res.status(400).json({ message: `Marks not entered for subject "${ct.subject?.name || 'Unknown'}".` });
+        // Check completion — bulk aggregation instead of per-subject countDocuments
+        const customTests = await CustomTest.find({ foundationGroup: ft._id.toString() }).populate('subject', 'name');
+        const ctIds = customTests.map(ct => ct._id);
+
+        if (ctIds.length > 0) {
+            const counts = await CustomTestGrade.aggregate([
+                { $match: { customTest: { $in: ctIds } } },
+                { $group: { _id: '$customTest', count: { $sum: 1 } } }
+            ]);
+            const countMap = {};
+            counts.forEach(c => { countMap[c._id.toString()] = c.count; });
+            for (const ct of customTests) {
+                if ((countMap[ct._id.toString()] || 0) === 0) {
+                    return res.status(400).json({ message: `Marks not entered for subject "${ct.subject?.name || 'Unknown'}".` });
+                }
             }
         }
 
@@ -537,6 +634,22 @@ exports.sendMergedPdf = async (req, res) => {
         }
         const students = await Student.find(studentFilter);
 
+        // Bulk fetch ALL grades for ALL students at once (instead of per-student-per-subject)
+        const studentIdsAll = students.map(st => st._id);
+        let allGrades = [];
+        if (ctIds.length > 0 && studentIdsAll.length > 0) {
+            allGrades = await CustomTestGrade.find({
+                customTest: { $in: ctIds },
+                student: { $in: studentIdsAll }
+            }).select('customTest student score').lean();
+        }
+
+        // Build lookup: `customTestId_studentId` -> score
+        const gradeLookup = {};
+        allGrades.forEach(g => {
+            gradeLookup[`${g.customTest}_${g.student}`] = g.score;
+        });
+
         const results = { sent: 0, failed: 0, errors: [] };
 
         const tasks = students.map(st => async () => {
@@ -546,15 +659,15 @@ exports.sendMergedPdf = async (req, res) => {
                 return;
             }
 
-            // Gather subject scores
+            // Gather subject scores from pre-fetched lookup (no DB queries)
             const subjectData = [];
             for (const sub of ft.subjects) {
-                const ct = customTests.find(c => c.subject.toString() === sub.subject._id.toString());
+                const ct = customTests.find(c => c.subject?._id?.toString() === sub.subject._id.toString());
                 if (!ct) continue;
-                const grade = await CustomTestGrade.findOne({ customTest: ct._id, student: st._id });
+                const score = gradeLookup[`${ct._id}_${st._id}`];
                 subjectData.push({
                     name: sub.subject.name,
-                    score: grade ? grade.score : 0,
+                    score: score !== undefined ? score : 0,
                     totalMarks: sub.marks
                 });
             }
@@ -596,12 +709,20 @@ exports.downloadMergedPdf = async (req, res) => {
         if (!student) return res.status(404).json({ message: 'Student not found.' });
 
         const customTests = await CustomTest.find({ foundationGroup: ft._id.toString() });
+        const ctIds = customTests.map(ct => ct._id);
+
+        // Bulk fetch all grades for this student in 1 query
+        const allGrades = ctIds.length > 0
+            ? await CustomTestGrade.find({ customTest: { $in: ctIds }, student: student._id }).select('customTest score').lean()
+            : [];
+        const gradeMap = {};
+        allGrades.forEach(g => { gradeMap[g.customTest.toString()] = g.score; });
+
         const subjectData = [];
         for (const sub of ft.subjects) {
             const ct = customTests.find(c => c.subject.toString() === sub.subject._id.toString());
             if (!ct) continue;
-            const grade = await CustomTestGrade.findOne({ customTest: ct._id, student: student._id });
-            subjectData.push({ name: sub.subject.name, score: grade ? grade.score : 0, totalMarks: sub.marks });
+            subjectData.push({ name: sub.subject.name, score: gradeMap[ct._id.toString()] || 0, totalMarks: sub.marks });
         }
 
         const pdfBuffer = await generateMergedPdf(
@@ -631,12 +752,20 @@ exports.previewMergedPdf = async (req, res) => {
         if (!student) return res.status(404).json({ message: 'Student not found.' });
 
         const customTests = await CustomTest.find({ foundationGroup: ft._id.toString() });
+        const ctIds = customTests.map(ct => ct._id);
+
+        // Bulk fetch all grades for this student in 1 query
+        const allGrades = ctIds.length > 0
+            ? await CustomTestGrade.find({ customTest: { $in: ctIds }, student: student._id }).select('customTest score').lean()
+            : [];
+        const gradeMap = {};
+        allGrades.forEach(g => { gradeMap[g.customTest.toString()] = g.score; });
+
         const subjectData = [];
         for (const sub of ft.subjects) {
             const ct = customTests.find(c => c.subject.toString() === sub.subject._id.toString());
             if (!ct) continue;
-            const grade = await CustomTestGrade.findOne({ customTest: ct._id, student: student._id });
-            subjectData.push({ name: sub.subject.name, score: grade ? grade.score : 0, totalMarks: sub.marks });
+            subjectData.push({ name: sub.subject.name, score: gradeMap[ct._id.toString()] || 0, totalMarks: sub.marks });
         }
 
         const pdfBuffer = await generateMergedPdf(
@@ -666,13 +795,34 @@ exports.previewAllPdf = async (req, res) => {
 
         if (students.length === 0) return res.status(404).json({ message: 'No students found.' });
 
-        // Pick first student that has marks
+        // Pick first student that has marks — bulk fetch all grades at once
         let targetStudent = students[0];
         const customTests = await CustomTest.find({ foundationGroup: ft._id.toString() });
+        const allCtIds = customTests.map(ct => ct._id);
+        const allStIds = students.map(st => st._id);
+
+        // 1 query: get ALL grades for ALL students × ALL customTests
+        let allGrades = [];
+        if (allCtIds.length > 0 && allStIds.length > 0) {
+            allGrades = await CustomTestGrade.find({
+                customTest: { $in: allCtIds },
+                student: { $in: allStIds }
+            }).select('customTest student score').lean();
+        }
+
+        // Build lookup and find first student with marks
+        const gradeLookup = {};
+        const studentHasMarks = {};
+        allGrades.forEach(g => {
+            const sid = g.student.toString();
+            const ctid = g.customTest.toString();
+            gradeLookup[`${ctid}_${sid}`] = g.score;
+            studentHasMarks[sid] = true;
+        });
         for (const st of students) {
-            for (const ct of customTests) {
-                const grade = await CustomTestGrade.findOne({ customTest: ct._id, student: st._id });
-                if (grade) { targetStudent = st; break; }
+            if (studentHasMarks[st._id.toString()]) {
+                targetStudent = st;
+                break;
             }
         }
 
@@ -680,8 +830,8 @@ exports.previewAllPdf = async (req, res) => {
         for (const sub of ft.subjects) {
             const ct = customTests.find(c => c.subject.toString() === sub.subject._id.toString());
             if (!ct) continue;
-            const grade = await CustomTestGrade.findOne({ customTest: ct._id, student: targetStudent._id });
-            subjectData.push({ name: sub.subject.name, score: grade ? grade.score : 0, totalMarks: sub.marks });
+            const score = gradeLookup[`${ct._id}_${targetStudent._id}`];
+            subjectData.push({ name: sub.subject.name, score: score !== undefined ? score : 0, totalMarks: sub.marks });
         }
 
         const pdfBuffer = await generateMergedPdf(

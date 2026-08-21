@@ -69,4 +69,7 @@ customTestSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 customTestSchema.index({ subject: 1, gradeLevel: 1 });
 customTestSchema.index({ createdBy: 1, createdAt: -1 });
 
+// Index for FoundationTest group queries
+customTestSchema.index({ foundationGroup: 1 });
+
 module.exports = mongoose.model('CustomTest', customTestSchema);
