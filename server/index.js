@@ -30,6 +30,7 @@ const customMessageRoutes = require("./routes/customMessageRoutes");
 const personalMessageRoutes = require("./routes/personalMessageRoutes");
 const classRoutes = require("./routes/classRoutes");
 const customTestRoutes = require("./routes/customTestRoutes");
+const foundationTestRoutes = require("./routes/foundationTestRoutes");
 
 connectDB();
 
@@ -100,6 +101,7 @@ app.use("/api/whatsapp", customMessageRoutes);
 app.use("/api/whatsapp", personalMessageRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/custom-tests", customTestRoutes);
+app.use("/api/foundation-tests", foundationTestRoutes);
 
 // Error handling middleware (must be after routes)
 app.use(notFound);

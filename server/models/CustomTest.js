@@ -44,6 +44,11 @@ const customTestSchema = new mongoose.Schema({
     // Auto-calculate expiry date: 15 days from creation
     expiresAt: {
         type: Date
+    },
+    // Link to FoundationTest group (for merged tests)
+    foundationGroup: {
+        type: String,
+        default: null
     }
 }, {
     timestamps: true

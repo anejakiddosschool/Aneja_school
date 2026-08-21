@@ -122,6 +122,7 @@ const HomePage = () => {
             <ActionCard to="/subjects" title="Subject Setup" description="Define and manage the subjects offered for each grade level." />
             <ActionCard to="/manage-assessments" title="Assessments" description="Configure the grading structure and academic terms." />
             <ActionCard to="/custom-tests" title="Custom Tests" description="Create flexible tests with custom names, subjects & marks. Auto-shares PDFs via WhatsApp and auto-deletes after 15 days." icon="🧪" />
+            <ActionCard to="/foundation-tests" title="Foundation Tests" description="Create multi-subject merged tests. Each subject teacher enters marks, then merged result is shared with parents." icon="🏛️" />
             <ActionCard to="/students/import" title="Bulk Import" description="Quickly enroll a full class of students using an Excel sheet." icon="📥" />
           </div>
         </div>
@@ -180,6 +181,12 @@ const HomePage = () => {
               title="Custom Tests"
               description="Create on-the-fly tests, enter marks, and send professional PDF results to parents via WhatsApp."
               icon="🧪"
+            />
+            <ActionCard
+              to="/foundation-tests"
+              title="Foundation Tests"
+              description="Enter marks for multi-subject foundation tests. Merged result shared with parents."
+              icon="🏛️"
             />
           </div>
 
