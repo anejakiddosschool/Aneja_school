@@ -1791,6 +1791,40 @@ const StudentListPage = () => {
     loadInitialData();
   };
 
+  const handleBulkDelete = async () => {
+    const validStudents = filteredStudents.filter((s) =>
+      selectedStudentIds.includes(s.id || s._id),
+    );
+    if (validStudents.length === 0)
+      return toast.error("No valid students selected.");
+
+    const count = validStudents.length;
+    if (
+      !window.confirm(
+        `⚠️ Are you sure you want to PERMANENTLY DELETE ${count} student${count > 1 ? "s" : ""}?\n\nThis action cannot be undone!`,
+      )
+    )
+      return;
+
+    try {
+      setLoading(true);
+      const res = await studentService.bulkDeleteStudents({
+        studentIds: validStudents.map((s) => s.id || s._id),
+      });
+
+      toast.success(res.data?.message || `${count} students deleted.`);
+      setSelectedStudentIds([]);
+      await loadInitialData();
+    } catch (err) {
+      console.error("Bulk Delete Error:", err);
+      toast.error(
+        err.response?.data?.message || "Failed to delete students.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const submitBulkClassUpdate = async () => {
     if (!newGrade.trim()) return toast.error("Please select the new class!");
 
@@ -2368,6 +2402,16 @@ const StudentListPage = () => {
                   className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm border border-orange-600 flex items-center gap-1"
                 >
                   🔄 Promote / Update Class
+                </button>
+              )}
+
+              {currentUser.role === "admin" && (
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={isBulkUploading}
+                  className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm border border-red-600 flex items-center gap-1"
+                >
+                  🗑️ Delete Selected
                 </button>
               )}
 

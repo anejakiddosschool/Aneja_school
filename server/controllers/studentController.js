@@ -275,6 +275,66 @@ exports.deleteStudent = async (req, res) => {
   }
 };
 
+// @desc    Bulk delete students (by IDs or by whole class/section)
+// @route   DELETE /api/students/bulk
+// @body    { studentIds: [...] } OR { gradeLevel: "6", section: "A" }
+exports.bulkDeleteStudents = async (req, res) => {
+  try {
+    const { studentIds, gradeLevel, section } = req.body;
+
+    // Build the filter
+    const filter = {};
+    let scopeLabel = "";
+
+    if (Array.isArray(studentIds) && studentIds.length > 0) {
+      filter._id = { $in: studentIds };
+      scopeLabel = `${studentIds.length} selected students`;
+    } else if (gradeLevel) {
+      filter.gradeLevel = String(gradeLevel).trim();
+      if (section) filter.section = String(section).trim();
+      scopeLabel = section
+        ? `Class ${gradeLevel}-${section}`
+        : `Class ${gradeLevel}`;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Please provide studentIds OR gradeLevel (optionally with section) to delete.",
+      });
+    }
+
+    // Preview what will be deleted — protects against accidental mass deletion
+    const toDelete = await Student.find(filter).select("fullName studentId").lean();
+    if (toDelete.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No students found for ${scopeLabel}.`,
+      });
+    }
+
+    // Hard safety cap: never wipe more than 500 students in one call
+    if (toDelete.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: `This will delete ${toDelete.length} students which exceeds the safety limit (500). Delete in smaller batches.`,
+      });
+    }
+    const result = await Student.deleteMany(filter);
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} students deleted (${scopeLabel}).`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error("Bulk delete error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error during bulk delete",
+    });
+  }
+};
+
 // @desc    Upload student profile photo to Cloudinary
 // @route   POST /api/students/:id/photo
 exports.uploadProfilePhoto = async (req, res) => {

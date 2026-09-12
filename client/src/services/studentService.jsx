@@ -26,6 +26,11 @@ const deleteStudent = (id) => {
     return api.delete(`${API_URL}/${id}`);
 };
 
+// Bulk delete students — pass { studentIds: [...] } or { gradeLevel, section }
+const bulkDeleteStudents = (payload) => {
+    return api.delete(`${API_URL}/bulk`, { data: payload });
+};
+
 // --- Functions for File Uploads ---
 
 // For bulk import of students from an Excel file
@@ -59,6 +64,7 @@ export default {
     createStudent,
     updateStudent,
     deleteStudent,
+    bulkDeleteStudents,
     uploadStudents,
     uploadPhoto
 };

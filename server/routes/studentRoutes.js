@@ -9,6 +9,7 @@ const {
   updateStudent,
   deleteStudent,
   bulkCreateStudents,
+  bulkDeleteStudents,
   uploadProfilePhoto,
   uploadClassTestReport,
   getClassTestReport,
@@ -37,6 +38,8 @@ const upload = require("../middleware/upload");
 
 // Add this line BEFORE router.route("/:id").get(...)
 router.put("/bulk-update-class", protect, authorize("admin", "principal"), bulkUpdateClassSection);
+// Bulk delete (by IDs or whole class) — must be registered before "/:id" DELETE
+router.delete("/bulk", protect, authorize("admin"), bulkDeleteStudents);
 // Standard JSON routes
 router
   .route("/")
