@@ -26,6 +26,66 @@ const getMiddleName = (fullName) => {
   return names[0] || "User";
 };
 
+// Flexible DOB parser: DD-MM-YYYY, DD/MM/YYYY, DD.MM.YYYY, DD MM YYYY,
+// "15-May-2010", ISO "YYYY-MM-DD", Excel serial numbers and real Date cells.
+// Day-Month-Year order is fixed for numeric formats.
+const MONTH_NAMES = {
+  jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+  jul: 6, aug: 7, sep: 8, sept: 8, oct: 9, nov: 10, dec: 11,
+};
+
+const parseDob = (value) => {
+  // Real Date object (Excel cellDates:true)
+  if (value instanceof Date && !isNaN(value.getTime())) return value;
+
+  // Excel serial date number
+  if (typeof value === "number" && isFinite(value) && value > 0) {
+    const d = new Date(Math.round((value - 25569) * 86400 * 1000));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  if (typeof value !== "string") return null;
+  const raw = value.trim();
+  if (!raw) return null;
+
+  // Excel serials that arrived as text (plausible range 1954-2064)
+  if (/^\d+(\.\d+)?$/.test(raw)) {
+    const serial = parseFloat(raw);
+    if (serial >= 20000 && serial <= 60000) {
+      const d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+  }
+
+  // ISO format YYYY-MM-DD or YYYY/MM/DD (unambiguous)
+  let m = raw.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+  if (m) {
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return isNaN(d.getTime()) || d.getUTCMonth() !== +m[2] - 1 ? null : d;
+  }
+
+  // DD<sep>MM<sep>YYYY or DD<sep>MMM(M)<sep>YYYY — sep can be - / . or space
+  m = raw.match(/^(\d{1,2})[-/. ]([A-Za-z]{3,9}|\d{1,2})[-/. ](\d{2,4})$/);
+  if (m) {
+    const day = parseInt(m[1], 10);
+    const monthRaw = m[2].toLowerCase();
+    const month = /^\d+$/.test(monthRaw)
+      ? parseInt(monthRaw, 10) - 1
+      : MONTH_NAMES[monthRaw.slice(0, 4)] ?? MONTH_NAMES[monthRaw.slice(0, 3)];
+    if (month === undefined || month < 0 || month > 11) return null;
+    let year = parseInt(m[3], 10);
+    if (year < 100) year += year <= 30 ? 2000 : 1900;
+    if (day < 1 || day > 31) return null;
+    const d = new Date(Date.UTC(year, month, day));
+    return isNaN(d.getTime()) || d.getUTCDate() !== day ? null : d;
+  }
+
+  // Fallback: "15 May 2010" / "May 15, 2010"
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 // --- CONTROLLER FUNCTIONS ---
 
 // @desc    Get all students, sorted with pagination & search
@@ -356,17 +416,20 @@ exports.bulkCreateStudents = async (req, res) => {
       const fullName = studentRow["Full Name"] || studentRow["fullName"];
       const capitalizedFullName = capitalizeName(fullName);
 
-      let dob = studentRow["Date of Birth"] || studentRow["dateOfBirth"];
+      let dob = parseDob(
+        studentRow["Date of Birth"] || studentRow["dateOfBirth"]
+      );
 
-      if (typeof dob === "number") {
-        dob = new Date((dob - 25569) * 86400 * 1000);
-      } else if (typeof dob === "string") {
-        dob = new Date(dob);
+      if (!dob) {
+        throw new Error(
+          `Invalid or missing date format for student: ${fullName}. Accepted: DD-MM-YYYY, DD/MM/YYYY, DD.MM.YYYY (Day-Month-Year).`
+        );
       }
 
-      if (!(dob instanceof Date) || isNaN(dob.getTime())) {
-        throw new Error(`Invalid date format for student: ${fullName}`);
-      }
+      // Normalise to UTC midnight so timezone shifts cannot move the date
+      dob = new Date(
+        Date.UTC(dob.getFullYear(), dob.getMonth(), dob.getDate())
+      );
 
       const dobString = dob.toISOString().split("T")[0].replace(/-/g, "");
       const yearOfBirth = dob.getFullYear();

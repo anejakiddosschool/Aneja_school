@@ -70,6 +70,9 @@ const ImportStudentsPage = () => {
                         <code className="bg-blue-100 p-1 rounded">Section</code>,
                        
                     </li>
+                    <li>
+                        <strong>Date of Birth format:</strong> <code className="bg-blue-100 p-1 rounded">DD-MM-YYYY</code>, <code className="bg-blue-100 p-1 rounded">DD/MM/YYYY</code>, <code className="bg-blue-100 p-1 rounded">DD.MM.YYYY</code> — sabhi chalega (Day-Month-Year). Example: <code className="bg-blue-100 p-1 rounded">15-05-2010</code>
+                    </li>
                     <li>The system will automatically generate a unique Student ID and an initial password for each student.</li>
                     <li>
                         <a href="/student-template.xlsx" download className="font-bold text-blue-600 hover:underline">
