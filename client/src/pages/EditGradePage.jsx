@@ -114,15 +114,15 @@ const EditGradePage = () => {
 
   // --- Tailwind CSS class strings ---
   const textInput =
-    "shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-pink-500";
-  const submitButton = `bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200`;
+    "shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-violet-500";
+  const submitButton = `bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200`;
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Edit Grade</h2>
       <Link
         to={`/students/${gradeData.student}`}
-        className="text-pink-500 hover:underline mb-6 block"
+        className="text-violet-500 hover:underline mb-6 block"
       >
         ← Back to Student Details
       </Link>
@@ -183,7 +183,7 @@ const EditGradePage = () => {
             </div>
             <div className="text-right text-2xl font-bold text-gray-800 mt-6 p-4 bg-gray-100 rounded-lg">
               New Final Score:{" "}
-              <span className="text-pink-600">{currentTotal}</span>
+              <span className="text-violet-600">{currentTotal}</span>
             </div>
           </div>
         )}

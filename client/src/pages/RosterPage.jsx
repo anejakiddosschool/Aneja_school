@@ -123,8 +123,8 @@
 //   };
 
 //   const textInput =
-//     "shadow-sm border rounded-lg py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-pink-500";
-//   const submitButton = `bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200 ${
+//     "shadow-sm border rounded-lg py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-violet-500";
+//   const submitButton = `bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200 ${
 //     loading ? "opacity-50 cursor-not-allowed" : ""
 //   }`;
 //   const thStyle = "p-2 border border-black text-center align-middle";
@@ -227,7 +227,7 @@
 //           </h3>
 //           <table id="rosterTable" className="min-w-full text-sm">
 //             <thead>
-//               <tr className="bg-rose-600 text-cyan-100">
+//               <tr className="bg-violet-700 text-cyan-100">
 //                 <th className={thStyle}>Student ID</th>
 //                 <th className={thStyle}>Full Name</th>
 //                 <th className={thStyle}>Sex</th>
@@ -248,7 +248,7 @@
 //                 <tr key={`${student.studentId}-1`}>
 //                   <td
 //                     rowSpan="3"
-//                     className={`${tdStyle} bg-rose-600 text-cyan-100`}
+//                     className={`${tdStyle} bg-violet-700 text-cyan-100`}
 //                   >
 //                     {student.studentId}
 //                   </td>
@@ -474,7 +474,7 @@ const RosterPage = () => {
   };
 
   // --- Web UI Table Classes ---
-  const thStyle = "px-3 py-4 border-r border-rose-700 text-center align-middle font-semibold tracking-wide text-xs uppercase";
+  const thStyle = "px-3 py-4 border-r border-violet-800 text-center align-middle font-semibold tracking-wide text-xs uppercase";
   const tdStyle = "px-3 py-2 border border-gray-200 text-center text-sm text-gray-700";
   const semesterCellStyle = `${tdStyle} font-bold text-left bg-gray-50 text-gray-800 uppercase text-xs tracking-wider`;
 
@@ -496,7 +496,7 @@ const RosterPage = () => {
             <select
               value={gradeLevel}
               onChange={(e) => setGradeLevel(e.target.value)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 cursor-pointer transition-all"
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 cursor-pointer transition-all"
               required
             >
               <option value="">-- Choose Class --</option>
@@ -511,7 +511,7 @@ const RosterPage = () => {
             <select
               value={academicYear}
               onChange={(e) => setAcademicYear(e.target.value)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 cursor-pointer transition-all"
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 cursor-pointer transition-all"
             >
               {yearOptions.map((year) => (
                 <option key={year} value={year}>{year}</option>
@@ -523,7 +523,7 @@ const RosterPage = () => {
             <button 
               type="submit" 
               disabled={loading || !gradeLevel}
-              className="flex-1 bg-pink-500 hover:bg-pink-600 disabled:bg-pink-300 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all"
+              className="flex-1 bg-violet-500 hover:bg-violet-600 disabled:bg-violet-300 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all"
             >
               {loading ? "Generating Sheet..." : "Load Data"}
             </button>
@@ -548,7 +548,7 @@ const RosterPage = () => {
           <div className="bg-gray-50 p-5 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <div>
               <h3 className="text-lg font-bold text-gray-800">
-                Performance Register: <span className="text-pink-600">{gradeLevel}</span>
+                Performance Register: <span className="text-violet-600">{gradeLevel}</span>
               </h3>
               <p className="text-sm text-gray-600 font-medium mt-1">
                 Homeroom Teacher: <span className="text-gray-800 bg-white px-2 py-0.5 border rounded shadow-sm">{homeroomTeacher || "Not Assigned"}</span>
@@ -562,7 +562,7 @@ const RosterPage = () => {
           <div className="overflow-x-auto p-4">
             <table id="rosterTable" className="w-full border-collapse">
               <thead>
-                <tr className="bg-rose-600 text-white header-bg">
+                <tr className="bg-violet-700 text-white header-bg">
                   <th className={thStyle}>ID</th>
                   <th className={thStyle}>Full Name</th>
                   <th className={thStyle}>Sex</th>
@@ -571,9 +571,9 @@ const RosterPage = () => {
                   {rosterData.subjects.map((subjectName) => (
                     <th key={`head-${subjectName}`} className={thStyle}>{subjectName}</th>
                   ))}
-                  <th className={`${thStyle} bg-rose-700`}>Total</th>
-                  <th className={`${thStyle} bg-rose-700`}>Average</th>
-                  <th className={`${thStyle} bg-rose-800 border-none`}>Rank</th>
+                  <th className={`${thStyle} bg-violet-800`}>Total</th>
+                  <th className={`${thStyle} bg-violet-800`}>Average</th>
+                  <th className={`${thStyle} bg-violet-900 border-none`}>Rank</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
@@ -616,7 +616,7 @@ const RosterPage = () => {
                       ))}
                       <td className="px-3 py-2 border border-gray-200 text-center font-extrabold bg-blue-100 text-gray-900">{(student.overallTotal || 0).toFixed(2)}</td>
                       <td className="px-3 py-2 border border-gray-200 text-center font-extrabold bg-blue-100 text-blue-800">{(student.overallAverage || 0).toFixed(2)}%</td>
-                      <td className="px-3 py-2 border border-gray-200 text-center font-extrabold bg-pink-100 text-pink-700 text-lg">{student.overallRank}</td>
+                      <td className="px-3 py-2 border border-gray-200 text-center font-extrabold bg-violet-100 text-violet-700 text-lg">{student.overallRank}</td>
                     </tr>
                   </React.Fragment>
                 ))}

@@ -4,12 +4,13 @@
 }
 
 :root {
-  --navy: #0b3b78;
-  --muted: #6b7280;
-  --accent: #ff7a59;
+  --navy: #1e3a8a;
+  --primary: #7c3aed;
+  --accent: #f97316;
+  --muted: #64748b;
   --bg: #ffffff;
   --card: #f8fafc;
-  --border: #d1d5db;
+  --border: #d7dced;
   --text: #0f172a;
 }
 
@@ -26,7 +27,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
-  background: #f3f6f9;
+  background: #eef2f7;
   margin: 0;
   padding: 0;
 }
@@ -55,40 +56,48 @@ body {
 .btn {
   border: 1px solid var(--border);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #fff;
   cursor: pointer;
   font-size: 13px;
   line-height: 1.2;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(2, 6, 23, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(2, 6, 23, 0.12);
 }
 
 .btn-primary {
-  background: var(--navy);
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
   color: #fff;
-  border-color: var(--navy);
+  border: none;
 }
 
 .btn-outline {
-  background: transparent;
+  background: #fff;
+  color: var(--navy);
+}
+
+.btn-green {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  border: none;
 }
 
 .btn-red {
-  background-color: #dc3545;
-  color: white;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
 }
 
-.btn-red:disabled {
-  opacity: 0.6;
+.btn-red:disabled,
+.btn-primary:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
-}
-
-.btn-red:hover:not(:disabled) {
-  background-color: #c82333;
 }
 
 .paper-wrap {
@@ -103,23 +112,28 @@ body {
   max-width: 900px;
   min-height: 297mm;
   background: var(--bg);
-  box-shadow: 0 4px 14px rgba(7, 10, 25, 0.08);
-  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(30, 27, 75, 0.14);
+  border-radius: 14px;
   overflow: hidden;
   padding: 10mm;
   color: var(--text);
   margin: 0 auto;
+  position: relative;
+  border-top: 6px solid transparent;
+  border-image: linear-gradient(90deg, #7c3aed, #4f46e5, #f97316) 1;
 }
 
+/* ---------------- HEADER ---------------- */
 .rc-header {
   display: grid;
   grid-template-columns: 86px 1fr 120px;
   align-items: center;
   gap: 12px;
-  background-color: #ed8544 !important;
-  border-bottom: 2px solid #e6eef9;
-  padding: 10px 12px;
+  background: linear-gradient(120deg, #7c3aed 0%, #4f46e5 45%, #3b82f6 100%) !important;
+  border-radius: 12px;
+  padding: 12px 14px;
   width: 100%;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
 }
 
 .rc-left,
@@ -146,54 +160,65 @@ body {
   text-align: right;
 }
 
+.small-meta strong {
+  color: #fde68a;
+}
+
 .rc-logo {
   width: 72px;
   height: 72px;
   object-fit: contain;
-  border-radius: 10px;
+  border-radius: 50%;
   background: #fff;
   padding: 5px;
-  box-shadow: 0 2px 6px rgba(2, 6, 23, 0.06);
+  box-shadow: 0 0 0 3px rgba(253, 230, 138, 0.85), 0 3px 8px rgba(2, 6, 23, 0.25);
 }
 
 .school-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
-  color: var(--navy);
+  color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.6px;
   line-height: 1.15;
+  text-shadow: 0 1px 3px rgba(2, 6, 23, 0.25);
 }
 
 .school-sub {
-  font-size: 13px;
+  font-size: 12.5px;
   margin-top: 3px;
-  color: #f8fbff;
+  color: #e0e7ff;
+  letter-spacing: 0.3px;
 }
 
 .doc-title {
-  font-size: 13px;
-  margin-top: 4px;
-  font-weight: 700;
-  color: #111827;
+  font-size: 14px;
+  margin-top: 5px;
+  font-weight: 800;
+  color: #fde68a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .session {
-  font-size: 13px;
+  font-size: 12.5px;
   margin-top: 3px;
-  color: #eef6ff;
+  color: #c7d2fe;
+  font-weight: 600;
 }
 
+/* ---------------- STUDENT PROFILE ---------------- */
 .student-card {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  margin-top: 12px;
+  margin-top: 14px;
   padding: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  background: linear-gradient(135deg, #eef2ff, #fdf4ff);
+  border: 1px solid #e0e7ff;
+  border-left: 5px solid #7c3aed;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
   width: 100%;
 }
 
@@ -207,10 +232,10 @@ body {
   width: 95px;
   height: 120px;
   object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  border-radius: 10px;
+  border: 3px solid #c7d2fe;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 8px rgba(30, 27, 75, 0.18);
 }
 
 .student-photo.placeholder {
@@ -218,7 +243,7 @@ body {
   align-items: center;
   justify-content: center;
   color: var(--muted);
-  border: 1px dashed var(--border);
+  border: 2px dashed #a5b4fc;
   font-size: 12px;
 }
 
@@ -237,8 +262,8 @@ body {
   display: flex;
   gap: 6px;
   align-items: flex-start;
-  padding: 3px 0;
-  border-bottom: 1px dashed var(--border);
+  padding: 4px 0;
+  border-bottom: 1px dashed #dbe2f0;
   min-width: 0;
 }
 
@@ -248,7 +273,7 @@ body {
 
 .label {
   font-weight: 600;
-  color: var(--muted);
+  color: #6d28d9;
   min-width: 92px;
   font-size: 12px;
 }
@@ -260,8 +285,10 @@ body {
   word-break: break-word;
 }
 
-.scholastic {
-  margin-top: 12px;
+/* ---------------- SECTIONS ---------------- */
+.scholastic,
+.co-scholastic {
+  margin-top: 14px;
   width: 100%;
 }
 
@@ -273,10 +300,18 @@ body {
   margin-bottom: 8px;
 }
 
-.section-header h4 {
+.section-header h4,
+.co-scholastic h4 {
   margin: 0;
   font-size: 15px;
-  color: var(--navy);
+  font-weight: 800;
+  color: #4c1d95;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  padding-bottom: 3px;
+  border-bottom: 3px solid;
+  border-image: linear-gradient(90deg, #7c3aed, #f97316) 1;
 }
 
 .table-scroll {
@@ -284,13 +319,14 @@ body {
   overflow: hidden;
 }
 
+/* ---------------- MARKS TABLE ---------------- */
 .rc-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 11px;
   background: #fff;
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.02);
+  border-radius: 10px;
 }
 
 .rc-table th,
@@ -305,14 +341,17 @@ body {
 }
 
 .rc-table thead th {
-  background: #f5f9ff;
-  color: var(--navy);
+  background: linear-gradient(180deg, #ede9fe, #e0e7ff);
+  color: #4c1d95;
   font-weight: 700;
 }
 
 .term-head {
-  font-size: 11px;
-  letter-spacing: 0.2px;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  background: linear-gradient(90deg, #7c3aed, #4f46e5) !important;
+  color: #fff !important;
+  text-transform: uppercase;
 }
 
 .col-num {
@@ -339,7 +378,7 @@ body {
 .subhead {
   font-size: 10px;
   font-weight: 600;
-  color: #334155;
+  color: #5b21b6;
 }
 
 .sub-total {
@@ -354,25 +393,15 @@ body {
 
 .totals-row td,
 .averages-row td {
-  background: #fbfbfd;
+  background: linear-gradient(180deg, #fef3c7, #fde68a);
   font-weight: 700;
-  color: #0f172a;
+  color: #78350f;
 }
 
-.co-scholastic {
-  margin-top: 12px;
-  width: 100%;
-}
-
-.co-scholastic h4 {
-  margin: 0 0 8px 0;
-  font-size: 15px;
-  color: var(--navy);
-}
-
+/* ---------------- CO-SCHOLASTIC ---------------- */
 .traits-grid {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: stretch;
   width: 100%;
 }
@@ -393,8 +422,15 @@ body {
 }
 
 .traits-table th {
-  background: #f5f9ff;
-  color: var(--navy);
+  background: linear-gradient(90deg, #f97316, #fb923c);
+  color: #fff;
+  font-weight: 700;
+}
+
+.traits-table td.left {
+  font-weight: 600;
+  color: #334155;
+  background: #fff7ed;
 }
 
 .co-cards {
@@ -406,26 +442,31 @@ body {
 }
 
 .co-card {
-  border: 1px solid var(--border);
-  background: var(--card);
+  border: 1px solid #e0e7ff;
+  background: linear-gradient(135deg, #faf5ff, #eff6ff);
   padding: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   width: 100%;
   overflow-wrap: break-word;
+  border-left: 4px solid #7c3aed;
 }
 
 .co-card h5 {
   margin: 0 0 5px 0;
-  color: var(--navy);
+  color: #5b21b6;
   font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .co-card p {
   margin: 0;
   font-size: 11px;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
+/* ---------------- SIGNATURES ---------------- */
 .signatures {
   display: flex;
   gap: 10px;
@@ -442,7 +483,7 @@ body {
 }
 
 .sig-box {
-  border-top: 1px dashed var(--border);
+  border-top: 2px dashed #c7d2fe;
   padding-top: 12px;
   text-align: center;
   min-height: 46px;
@@ -451,7 +492,7 @@ body {
 
 .sig-label {
   font-weight: 700;
-  color: var(--muted);
+  color: #475569;
   margin-bottom: 4px;
   font-size: 12px;
   word-break: break-word;
@@ -459,7 +500,7 @@ body {
 
 .sig-line {
   width: 120px;
-  border-top: 2px solid #000;
+  border-top: 2px solid #94a3b8;
   margin: 0 auto 4px;
   height: 2px;
 }
@@ -475,20 +516,22 @@ input[type="file"] {
   margin-top: 8px;
 }
 
+/* ---------------- FOOTER ---------------- */
 .rc-footer {
   margin-top: 14px;
   padding: 10px 12px;
-  background-color: #ed8544 !important;
+  background: linear-gradient(90deg, #f97316, #f59e0b, #f97316) !important;
   color: #fff;
-  border-radius: 8px;
+  border-radius: 10px;
   text-align: center;
   width: 100%;
+  box-shadow: 0 3px 10px rgba(249, 115, 22, 0.3);
 }
 
 .footer-msg {
   font-size: 12px;
   line-height: 1.3;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .footer-sub {
@@ -497,33 +540,34 @@ input[type="file"] {
   margin-top: 2px;
 }
 
+/* ---------------- GRADE PILLS ---------------- */
 .grade-excellent {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #dcfce7;
+  color: #166534;
   font-weight: 700;
 }
 
 .grade-good {
-  background-color: #d1ecf1;
-  color: #0c5460;
+  background-color: #dbeafe;
+  color: #1e40af;
   font-weight: 700;
 }
 
 .grade-average {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: #fef9c3;
+  color: #854d0e;
   font-weight: 700;
 }
 
 .grade-below {
-  background-color: #ffe5b4;
-  color: #7a4f01;
+  background-color: #ffedd5;
+  color: #9a3412;
   font-weight: 700;
 }
 
 .grade-poor {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #fee2e2;
+  color: #991b1b;
   font-weight: 700;
 }
 
@@ -532,8 +576,9 @@ input[type="file"] {
   color: #000;
 }
 
+/* ---------------- THEMES ---------------- */
 .report-card-container.light-theme {
-  background-color: #f9f9f9;
+  background-color: #eef2f7;
   color: #222;
 }
 
@@ -554,10 +599,11 @@ input[type="file"] {
   border-color: #555773;
 }
 
+/* ---------------- PRINT (compact single-page) ---------------- */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 6mm;
   }
 
   html,
@@ -600,32 +646,96 @@ input[type="file"] {
     box-shadow: none !important;
     overflow: visible !important;
     border: none !important;
+    border-top: none !important;
   }
 
+  /* HEADER */
   .rc-header {
-    padding: 8px 10px !important;
+    padding: 7px 10px !important;
+    border-radius: 8px !important;
+    gap: 8px !important;
+    grid-template-columns: 62px 1fr 105px !important;
   }
 
-  .student-card,
-  .scholastic,
-  .co-scholastic,
-  .rc-footer,
-  .signatures {
+  .rc-logo {
+    width: 56px !important;
+    height: 56px !important;
+    padding: 3px !important;
+  }
+
+  .school-name {
+    font-size: 16px !important;
+  }
+
+  .school-sub,
+  .session {
+    font-size: 10px !important;
+    margin-top: 1px !important;
+  }
+
+  .doc-title {
+    font-size: 11px !important;
+    margin-top: 2px !important;
+  }
+
+  .small-meta {
+    font-size: 10px !important;
+    gap: 2px !important;
+  }
+
+  /* STUDENT CARD */
+  .student-card {
+    margin-top: 7px !important;
+    padding: 6px 10px !important;
+    gap: 10px !important;
+    box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  .student-card {
-    margin-top: 10px !important;
-    padding: 10px !important;
-    border: 1px solid var(--border) !important;
-    box-shadow: none !important;
+  .student-photo,
+  .student-photo.placeholder {
+    width: 72px !important;
+    height: 88px !important;
+    border-width: 2px !important;
+  }
+
+  .profile-grid {
+    gap: 2px 14px !important;
+  }
+
+  .profile-item {
+    padding: 1px 0 !important;
+  }
+
+  /* SECTIONS */
+  .scholastic,
+  .co-scholastic,
+  .signatures,
+  .rc-footer {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .scholastic {
+    margin-top: 7px !important;
+  }
+
+  .co-scholastic {
+    margin-top: 7px !important;
   }
 
   .section-header {
-    margin-bottom: 6px !important;
+    margin-bottom: 4px !important;
   }
 
+  .section-header h4,
+  .co-scholastic h4 {
+    font-size: 12px !important;
+    padding-bottom: 2px !important;
+  }
+
+  /* MARKS TABLE */
   .table-scroll {
     overflow: visible !important;
   }
@@ -634,68 +744,123 @@ input[type="file"] {
     width: 100% !important;
     table-layout: fixed !important;
     min-width: 0 !important;
-    font-size: 10px !important;
+    font-size: 9px !important;
   }
 
   .rc-table th,
   .rc-table td {
-    padding: 4px 3px !important;
-    line-height: 1.15 !important;
+    padding: 2.5px 2px !important;
+    line-height: 1.1 !important;
   }
 
   .col-num {
-    width: 24px !important;
-    min-width: 24px !important;
-    max-width: 24px !important;
+    width: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
   }
 
   .col-sub {
-    width: 104px !important;
-    min-width: 104px !important;
-    max-width: 104px !important;
-    padding-left: 5px !important;
+    width: 90px !important;
+    min-width: 90px !important;
+    max-width: 90px !important;
+    padding-left: 4px !important;
+  }
+
+  .term-head {
+    font-size: 10px !important;
   }
 
   .subhead {
-    font-size: 9px !important;
-  }
-
-  .sub-total {
     font-size: 8px !important;
   }
 
-  .score-cell {
-    font-size: 9.5px !important;
+  .sub-total {
+    font-size: 7.5px !important;
   }
 
+  .score-cell {
+    font-size: 8.5px !important;
+  }
+
+  /* CO-SCHOLASTIC - keep side by side */
   .traits-grid {
+    flex-direction: row !important;
     gap: 8px !important;
+  }
+
+  .traits-table,
+  .co-cards {
+    width: 50% !important;
+    min-width: 0 !important;
+    max-width: 50% !important;
   }
 
   .traits-table th,
-  .traits-table td,
-  .co-card p,
-  .co-card h5,
-  .sig-label,
-  .footer-msg,
-  .footer-sub,
-  .label,
-  .value,
-  .small-meta {
-    font-size: 11px !important;
+  .traits-table td {
+    padding: 2.5px 4px !important;
+    font-size: 8.5px !important;
   }
 
-  .rc-footer {
-    margin-top: 12px !important;
-    padding: 8px 10px !important;
+  .co-cards {
+    gap: 6px !important;
   }
 
+  .co-card {
+    padding: 6px 8px !important;
+  }
+
+  .co-card h5 {
+    font-size: 9.5px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .co-card p {
+    font-size: 8.5px !important;
+    line-height: 1.25 !important;
+  }
+
+  /* SIGNATURES */
   .signatures {
-    margin-top: 28px !important;
+    margin-top: 14px !important;
     gap: 8px !important;
+  }
+
+  .sig-box {
+    padding-top: 7px !important;
+    min-height: 34px !important;
+  }
+
+  .sig-label {
+    font-size: 9.5px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .sig-line {
+    width: 100px !important;
+  }
+
+  .sig-image {
+    max-height: 36px !important;
+  }
+
+  /* FOOTER */
+  .rc-footer {
+    margin-top: 8px !important;
+    padding: 6px 10px !important;
+    border-radius: 7px !important;
+  }
+
+  .footer-msg {
+    font-size: 10px !important;
+  }
+
+  .footer-sub {
+    font-size: 9px !important;
+    margin-top: 1px !important;
   }
 }
 
+/* ---------------- RESPONSIVE ---------------- */
 @media (max-width: 900px) {
   .sheet-paper {
     padding: 10mm;

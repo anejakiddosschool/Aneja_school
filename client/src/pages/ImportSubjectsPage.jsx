@@ -45,7 +45,7 @@ const ImportSubjectsPage = () => {
     return (
         <div className={cardContainer}>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Import Subjects from Excel</h2>
-            <Link to="/subjects" className="text-pink-500 hover:underline mb-6 block">
+            <Link to="/subjects" className="text-violet-500 hover:underline mb-6 block">
                 ← Back to Subject Management
             </Link>
 
@@ -89,7 +89,7 @@ const ImportSubjectsPage = () => {
                             </tbody>
                         </table>
                     </div>
-                    <button onClick={() => navigate('/subjects')} className="mt-6 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg">
+                    <button onClick={() => navigate('/subjects')} className="mt-6 bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg">
                         Back to Subject Management
                     </button>
                 </div>

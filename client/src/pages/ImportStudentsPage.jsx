@@ -46,7 +46,7 @@ const ImportStudentsPage = () => {
     return (
         <div className={cardContainer}>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Import Students from Excel/CSV</h2>
-            <Link to="/students" className="text-pink-500 hover:underline mb-6 block">
+            <Link to="/students" className="text-violet-500 hover:underline mb-6 block">
                 ← Back to Students List
             </Link>
 

@@ -31,7 +31,7 @@ const TimetableGrid = ({
     "bg-yellow-200",
     "bg-green-200",
     "bg-blue-200",
-    "bg-pink-200",
+    "bg-violet-200",
     "bg-purple-200",
     "bg-orange-200",
     "bg-teal-200",
@@ -77,7 +77,7 @@ const TimetableGrid = ({
           className={`w-full table-fixed border border-black text-center shadow-md rounded-lg ${isLandscape ? "text-xs" : getFontSize()}`}
         >
           <thead>
-            <tr className="bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200">
+            <tr className="bg-gradient-to-r from-blue-200 via-purple-200 to-violet-200">
               <th className="border border-black p-2 font-semibold text-sm">
                 Day
               </th>

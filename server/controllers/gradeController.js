@@ -61,11 +61,11 @@ exports.getGrades = async (req, res) => {
 exports.getGradesByStudent = async (req, res) => {
     try {
         const studentId = req.params.id || req.params.studentId;
-        let gradesQuery = Grade.find({ student: studentId })
+        // .lean() skips hydration — ~2x faster for report-card payloads
+        let allGrades = await Grade.find({ student: studentId })
             .populate('subject', 'name gradeLevel')
-            .populate('assessments.assessmentType');
-
-        let allGrades = await gradesQuery;
+            .populate('assessments.assessmentType')
+            .lean();
         allGrades = allGrades.filter(grade => grade.subject !== null);
 
         res.status(200).json({ success: true, count: allGrades.length, data: allGrades });
@@ -88,12 +88,16 @@ exports.getGradeDetails = async (req, res) => {
 };
 
 exports.deleteGrade = async (req, res) => {
-    const grade = await Grade.findById(req.params.id);
-    // if (req.user.role === 'admin') return res.status(403).json({ message: "Forbidden" });
-    if (!grade) return res.status(404).json({ message: 'Grade not found' });
-    
-    await grade.deleteOne();
-    res.status(200).json({ success: true, message: 'Grade deleted' });
+    try {
+        const grade = await Grade.findById(req.params.id);
+        // if (req.user.role === 'admin') return res.status(403).json({ message: "Forbidden" });
+        if (!grade) return res.status(404).json({ message: 'Grade not found' });
+
+        await grade.deleteOne();
+        res.status(200).json({ success: true, message: 'Grade deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
 };
 
 exports.updateGrade = async (req, res) => {

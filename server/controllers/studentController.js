@@ -88,6 +88,9 @@ const parseDob = (value) => {
 
 // --- CONTROLLER FUNCTIONS ---
 
+// Escape user input so it can't inject regex operators (e.g. ".*" matches everything)
+const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 // @desc    Get all students, sorted with pagination & search
 // @route   GET /api/students
 exports.getStudents = async (req, res) => {
@@ -109,9 +112,10 @@ exports.getStudents = async (req, res) => {
     if (gradeLevel) filter.gradeLevel = gradeLevel;
     if (status) filter.status = status;
     if (search && search.length >= 2) {
+      const safe = escapeRegex(search);
       filter.$or = [
-        { fullName: { $regex: search, $options: 'i' } },
-        { studentId: { $regex: search, $options: 'i' } }
+        { fullName: { $regex: safe, $options: 'i' } },
+        { studentId: { $regex: safe, $options: 'i' } }
       ];
     }
 
@@ -121,7 +125,7 @@ exports.getStudents = async (req, res) => {
       Student.find(filter)
         .sort({ gradeLevel: 1, fullName: 1 })
         .skip(skip)
-        .limit(parseInt(limit)),
+        .limit(limitNum),
       Student.countDocuments(filter)
     ]);
     

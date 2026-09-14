@@ -38,15 +38,15 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-pink-50/30 to-white p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-violet-50/30 to-white p-4 relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-pink-200/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-rose-200/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-violet-200/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-200/20 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="bg-white/90 backdrop-blur-xl p-8 md:p-10 rounded-3xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.12)] w-full max-w-md border border-gray-100 relative">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-400 flex items-center justify-center text-white font-black text-2xl mx-auto mb-4 shadow-lg shadow-pink-200/50">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-400 flex items-center justify-center text-white font-black text-2xl mx-auto mb-4 shadow-lg shadow-violet-200/50">
             A
           </div>
           <h2 className="text-2xl font-black text-gray-900">Welcome Back</h2>
@@ -71,7 +71,7 @@ const LoginPage = () => {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Enter your username"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:bg-white focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:bg-white focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
                 required
               />
             </div>
@@ -94,13 +94,13 @@ const LoginPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:bg-white focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all"
+                className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:bg-white focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-500 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-violet-500 transition-colors"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -120,7 +120,7 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-pink-200/50 hover:shadow-xl hover:shadow-pink-300/50 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-violet-200/50 hover:shadow-xl hover:shadow-violet-300/50 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -148,7 +148,7 @@ const LoginPage = () => {
         <div className="mt-8 pt-6 border-t border-gray-100 text-center">
           <p className="text-sm text-gray-500 font-medium">
             Are you a parent?{" "}
-            <Link to="/parent-login" className="font-bold text-pink-600 hover:text-pink-700 transition-colors">
+            <Link to="/parent-login" className="font-bold text-violet-600 hover:text-violet-700 transition-colors">
               Go to Parent Portal
             </Link>
           </p>

@@ -82,8 +82,8 @@
 //     // --- Tailwind CSS class strings ---
 //     const fieldset = "border border-gray-300 p-4 rounded-lg";
 //     const legend = "font-bold text-lg text-gray-700 px-2";
-//     const textInput = "shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-pink-500";
-//     const submitButton = "w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200";
+//     const textInput = "shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-violet-500";
+//     const submitButton = "w-full md:w-auto bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200";
 
 //     // --- Filter Subjects ---
 //     const filteredSubjects = allSubjects.filter(subject => {
@@ -98,7 +98,7 @@
 //     return (
 //         <div className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
 //             <h2 className="text-2xl font-bold text-gray-800 mb-4">Edit User: {user?.fullName}</h2>
-//             <Link to="/admin/users" className="text-pink-500 hover:underline mb-6 block">
+//             <Link to="/admin/users" className="text-violet-500 hover:underline mb-6 block">
 //                 ← Back to User List
 //             </Link>
             
@@ -111,7 +111,7 @@
 //   <label className="flex items-center space-x-3 p-2 cursor-pointer">
 //     <input
 //       type="checkbox"
-//       className="h-5 w-5 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+//       className="h-5 w-5 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
 //       checked={isHomeroom}
 //       onChange={(e) => setIsHomeroom(e.target.checked)}
 //     />
@@ -153,12 +153,12 @@
 //                                         placeholder="Search by subject name..."
 //                                         value={searchTerm}
 //                                         onChange={(e) => setSearchTerm(e.target.value)}
-//                                         className="flex-1 shadow border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
+//                                         className="flex-1 shadow border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
 //                                     />
 //                                     <select
 //                                         value={filterGrade}
 //                                         onChange={(e) => setFilterGrade(e.target.value)}
-//                                         className="shadow border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
+//                                         className="shadow border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
 //                                     >
 //                                         <option value="">All Grades</option>
 //                                         {uniqueGrades.map(grade => (
@@ -174,7 +174,7 @@
 //                                             <label key={subject._id} className="flex items-center space-x-3 cursor-pointer">
 //                                                 <input
 //                                                     type="checkbox"
-//                                                     className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+//                                                     className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
 //                                                     checked={assignedSubjects.has(subject._id)}
 //                                                     onChange={() => handleCheckboxChange(subject._id)}
 //                                                 />
@@ -289,27 +289,27 @@ const UserEditPage = () => {
 
     const uniqueGrades = [...new Set(allSubjects.map(sub => sub.gradeLevel))];
 
-    if (loading) return <div className="flex justify-center mt-20"><div className="w-10 h-10 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin"></div></div>;
+    if (loading) return <div className="flex justify-center mt-20"><div className="w-10 h-10 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div></div>;
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-8 animate-fade-in pb-20">
             <div className="max-w-4xl mx-auto space-y-6">
 
                 {/* BACK LINK */}
-                <Link to="/admin/users" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-pink-600 transition-colors">
+                <Link to="/admin/users" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-violet-600 transition-colors">
                     <span className="mr-1">←</span> Back to User List
                 </Link>
 
                 {/* USER PROFILE HEADER */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-2xl font-bold shadow-md">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-violet-500 to-indigo-400 flex items-center justify-center text-white text-2xl font-bold shadow-md">
                         {user?.fullName?.charAt(0).toUpperCase()}
                     </div>
                     <div>
                         <h2 className="text-2xl font-extrabold text-gray-800">{user?.fullName}</h2>
                         <div className="flex items-center gap-2 mt-1">
                             <span className="text-sm text-gray-500 font-mono bg-gray-100 px-2 py-0.5 rounded">{user?.username}</span>
-                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${user?.role === 'admin' ? 'bg-pink-50 text-pink-700 border-pink-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${user?.role === 'admin' ? 'bg-violet-50 text-violet-700 border-violet-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
                                 {user?.role}
                             </span>
                         </div>
@@ -336,12 +336,12 @@ const UserEditPage = () => {
                                 <div className="relative flex items-center justify-center">
                                     <input
                                         type="checkbox"
-                                        className="w-5 h-5 rounded border-gray-300 text-pink-600 focus:ring-pink-500 transition-all cursor-pointer"
+                                        className="w-5 h-5 rounded border-gray-300 text-violet-600 focus:ring-violet-500 transition-all cursor-pointer"
                                         checked={isHomeroom}
                                         onChange={(e) => setIsHomeroom(e.target.checked)}
                                     />
                                 </div>
-                                <span className="text-gray-700 font-semibold group-hover:text-pink-600 transition-colors">Assign as Homeroom Teacher</span>
+                                <span className="text-gray-700 font-semibold group-hover:text-violet-600 transition-colors">Assign as Homeroom Teacher</span>
                             </label>
 
                             {isHomeroom && (
@@ -351,7 +351,7 @@ const UserEditPage = () => {
                                     </label>
                                     <select
                                         id="homeroomGrade"
-                                        className="w-full md:w-1/2 border border-gray-300 rounded-xl py-2.5 px-4 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-pink-500 bg-gray-50 hover:bg-white transition-colors"
+                                        className="w-full md:w-1/2 border border-gray-300 rounded-xl py-2.5 px-4 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-violet-500 bg-gray-50 hover:bg-white transition-colors"
                                         value={homeroomGrade}
                                         onChange={(e) => setHomeroomGrade(e.target.value)}
                                         required
@@ -381,13 +381,13 @@ const UserEditPage = () => {
                                                 placeholder="Search subject..."
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                                className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 bg-gray-50"
+                                                className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-gray-50"
                                             />
                                         </div>
                                         <select
                                             value={filterGrade}
                                             onChange={(e) => setFilterGrade(e.target.value)}
-                                            className="text-sm border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-pink-500 bg-gray-50 cursor-pointer"
+                                            className="text-sm border border-gray-200 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-violet-500 bg-gray-50 cursor-pointer"
                                         >
                                             <option value="">All Grades</option>
                                             {uniqueGrades.map(grade => (
@@ -405,17 +405,17 @@ const UserEditPage = () => {
                                                 <label 
                                                     key={subject._id} 
                                                     className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                                                        isChecked ? 'border-pink-500 bg-pink-50/30 shadow-sm' : 'border-gray-100 bg-gray-50 hover:border-pink-200 hover:bg-white'
+                                                        isChecked ? 'border-violet-500 bg-violet-50/30 shadow-sm' : 'border-gray-100 bg-gray-50 hover:border-violet-200 hover:bg-white'
                                                     }`}
                                                 >
                                                     <input
                                                         type="checkbox"
-                                                        className="mt-0.5 w-4 h-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500 cursor-pointer"
+                                                        className="mt-0.5 w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 cursor-pointer"
                                                         checked={isChecked}
                                                         onChange={() => handleCheckboxChange(subject._id)}
                                                     />
                                                     <div className="flex flex-col">
-                                                        <span className={`text-sm font-bold ${isChecked ? 'text-pink-700' : 'text-gray-700'}`}>{subject.name}</span>
+                                                        <span className={`text-sm font-bold ${isChecked ? 'text-violet-700' : 'text-gray-700'}`}>{subject.name}</span>
                                                         <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Class {subject.gradeLevel}</span>
                                                     </div>
                                                 </label>
@@ -435,7 +435,7 @@ const UserEditPage = () => {
                         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-end">
                             <button 
                                 type="submit" 
-                                className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all hover:-translate-y-0.5"
+                                className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all hover:-translate-y-0.5"
                             >
                                 Save Assignments
                             </button>

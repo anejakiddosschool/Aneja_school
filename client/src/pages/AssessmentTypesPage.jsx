@@ -210,7 +210,7 @@
 //       <div className="mb-4">
 //         <input
 //           type="text"
-//           className="w-full md:w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+//           className="w-full md:w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
 //           placeholder="Search subjects by name or grade"
 //           value={subjectSearch}
 //           onChange={(e) => setSubjectSearch(e.target.value)}
@@ -237,7 +237,7 @@
 //                       onClick={() => setSelectedSubject(subject)}
 //                       className={`px-3 py-1 rounded-md transition-colors duration-200 text-sm font-medium ${
 //                         selectedSubject?._id === subject._id
-//                           ? "bg-pink-500 text-white shadow"
+//                           ? "bg-violet-500 text-white shadow"
 //                           : "bg-gray-200 hover:bg-gray-300 text-gray-800"
 //                       }`}
 //                     >
@@ -261,7 +261,7 @@
 //         <div className="animate-fade-in">
 //           <h3 className="text-xl font-bold text-gray-800 mb-4">
 //             Assessments for:{" "}
-//             <span className="text-pink-600">
+//             <span className="text-violet-600">
 //               {selectedSubject.name} ({selectedSubject.gradeLevel})
 //             </span>
 //           </h3>
@@ -271,7 +271,7 @@
 //             <input
 //               type="text"
 //               placeholder="Search assessments by name, month, or marks"
-//               className="w-full md:w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+//               className="w-full md:w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
 //               value={search}
 //               onChange={(e) => setSearch(e.target.value)}
 //             />
@@ -558,7 +558,7 @@ const AssessmentTypesPage = () => {
   };
 
   if (pageLoading) {
-    return <div className="flex justify-center items-center mt-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div></div>;
+    return <div className="flex justify-center items-center mt-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500"></div></div>;
   }
 
   // Segregate assessments for better view
@@ -582,7 +582,7 @@ const AssessmentTypesPage = () => {
             <select
               value={selectedClass}
               onChange={handleClassChange}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all cursor-pointer"
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all cursor-pointer"
             >
               <option value="">-- Choose Class --</option>
               {availableClasses.map((cls) => (
@@ -597,7 +597,7 @@ const AssessmentTypesPage = () => {
               value={selectedSubject}
               onChange={handleSubjectChange}
               disabled={!selectedClass}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all cursor-pointer"
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all cursor-pointer"
             >
               <option value="">-- Choose Subject --</option>
               {filteredSubjects.map((s) => (
@@ -675,7 +675,7 @@ const AssessmentTypesPage = () => {
           <div className="lg:col-span-1">
             <form onSubmit={handleCreate} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-6">
               <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span className="bg-pink-100 text-pink-600 w-6 h-6 rounded-full flex items-center justify-center text-sm">+</span>
+                <span className="bg-violet-100 text-violet-600 w-6 h-6 rounded-full flex items-center justify-center text-sm">+</span>
                 Create New
               </h4>
               
@@ -685,7 +685,7 @@ const AssessmentTypesPage = () => {
                   <select
                     value={newAssessmentSemester}
                     onChange={(e) => setNewAssessmentSemester(e.target.value)}
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none"
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none"
                     required
                   >
                     <option value="" disabled>-- Select --</option>
@@ -699,7 +699,7 @@ const AssessmentTypesPage = () => {
                   <select
                     value={newAssessmentMonth}
                     onChange={(e) => setNewAssessmentMonth(e.target.value)}
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none"
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none"
                     required
                   >
                     <option value="" disabled>-- Select --</option>
@@ -712,7 +712,7 @@ const AssessmentTypesPage = () => {
                   <select
                     value={newAssessmentName}
                     onChange={(e) => setNewAssessmentName(e.target.value)}
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none"
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none"
                     required
                   >
                     <option value="" disabled>-- Select --</option>
@@ -727,7 +727,7 @@ const AssessmentTypesPage = () => {
                     placeholder="e.g. 20, 80"
                     value={newAssessmentMarks}
                     onChange={(e) => setNewAssessmentMarks(e.target.value)}
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none"
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none"
                     min="1"
                     required
                   />
@@ -735,7 +735,7 @@ const AssessmentTypesPage = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all mt-2"
+                  className="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all mt-2"
                 >
                   Save Assessment
                 </button>

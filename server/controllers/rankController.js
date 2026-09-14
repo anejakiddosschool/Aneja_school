@@ -1,5 +1,6 @@
 // backend/controllers/rankController.js
 const Grade = require('../models/Grade');
+const Student = require('../models/Student');
 const mongoose = require('mongoose');
 
 // @desc    Calculate a student's rank in their class for a semester
@@ -13,29 +14,28 @@ exports.getStudentRank = async (req, res) => {
     }
 
     try {
-        // This is a powerful MongoDB Aggregation Pipeline
+        // OPTIMIZED: Resolve class student IDs first (indexed query), then aggregate
+        // with $match first instead of $lookup-then-match over the whole collection.
+        const classmates = await Student.find({ gradeLevel }).select('_id').lean();
+        const classmateIds = classmates.map((s) => s._id);
+
+        if (classmateIds.length === 0) {
+            return res.status(200).json({ rank: 'N/A' });
+        }
+
         const rankedList = await Grade.aggregate([
-            // Stage 1: Match only the grades for the specific year, semester, and grade level
-            {
-                $lookup: {
-                    from: 'students',
-                    localField: 'student',
-                    foreignField: '_id',
-                    as: 'studentInfo'
-                }
-            },
-            { $unwind: '$studentInfo' },
+            // Stage 1: Match FIRST (uses index) — only grades of this class/year/semester
             {
                 $match: {
-                    'studentInfo.gradeLevel': gradeLevel,
+                    student: { $in: classmateIds },
                     academicYear: academicYear,
-                    semester: semester
+                    semester: semester,
                 }
             },
             // Stage 2: Group grades by student and calculate their average score
             {
                 $group: {
-                    _id: '$student', // Group by student ID
+                    _id: '$student',
                     averageScore: { $avg: '$finalScore' }
                 }
             },
@@ -76,27 +76,27 @@ exports.getOverallRank = async (req, res) => {
     }
 
     try {
+        // OPTIMIZED: same approach as semester rank — resolve class first, match first
+        const classmates = await Student.find({ gradeLevel }).select('_id').lean();
+        const classmateIds = classmates.map((s) => s._id);
+
+        if (classmateIds.length === 0) {
+            return res.status(200).json({ rank: 'N/A' });
+        }
+
         const rankedList = await Grade.aggregate([
-            // Stage 1: Match grades for the specific year and grade level (both semesters)
-            {
-                $lookup: { from: 'students', localField: 'student', foreignField: '_id', as: 'studentInfo' }
-            },
-            { $unwind: '$studentInfo' },
             {
                 $match: {
-                    'studentInfo.gradeLevel': gradeLevel,
+                    student: { $in: classmateIds },
                     academicYear: academicYear,
                 }
             },
-            // Stage 2: Group by student and calculate their OVERALL average from all subjects/semesters
             {
                 $group: {
-                    _id: '$student', // Group by student
-                    // This calculates the average of ALL finalScores for that student in the matched year
-                    overallAverage: { $avg: '$finalScore' } 
+                    _id: '$student',
+                    overallAverage: { $avg: '$finalScore' }
                 }
             },
-            // Stage 3: Sort by the calculated overall average
             {
                 $sort: { overallAverage: -1 }
             }

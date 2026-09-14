@@ -145,7 +145,7 @@ const Navbar = () => {
     if (value.includes("connected")) return { label: "Connected", dot: "bg-emerald-500", iconBg: "bg-emerald-50 border-emerald-200", iconText: "text-emerald-600" };
     if (value.includes("logging out")) return { label: "Logging out", dot: "bg-orange-500", iconBg: "bg-orange-50 border-orange-200", iconText: "text-orange-600" };
     if (value.includes("checking")) return { label: "Checking", dot: "bg-sky-500", iconBg: "bg-sky-50 border-sky-200", iconText: "text-sky-600" };
-    if (value.includes("auth failure")) return { label: "Auth issue", dot: "bg-rose-500", iconBg: "bg-rose-50 border-rose-200", iconText: "text-rose-600" };
+    if (value.includes("auth failure")) return { label: "Auth issue", dot: "bg-red-500", iconBg: "bg-red-50 border-red-200", iconText: "text-violet-700" };
     return { label: "Disconnected", dot: "bg-red-500", iconBg: "bg-red-50 border-red-200", iconText: "text-red-600" };
   }, [whatsappStatus, qr]);
 
@@ -153,7 +153,7 @@ const Navbar = () => {
   const navLinkClasses = ({ isActive }) => 
     `text-sm font-semibold transition-all duration-200 px-3 py-3 md:py-2 rounded-lg block md:inline-block
     ${isActive 
-      ? "bg-pink-50 text-pink-600 shadow-sm border border-pink-100/50" 
+      ? "bg-violet-50 text-violet-600 shadow-sm border border-violet-100/50" 
       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`;
 
   return (
@@ -186,11 +186,11 @@ const Navbar = () => {
             
             {/* LOGO */}
             <div className="flex-shrink-0 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-pink-200">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-500 to-indigo-400 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-violet-200">
                 A
               </div>
               <Link to="/" onClick={closeMobileMenu} className="font-extrabold text-xl tracking-tight text-gray-800">
-                Aneja <span className="text-pink-600">Kiddos</span>
+                Aneja <span className="text-violet-600">Kiddos</span>
               </Link>
             </div>
 
@@ -288,7 +288,7 @@ const Navbar = () => {
                           </div>
                         ) : (
                           <div className="flex flex-col items-center py-6">
-                            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-pink-500" />
+                            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-violet-500" />
                             <p className="text-xs text-gray-400">Awaiting server response...</p>
                           </div>
                         )}
@@ -300,13 +300,13 @@ const Navbar = () => {
 
               {/* USER ACTION BUTTONS */}
               {currentUser || currentStudent ? (
-                <button onClick={handleLogout} className="text-xs font-bold text-gray-600 hover:text-pink-600 bg-white hover:bg-pink-50 px-5 py-2 rounded-full transition-colors border border-gray-200 hover:border-pink-200 shadow-sm">
+                <button onClick={handleLogout} className="text-xs font-bold text-gray-600 hover:text-violet-600 bg-white hover:bg-violet-50 px-5 py-2 rounded-full transition-colors border border-gray-200 hover:border-violet-200 shadow-sm">
                   Log Out
                 </button>
               ) : (
                 <div className="flex gap-3 items-center">
-                  <NavLink to="/login" className="text-xs font-bold text-gray-600 hover:text-pink-600 px-2 py-2 transition-colors">Staff Login</NavLink>
-                  <NavLink to="/parent-login" className="text-xs font-bold bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-full transition-colors shadow-sm shadow-pink-200">Parent Login</NavLink>
+                  <NavLink to="/login" className="text-xs font-bold text-gray-600 hover:text-violet-600 px-2 py-2 transition-colors">Staff Login</NavLink>
+                  <NavLink to="/parent-login" className="text-xs font-bold bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-full transition-colors shadow-sm shadow-violet-200">Parent Login</NavLink>
                 </div>
               )}
             </div>
@@ -351,7 +351,7 @@ const Navbar = () => {
                  ) : (
                     <div className="grid grid-cols-2 gap-3">
                         <NavLink to="/login" className="text-sm font-semibold text-gray-700 py-3 bg-white border border-gray-200 text-center rounded-xl shadow-sm" onClick={closeMobileMenu}>Staff Login</NavLink>
-                        <NavLink to="/parent-login" className="text-sm font-semibold text-white py-3 bg-pink-600 text-center rounded-xl shadow-sm" onClick={closeMobileMenu}>Parent Login</NavLink>
+                        <NavLink to="/parent-login" className="text-sm font-semibold text-white py-3 bg-violet-600 text-center rounded-xl shadow-sm" onClick={closeMobileMenu}>Parent Login</NavLink>
                     </div>
                  )}
               </div>

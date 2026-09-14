@@ -90,16 +90,16 @@
 //   // --- Tailwind CSS class strings ---
 //   const inputLabel = "block text-gray-700 text-sm font-bold mb-2";
 //   const textInput =
-//     "shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-pink-500";
+//     "shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-violet-500";
 //   const textAreaInput = `${textInput} h-24 resize-y`;
-//   const submitButton = `w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200`;
+//   const submitButton = `w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200`;
 
 //   return (
 //     <div className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
 //       <h2 className="text-2xl font-bold text-gray-800 mb-4">
 //         Edit Student Profile
 //       </h2>
-//       <Link to="/students" className="text-pink-500 hover:underline mb-6 block">
+//       <Link to="/students" className="text-violet-500 hover:underline mb-6 block">
 //         ← Back to Students List
 //       </Link>
 
@@ -395,26 +395,26 @@ const EditStudentPage = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center mt-20"><div className="w-10 h-10 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin"></div></div>;
+  if (loading) return <div className="flex justify-center mt-20"><div className="w-10 h-10 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div></div>;
   if (error && !studentData) return <p className="text-center text-red-600 font-bold bg-red-50 p-4 rounded-xl max-w-lg mx-auto mt-10">{error}</p>;
   if (!studentData) return null;
 
   // --- Styled Class Strings ---
   const inputLabel = "block text-gray-600 text-xs font-bold uppercase tracking-wider mb-2";
-  const textInput = "w-full border border-gray-200 rounded-xl py-3 px-4 text-gray-800 text-sm font-medium focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 bg-gray-50 hover:bg-white transition-all";
+  const textInput = "w-full border border-gray-200 rounded-xl py-3 px-4 text-gray-800 text-sm font-medium focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-gray-50 hover:bg-white transition-all";
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 animate-fade-in pb-20">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* BACK LINK */}
-        <Link to="/students" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-pink-600 transition-colors">
+        <Link to="/students" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-violet-600 transition-colors">
             <span className="mr-1">←</span> Back to Directory
         </Link>
 
         {/* HEADER */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center text-pink-600 text-2xl">
+            <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 text-2xl">
                 📝
             </div>
             <div>
@@ -440,7 +440,7 @@ const EditStudentPage = () => {
                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg bg-gray-100"
                     onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=" + studentData.fullName + "&background=fbcfe8&color=be185d&size=128" }}
                 />
-                <label htmlFor="photo-upload" className="absolute bottom-0 right-0 w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center cursor-pointer shadow-md text-gray-500 hover:text-pink-600 hover:border-pink-300 transition-colors group-hover:scale-110">
+                <label htmlFor="photo-upload" className="absolute bottom-0 right-0 w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center cursor-pointer shadow-md text-gray-500 hover:text-violet-600 hover:border-violet-300 transition-colors group-hover:scale-110">
                     📷
                 </label>
                 <input id="photo-upload" type="file" onChange={handlePhotoUpload} className="hidden" accept="image/*" />
@@ -525,7 +525,7 @@ const EditStudentPage = () => {
 
           {/* SUBMIT BUTTON */}
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-end">
-            <button type="submit" className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-10 rounded-xl shadow-md transition-all hover:-translate-y-0.5">
+            <button type="submit" className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-10 rounded-xl shadow-md transition-all hover:-translate-y-0.5">
                 Save Profile Changes
             </button>
           </div>

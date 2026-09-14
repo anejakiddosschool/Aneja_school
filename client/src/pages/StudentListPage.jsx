@@ -675,7 +675,7 @@
 //   if (loading)
 //     return (
 //       <div className="flex justify-center mt-20">
-//         <div className="w-10 h-10 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin"></div>
+//         <div className="w-10 h-10 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
 //       </div>
 //     );
 
@@ -705,7 +705,7 @@
 //       {isBulkUploading && (
 //         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center text-white">
 //           <div className="bg-white p-8 rounded-2xl text-center shadow-2xl max-w-sm w-full">
-//             <div className="w-16 h-16 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
+//             <div className="w-16 h-16 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mx-auto mb-4"></div>
 //             <h3 className="text-gray-900 font-extrabold text-xl mb-1">
 //               {bulkActionType === "upload"
 //                 ? "Uploading Reports..."
@@ -717,13 +717,13 @@
 
 //             <div className="bg-gray-100 rounded-full h-3 w-full overflow-hidden mb-2">
 //               <div
-//                 className="bg-pink-600 h-full transition-all duration-300"
+//                 className="bg-violet-600 h-full transition-all duration-300"
 //                 style={{
 //                   width: `${(bulkProgress.current / bulkProgress.total) * 100}%`,
 //                 }}
 //               ></div>
 //             </div>
-//             <p className="text-pink-600 font-extrabold text-md">
+//             <p className="text-violet-600 font-extrabold text-md">
 //               {bulkProgress.current} / {bulkProgress.total} Processed
 //             </p>
 //           </div>
@@ -752,7 +752,7 @@
 //               <>
 //                 <Link
 //                   to="/students/add"
-//                   className="flex-1 sm:flex-none text-center bg-pink-600 hover:bg-pink-700 text-white text-sm font-bold py-2 md:py-1.5 px-4 rounded-lg transition-all"
+//                   className="flex-1 sm:flex-none text-center bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold py-2 md:py-1.5 px-4 rounded-lg transition-all"
 //                 >
 //                   + Add
 //                 </Link>
@@ -778,7 +778,7 @@
 //                 setSelectedGrade(e.target.value);
 //                 setSelectedStudentIds([]);
 //               }}
-//               className="w-full md:w-40 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-pink-500 outline-none cursor-pointer bg-gray-50"
+//               className="w-full md:w-40 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-violet-500 outline-none cursor-pointer bg-gray-50"
 //             >
 //               <option value="">-- Select --</option>
 //               {availableGrades.map((g) => (
@@ -796,7 +796,7 @@
 //                 placeholder="Search Name or ID..."
 //                 value={searchQuery}
 //                 onChange={(e) => setSearchQuery(e.target.value)}
-//                 className="w-full border border-gray-300 rounded-lg py-2.5 md:py-2 px-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none bg-gray-50"
+//                 className="w-full border border-gray-300 rounded-lg py-2.5 md:py-2 px-3 text-sm focus:ring-2 focus:ring-violet-500 outline-none bg-gray-50"
 //               />
 //             </div>
 //           )}
@@ -812,7 +812,7 @@
 //               <label className="sm:hidden flex items-center gap-2 text-xs font-bold text-indigo-700">
 //                 <input
 //                   type="checkbox"
-//                   className="rounded text-pink-600 focus:ring-pink-500"
+//                   className="rounded text-violet-600 focus:ring-violet-500"
 //                   onChange={(e) => handleSelectAll(e.target.checked)}
 //                   checked={
 //                     filteredStudents.length > 0 &&
@@ -879,7 +879,7 @@
 //               <button
 //                 onClick={sendReportCardsToParents}
 //                 disabled={!whatsappReady}
-//                 className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap"
+//                 className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap"
 //               >
 //                 Report Card
 //               </button>
@@ -924,7 +924,7 @@
 //                             selectedStudentIds.includes(s._id),
 //                           )
 //                         }
-//                         className="cursor-pointer rounded text-pink-600 focus:ring-pink-500"
+//                         className="cursor-pointer rounded text-violet-600 focus:ring-violet-500"
 //                       />
 //                     </th>
 //                     <th className="py-3 px-4 font-bold text-gray-700">
@@ -955,7 +955,7 @@
 //                       return (
 //                         <tr
 //                           key={student._id}
-//                           className="hover:bg-pink-50/50 transition-colors"
+//                           className="hover:bg-violet-50/50 transition-colors"
 //                         >
 //                           <td className="py-4 px-4 text-center">
 //                             <input
@@ -967,14 +967,14 @@
 //                                   e.target.checked,
 //                                 )
 //                               }
-//                               className="cursor-pointer rounded text-pink-600 focus:ring-pink-500 w-4 h-4"
+//                               className="cursor-pointer rounded text-violet-600 focus:ring-violet-500 w-4 h-4"
 //                             />
 //                           </td>
 
 //                           <td className="py-4 px-4">
 //                             <Link
 //                               to={`/students/${student._id}`}
-//                               className="font-bold text-gray-900 hover:text-pink-600 block text-[15px]"
+//                               className="font-bold text-gray-900 hover:text-violet-600 block text-[15px]"
 //                             >
 //                               {student.fullName}
 //                             </Link>
@@ -991,7 +991,7 @@
 //                                   <div className="flex flex-wrap justify-center gap-1 w-full">
 //                                     {hasReportCard && (
 //                                       <span
-//                                         className="bg-pink-100 text-pink-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-pink-200"
+//                                         className="bg-violet-100 text-violet-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-violet-200"
 //                                         title="Report Card"
 //                                       >
 //                                         RC
@@ -1053,7 +1053,7 @@
 //                           <td className="py-4 px-4 text-right">
 //                             {personalMessageStudentId === student._id ? (
 //                               <div className="flex items-center gap-1 justify-end">
-//                                 <div className="w-[340px] bg-white border border-pink-300 rounded-lg overflow-hidden text-left">
+//                                 <div className="w-[340px] bg-white border border-violet-300 rounded-lg overflow-hidden text-left">
 //                                   <ReactQuill
 //                                     theme="snow"
 //                                     value={personalMessageContent}
@@ -1175,7 +1175,7 @@
 //                       key={student._id}
 //                       className={`bg-white rounded-xl shadow-sm border p-4 transition-colors ${
 //                         isSelected
-//                           ? "border-pink-400 bg-pink-50/20"
+//                           ? "border-violet-400 bg-violet-50/20"
 //                           : "border-gray-200"
 //                       }`}
 //                     >
@@ -1190,7 +1190,7 @@
 //                                 e.target.checked,
 //                               )
 //                             }
-//                             className="mt-1 w-5 h-5 cursor-pointer rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+//                             className="mt-1 w-5 h-5 cursor-pointer rounded border-gray-300 text-violet-600 focus:ring-violet-500"
 //                           />
 //                           <div>
 //                             <Link
@@ -1215,7 +1215,7 @@
 //                           {hasAnyDoc ? (
 //                             <div className="flex gap-1">
 //                               {hasReportCard && (
-//                                 <span className="bg-pink-100 text-pink-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-pink-200">
+//                                 <span className="bg-violet-100 text-violet-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-violet-200">
 //                                   RC
 //                                 </span>
 //                               )}
@@ -1406,7 +1406,7 @@
 //                 </Dialog.Title>
 //                 <p className="text-sm text-gray-500 mb-5">
 //                   You are updating the class for{" "}
-//                   <strong className="text-pink-600">
+//                   <strong className="text-violet-600">
 //                     {selectedStudentIds.length}
 //                   </strong>{" "}
 //                   selected students.
@@ -1423,7 +1423,7 @@
 //                         setNewGrade(e.target.value);
 //                         setNewSection("");
 //                       }}
-//                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer"
+//                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 bg-white cursor-pointer"
 //                     >
 //                       <option value="" disabled>
 //                         -- Select New Class --
@@ -1447,7 +1447,7 @@
 //                       value={newSection}
 //                       onChange={(e) => setNewSection(e.target.value)}
 //                       disabled={!newGrade}
-//                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+//                       className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
 //                     >
 //                       <option value="">
 //                         {!newGrade
@@ -1472,7 +1472,7 @@
 //                   </button>
 //                   <button
 //                     onClick={submitBulkClassUpdate}
-//                     className="px-4 py-2 text-sm font-bold text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition flex items-center gap-2"
+//                     className="px-4 py-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition flex items-center gap-2"
 //                   >
 //                     Update Students
 //                   </button>
@@ -2209,7 +2209,7 @@ const StudentListPage = () => {
   if (loading)
     return (
       <div className="flex justify-center mt-20">
-        <div className="w-10 h-10 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
       </div>
     );
 
@@ -2240,7 +2240,7 @@ const StudentListPage = () => {
       {isBulkUploading && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center text-white">
           <div className="bg-white p-8 rounded-2xl text-center shadow-2xl max-w-sm w-full">
-            <div className="w-16 h-16 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-16 h-16 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mx-auto mb-4"></div>
             <h3 className="text-gray-900 font-extrabold text-xl mb-1">
               {bulkActionType === "upload"
                 ? "Uploading Reports..."
@@ -2252,13 +2252,13 @@ const StudentListPage = () => {
 
             <div className="bg-gray-100 rounded-full h-3 w-full overflow-hidden mb-2">
               <div
-                className="bg-pink-600 h-full transition-all duration-300"
+                className="bg-violet-600 h-full transition-all duration-300"
                 style={{
                   width: `${(bulkProgress.current / bulkProgress.total) * 100}%`,
                 }}
               ></div>
             </div>
-            <p className="text-pink-600 font-extrabold text-md">
+            <p className="text-violet-600 font-extrabold text-md">
               {bulkProgress.current} / {bulkProgress.total} Processed
             </p>
           </div>
@@ -2287,7 +2287,7 @@ const StudentListPage = () => {
               <>
                 <Link
                   to="/students/add"
-                  className="flex-1 sm:flex-none text-center bg-pink-600 hover:bg-pink-700 text-white text-sm font-bold py-2 md:py-1.5 px-4 rounded-lg transition-all"
+                  className="flex-1 sm:flex-none text-center bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold py-2 md:py-1.5 px-4 rounded-lg transition-all"
                 >
                   + Add
                 </Link>
@@ -2313,7 +2313,7 @@ const StudentListPage = () => {
                 setSelectedGrade(e.target.value);
                 setSelectedStudentIds([]);
               }}
-              className="w-full md:w-40 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-pink-500 outline-none cursor-pointer bg-gray-50"
+              className="w-full md:w-40 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-violet-500 outline-none cursor-pointer bg-gray-50"
             >
               <option value="">-- Select --</option>
               {availableGrades.map((g) => (
@@ -2331,7 +2331,7 @@ const StudentListPage = () => {
             <select
               value={selectedSession}
               onChange={(e) => setSelectedSession(e.target.value)}
-              className="w-full md:w-44 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-pink-500 outline-none cursor-pointer bg-gray-50"
+              className="w-full md:w-44 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-violet-500 outline-none cursor-pointer bg-gray-50"
             >
               {sessionOptions.map((session) => (
                 <option key={session} value={session}>
@@ -2348,7 +2348,7 @@ const StudentListPage = () => {
                 placeholder="Search Name or ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg py-2.5 md:py-2 px-3 text-sm focus:ring-2 focus:ring-pink-500 outline-none bg-gray-50"
+                className="w-full border border-gray-300 rounded-lg py-2.5 md:py-2 px-3 text-sm focus:ring-2 focus:ring-violet-500 outline-none bg-gray-50"
               />
             </div>
           )}
@@ -2364,7 +2364,7 @@ const StudentListPage = () => {
               <label className="sm:hidden flex items-center gap-2 text-xs font-bold text-indigo-700">
                 <input
                   type="checkbox"
-                  className="rounded text-pink-600 focus:ring-pink-500"
+                  className="rounded text-violet-600 focus:ring-violet-500"
                   onChange={(e) => handleSelectAll(e.target.checked)}
                   checked={
                     filteredStudents.length > 0 &&
@@ -2441,7 +2441,7 @@ const StudentListPage = () => {
               <button
                 onClick={sendReportCardsToParents}
                 disabled={!whatsappReady}
-                className="bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap"
+                className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap"
               >
                 Report Card
               </button>
@@ -2486,7 +2486,7 @@ const StudentListPage = () => {
                             selectedStudentIds.includes(s._id),
                           )
                         }
-                        className="cursor-pointer rounded text-pink-600 focus:ring-pink-500"
+                        className="cursor-pointer rounded text-violet-600 focus:ring-violet-500"
                       />
                     </th>
                     <th className="py-3 px-4 font-bold text-gray-700">
@@ -2517,7 +2517,7 @@ const StudentListPage = () => {
                       return (
                         <tr
                           key={student._id}
-                          className="hover:bg-pink-50/50 transition-colors"
+                          className="hover:bg-violet-50/50 transition-colors"
                         >
                           <td className="py-4 px-4 text-center">
                             <input
@@ -2529,14 +2529,14 @@ const StudentListPage = () => {
                                   e.target.checked,
                                 )
                               }
-                              className="cursor-pointer rounded text-pink-600 focus:ring-pink-500 w-4 h-4"
+                              className="cursor-pointer rounded text-violet-600 focus:ring-violet-500 w-4 h-4"
                             />
                           </td>
 
                           <td className="py-4 px-4">
                             <Link
                               to={`/students/${student._id}`}
-                              className="font-bold text-gray-900 hover:text-pink-600 block text-[15px]"
+                              className="font-bold text-gray-900 hover:text-violet-600 block text-[15px]"
                             >
                               {student.fullName}
                             </Link>
@@ -2553,7 +2553,7 @@ const StudentListPage = () => {
                                   <div className="flex flex-wrap justify-center gap-1 w-full">
                                     {hasReportCard && (
                                       <span
-                                        className="bg-pink-100 text-pink-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-pink-200"
+                                        className="bg-violet-100 text-violet-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-violet-200"
                                         title="Report Card"
                                       >
                                         RC
@@ -2615,7 +2615,7 @@ const StudentListPage = () => {
                           <td className="py-4 px-4 text-right">
                             {personalMessageStudentId === student._id ? (
                               <div className="flex items-center gap-1 justify-end">
-                                <div className="w-[340px] bg-white border border-pink-300 rounded-lg overflow-hidden text-left">
+                                <div className="w-[340px] bg-white border border-violet-300 rounded-lg overflow-hidden text-left">
                                   <ReactQuill
                                     theme="snow"
                                     value={personalMessageContent}
@@ -2733,7 +2733,7 @@ const StudentListPage = () => {
                       key={student._id}
                       className={`bg-white rounded-xl shadow-sm border p-4 transition-colors ${
                         isSelected
-                          ? "border-pink-400 bg-pink-50/20"
+                          ? "border-violet-400 bg-violet-50/20"
                           : "border-gray-200"
                       }`}
                     >
@@ -2748,7 +2748,7 @@ const StudentListPage = () => {
                                 e.target.checked,
                               )
                             }
-                            className="mt-1 w-5 h-5 cursor-pointer rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                            className="mt-1 w-5 h-5 cursor-pointer rounded border-gray-300 text-violet-600 focus:ring-violet-500"
                           />
                           <div>
                             <Link
@@ -2773,7 +2773,7 @@ const StudentListPage = () => {
                           {hasAnyDoc ? (
                             <div className="flex gap-1">
                               {hasReportCard && (
-                                <span className="bg-pink-100 text-pink-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-pink-200">
+                                <span className="bg-violet-100 text-violet-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-violet-200">
                                   RC
                                 </span>
                               )}
@@ -2962,7 +2962,7 @@ const StudentListPage = () => {
                 </Dialog.Title>
                 <p className="text-sm text-gray-500 mb-5">
                   You are updating the class for{" "}
-                  <strong className="text-pink-600">
+                  <strong className="text-violet-600">
                     {selectedStudentIds.length}
                   </strong>{" "}
                   selected students.
@@ -2979,7 +2979,7 @@ const StudentListPage = () => {
                         setNewGrade(e.target.value);
                         setNewSection("");
                       }}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer"
+                      className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 bg-white cursor-pointer"
                     >
                       <option value="" disabled>
                         -- Select New Class --
@@ -3003,7 +3003,7 @@ const StudentListPage = () => {
                       value={newSection}
                       onChange={(e) => setNewSection(e.target.value)}
                       disabled={!newGrade}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       <option value="">
                         {!newGrade
@@ -3028,7 +3028,7 @@ const StudentListPage = () => {
                   </button>
                   <button
                     onClick={submitBulkClassUpdate}
-                    className="px-4 py-2 text-sm font-bold text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition flex items-center gap-2"
+                    className="px-4 py-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition flex items-center gap-2"
                   >
                     Update Students
                   </button>

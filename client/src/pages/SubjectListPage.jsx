@@ -89,9 +89,9 @@
 
 //   // --- Tailwind CSS class strings ---
 //   const textInput =
-//     'shadow-sm border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-pink-500';
+//     'shadow-sm border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-violet-500';
 //   const buttonPink =
-//     'bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200';
+//     'bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200';
 //   const buttonGreen =
 //     'bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200';
 
@@ -331,7 +331,7 @@ const SubjectListPage = () => {
 
   // --- Render logic ---
   if (loading) {
-    return <div className="flex justify-center items-center mt-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div></div>;
+    return <div className="flex justify-center items-center mt-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500"></div></div>;
   }
 
   return (
@@ -361,7 +361,7 @@ const SubjectListPage = () => {
             <select
               value={selectedGrade}
               onChange={(e) => setSelectedGrade(e.target.value)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all cursor-pointer"
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all cursor-pointer"
             >
               <option value="">-- All Classes --</option>
               {gradeOptions.map((grade) => (
@@ -378,7 +378,7 @@ const SubjectListPage = () => {
               placeholder="Search by name or code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all outline-none"
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all outline-none"
             />
           </div>
 
@@ -443,7 +443,7 @@ const SubjectListPage = () => {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-6">
             
             <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <span className="bg-pink-100 text-pink-600 w-6 h-6 rounded-full flex items-center justify-center text-sm">+</span>
+              <span className="bg-violet-100 text-violet-600 w-6 h-6 rounded-full flex items-center justify-center text-sm">+</span>
               Create Subject
             </h4>
 
@@ -464,7 +464,7 @@ const SubjectListPage = () => {
                     value={newSubjectName}
                     onChange={(e) => setNewSubjectName(e.target.value)}
                     placeholder="e.g., Mathematics"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none"
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none"
                     required
                   />
                 </div>
@@ -476,14 +476,14 @@ const SubjectListPage = () => {
                     value={newSubjectCode}
                     onChange={(e) => setNewSubjectCode(e.target.value)}
                     placeholder="e.g., MATH-01"
-                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none uppercase"
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none uppercase"
                   />
                 </div>
 
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-pink-300 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all mt-4"
+                  className="w-full bg-violet-500 hover:bg-violet-600 disabled:bg-violet-300 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all mt-4"
                 >
                   {isSubmitting ? "Adding..." : "+ Add Subject"}
                 </button>

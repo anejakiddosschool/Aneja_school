@@ -132,7 +132,7 @@ body {
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #ec4899, #f43f5e);
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -154,8 +154,8 @@ body {
 }
 
 .input-focus:focus {
-  border-color: #ec4899;
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
 /* Shimmer loading effect */
@@ -182,7 +182,7 @@ body {
 }
 
 .table-row:hover {
-  background-color: #fdf2f8;
+  background-color: #f5f3ff;
 }
 
 /* Badge styles */

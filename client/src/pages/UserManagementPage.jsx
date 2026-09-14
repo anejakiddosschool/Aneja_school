@@ -54,7 +54,7 @@ const UserManagementPage = () => {
         }
     };
 
-    if (loading) return <div className="flex justify-center mt-20"><div className="w-10 h-10 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin"></div></div>;
+    if (loading) return <div className="flex justify-center mt-20"><div className="w-10 h-10 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div></div>;
     if (error) return <p className="text-center text-red-600 font-bold bg-red-50 p-4 rounded-xl max-w-lg mx-auto mt-10 shadow-sm border border-red-100">{error}</p>;
 
     return (
@@ -80,7 +80,7 @@ const UserManagementPage = () => {
                         <Link to="/admin/users/import" className="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-5 rounded-xl border border-gray-200 shadow-sm transition-all text-sm">
                             <span>📥</span> Bulk Import
                         </Link>
-                        <Link to="/register" className="flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-sm shadow-pink-200 transition-all text-sm">
+                        <Link to="/register" className="flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-sm shadow-violet-200 transition-all text-sm">
                             <span>➕</span> Add User
                         </Link>
                     </div>
@@ -95,7 +95,7 @@ const UserManagementPage = () => {
                             <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full border border-blue-200 shadow-sm">
                                 Total: {users.length}
                             </span>
-                            <span className="bg-pink-100 text-pink-800 text-xs font-bold px-3 py-1 rounded-full border border-pink-200 shadow-sm">
+                            <span className="bg-violet-100 text-violet-800 text-xs font-bold px-3 py-1 rounded-full border border-violet-200 shadow-sm">
                                 Admins: {users.filter(u => u.role === 'admin').length}
                             </span>
                         </div>
@@ -104,7 +104,7 @@ const UserManagementPage = () => {
                             <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">🔍</span>
                             <input
                                 type="text"
-                                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 bg-white text-sm shadow-sm transition-all"
+                                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white text-sm shadow-sm transition-all"
                                 placeholder="Search name or subject..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -128,11 +128,11 @@ const UserManagementPage = () => {
                                     <tr key={user._id} className="hover:bg-gray-50/50 transition-colors group">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm ${user.role === 'admin' ? 'bg-gradient-to-tr from-pink-500 to-rose-400' : 'bg-gradient-to-tr from-slate-600 to-slate-500'}`}>
+                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm ${user.role === 'admin' ? 'bg-gradient-to-tr from-violet-500 to-indigo-400' : 'bg-gradient-to-tr from-slate-600 to-slate-500'}`}>
                                                     {user.fullName.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="font-extrabold text-gray-900 group-hover:text-pink-600 transition-colors">{user.fullName}</p>
+                                                    <p className="font-extrabold text-gray-900 group-hover:text-violet-600 transition-colors">{user.fullName}</p>
                                                     <p className="text-[11px] text-gray-500 font-mono mt-0.5">{user.username}</p>
                                                 </div>
                                             </div>
@@ -140,9 +140,9 @@ const UserManagementPage = () => {
                                         
                                         <td className="py-4 px-4 text-center">
                                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm ${
-                                                user.role === 'admin' ? 'bg-pink-50 text-pink-700 border-pink-200' : 'bg-slate-50 text-slate-700 border-slate-200'
+                                                user.role === 'admin' ? 'bg-violet-50 text-violet-700 border-violet-200' : 'bg-slate-50 text-slate-700 border-slate-200'
                                             }`}>
-                                                {user.role === 'admin' && <span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span>}
+                                                {user.role === 'admin' && <span className="w-1.5 h-1.5 rounded-full bg-violet-500"></span>}
                                                 {user.role}
                                             </span>
                                         </td>

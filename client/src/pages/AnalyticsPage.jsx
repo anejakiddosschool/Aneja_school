@@ -111,7 +111,7 @@
 //                         {loadingAssessments ? <option>Loading...</option> : assessmentTypes.map(at => <option key={at._id} value={at._id}>{at.month} - {at.name} ({at.semester})</option>)}
 //                     </select>
 //                 </div>
-//                 <button onClick={handleFetchAnalysis} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-md" disabled={!selectedAssessment || loadingAnalysis}>
+//                 <button onClick={handleFetchAnalysis} className="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-md" disabled={!selectedAssessment || loadingAnalysis}>
 //                     {loadingAnalysis ? 'Analyzing...' : 'Get Analysis'}
 //                 </button>
 //             </div>
@@ -122,7 +122,7 @@
 
 //             {analysisResult && (
 //                 <div className="animate-fade-in space-y-8 mt-6">
-//                     <h3 className="text-xl font-bold text-gray-800">Results for: <span className="text-pink-600">{analysisResult.assessmentType.name}</span></h3>
+//                     <h3 className="text-xl font-bold text-gray-800">Results for: <span className="text-violet-600">{analysisResult.assessmentType.name}</span></h3>
 //                     {analysisResult.analysis ? (
 //                         <>
 //                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -276,7 +276,7 @@ const AnalyticsPage = () => {
     const tdBase = "px-4 py-3 border border-gray-100 text-center text-sm font-medium text-gray-700";
 
     if (loadingSubjects) {
-        return <div className="flex justify-center items-center mt-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div></div>;
+        return <div className="flex justify-center items-center mt-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500"></div></div>;
     }
 
     return (
@@ -297,7 +297,7 @@ const AnalyticsPage = () => {
                         <select 
                             onChange={(e) => { setSelectedGrade(e.target.value); setSelectedSubject(''); }} 
                             value={selectedGrade} 
-                            className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 transition-all cursor-pointer"
+                            className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer"
                         >
                             <option value="">-- Choose Grade --</option>
                             {gradeLevels.map(g => <option key={g} value={g}>{g}</option>)}
@@ -310,7 +310,7 @@ const AnalyticsPage = () => {
                             onChange={(e) => setSelectedSubject(e.target.value)} 
                             value={selectedSubject} 
                             disabled={!selectedGrade}
-                            className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 cursor-pointer focus:ring-2 focus:ring-pink-500 transition-all"
+                            className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 cursor-pointer focus:ring-2 focus:ring-violet-500 transition-all"
                         >
                             <option value="">-- Choose Subject --</option>
                             {subjectsForGrade.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
@@ -323,7 +323,7 @@ const AnalyticsPage = () => {
                             onChange={(e) => setSelectedAssessment(e.target.value)} 
                             value={selectedAssessment} 
                             disabled={!selectedSubject || assessmentTypes.length === 0}
-                            className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 cursor-pointer focus:ring-2 focus:ring-pink-500 transition-all"
+                            className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 cursor-pointer focus:ring-2 focus:ring-violet-500 transition-all"
                         >
                             <option value="">-- Choose Test --</option>
                             {loadingAssessments ? <option>Loading...</option> : assessmentTypes.map(at => <option key={at._id} value={at._id}>{at.name} ({at.semester})</option>)}
@@ -333,7 +333,7 @@ const AnalyticsPage = () => {
                     <button 
                         onClick={handleFetchAnalysis} 
                         disabled={!selectedAssessment || loadingAnalysis}
-                        className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-pink-300 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all h-[42px]"
+                        className="w-full bg-violet-500 hover:bg-violet-600 disabled:bg-violet-300 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all h-[42px]"
                     >
                         {loadingAnalysis ? 'Analyzing...' : 'Generate Report'}
                     </button>
@@ -348,7 +348,7 @@ const AnalyticsPage = () => {
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <div className="mb-6 flex justify-between items-center border-b border-gray-100 pb-4">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-800">Results for: <span className="text-pink-600">{analysisResult.assessmentType.name}</span></h3>
+                                <h3 className="text-xl font-bold text-gray-800">Results for: <span className="text-violet-600">{analysisResult.assessmentType.name}</span></h3>
                                 <p className="text-sm text-gray-500 mt-1">Based on {analysisResult.analysis.stats.studentCount} graded students</p>
                             </div>
                         </div>

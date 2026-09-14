@@ -77,8 +77,8 @@ const ProfilePage = () => {
     
     // --- Tailwind CSS class strings ---
     const inputLabel = "block text-gray-700 text-sm font-bold mb-2";
-    const textInput = "shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-pink-500";
-    const submitButton = `w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`;
+    const textInput = "shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-violet-500";
+    const submitButton = `w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`;
     
     return (
         <div className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">

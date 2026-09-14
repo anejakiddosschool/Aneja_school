@@ -257,7 +257,7 @@ const FoundationTestPage = () => {
           {isAdmin && (
             <button
               onClick={() => setShowCreate(!showCreate)}
-              className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-5 py-3 sm:py-2.5 rounded-xl shadow-sm transition-all text-sm sm:text-base w-full sm:w-auto"
+              className="bg-violet-600 hover:bg-violet-700 text-white font-bold px-5 py-3 sm:py-2.5 rounded-xl shadow-sm transition-all text-sm sm:text-base w-full sm:w-auto"
             >
               {showCreate ? "✕ Cancel" : "+ New Foundation Test"}
             </button>
@@ -266,7 +266,7 @@ const FoundationTestPage = () => {
 
         {/* Create Form */}
         {showCreate && isAdmin && (
-          <div className="bg-white rounded-2xl border-2 border-pink-200 p-4 sm:p-6 mb-6 shadow-md">
+          <div className="bg-white rounded-2xl border-2 border-violet-200 p-4 sm:p-6 mb-6 shadow-md">
             <h3 className="font-extrabold text-lg mb-4">Create Foundation Test</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div>
@@ -274,7 +274,7 @@ const FoundationTestPage = () => {
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-violet-300 outline-none"
                   placeholder="e.g. Foundation Test - Unit 1"
                 />
               </div>
@@ -283,7 +283,7 @@ const FoundationTestPage = () => {
                 <select
                   value={form.gradeLevel}
                   onChange={(e) => setForm({ ...form, gradeLevel: e.target.value, subjects: [] })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-violet-300 outline-none"
                 >
                   <option value="">Select Class</option>
                   {classes.map((c) => (
@@ -296,7 +296,7 @@ const FoundationTestPage = () => {
                 <select
                   value={form.semester}
                   onChange={(e) => setForm({ ...form, semester: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-sm focus:ring-2 focus:ring-violet-300 outline-none"
                 >
                   <option>First Semester</option>
                   <option>Second Semester</option>
@@ -314,7 +314,7 @@ const FoundationTestPage = () => {
                       <div
                         key={sub._id}
                         className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-                          selected ? "border-pink-400 bg-pink-50" : "border-gray-200 bg-gray-50 hover:bg-gray-100"
+                          selected ? "border-violet-400 bg-violet-50" : "border-gray-200 bg-gray-50 hover:bg-gray-100"
                         }`}
                         onClick={() => toggleSubject(sub._id)}
                       >
@@ -322,7 +322,7 @@ const FoundationTestPage = () => {
                           type="checkbox"
                           checked={!!selected}
                           onChange={() => toggleSubject(sub._id)}
-                          className="accent-pink-600"
+                          className="accent-violet-600"
                         />
                         <span className="text-sm font-medium flex-1">{sub.name}</span>
                         {selected && (
@@ -355,7 +355,7 @@ const FoundationTestPage = () => {
             <button
               onClick={handleCreate}
               disabled={creating || !form.name || !form.gradeLevel || form.subjects.length < 2}
-              className="bg-pink-600 hover:bg-pink-700 disabled:bg-gray-300 text-white font-bold px-6 py-2.5 rounded-xl transition-all"
+              className="bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 text-white font-bold px-6 py-2.5 rounded-xl transition-all"
             >
               {creating ? "Creating..." : "Create Foundation Test"}
             </button>
@@ -428,7 +428,7 @@ const FoundationTestPage = () => {
   if (detailLoading) {
     return (
       <div className="text-center py-20">
-        <div className="w-10 h-10 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin mx-auto"></div>
+        <div className="w-10 h-10 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mx-auto"></div>
         <p className="text-gray-400 mt-4">Loading...</p>
       </div>
     );
@@ -441,7 +441,7 @@ const FoundationTestPage = () => {
   return (
     <div className="max-w-6xl mx-auto p-3 sm:p-4">
       {/* Back + Title */}
-      <button onClick={() => setView("list")} className="text-pink-600 font-bold text-sm mb-3 hover:underline">
+      <button onClick={() => setView("list")} className="text-violet-600 font-bold text-sm mb-3 hover:underline">
         ← Back to List
       </button>
 
@@ -487,7 +487,7 @@ const FoundationTestPage = () => {
               onClick={() => canEdit && loadStudentsForSubject(sub.subjectId)}
               className={`rounded-2xl border-2 p-4 transition-all ${
                 canEdit
-                  ? `cursor-pointer ${isSelected ? "border-pink-500 bg-pink-50 shadow-md" : "border-gray-100 bg-white hover:border-pink-200"}`
+                  ? `cursor-pointer ${isSelected ? "border-violet-500 bg-violet-50 shadow-md" : "border-gray-100 bg-white hover:border-violet-200"}`
                   : "border-gray-100 bg-gray-50 opacity-60"
               }`}
             >
@@ -507,7 +507,7 @@ const FoundationTestPage = () => {
                 </div>
               </div>
               {canEdit && !sub.hasMarks && isSelected && (
-                <p className="text-xs text-pink-600 mt-2 font-medium">📝 Enter marks below</p>
+                <p className="text-xs text-violet-600 mt-2 font-medium">📝 Enter marks below</p>
               )}
               {!canEdit && (
                 <p className="text-xs text-gray-400 mt-2">🔒 Not your subject</p>
@@ -527,7 +527,7 @@ const FoundationTestPage = () => {
             <button
               onClick={handleSaveMarks}
               disabled={saving}
-              className="bg-pink-600 hover:bg-pink-700 disabled:bg-gray-300 text-white font-bold px-5 py-3 sm:py-2 rounded-xl text-sm transition-all w-full sm:w-auto text-center"
+              className="bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 text-white font-bold px-5 py-3 sm:py-2 rounded-xl text-sm transition-all w-full sm:w-auto text-center"
             >
               {saving ? "Saving..." : "💾 Save Marks"}
             </button>
@@ -548,7 +548,7 @@ const FoundationTestPage = () => {
                 </thead>
                 <tbody>
                   {students.map((s, i) => (
-                    <tr key={s._id} className="border-b border-gray-50 active:bg-pink-50">
+                    <tr key={s._id} className="border-b border-gray-50 active:bg-violet-50">
                       <td className="py-3 sm:py-2 px-3 text-gray-400">{i + 1}</td>
                       <td className="py-3 sm:py-2 px-3 font-medium text-sm">{s.fullName}</td>
                       <td className="py-3 sm:py-2 px-3 text-gray-500 text-sm">{s.rollNumber || "-"}</td>
@@ -574,7 +574,7 @@ const FoundationTestPage = () => {
                               }
                             }
                           }}
-                          className="w-20 border border-gray-300 rounded-lg px-2 py-2.5 sm:py-2 text-center text-base sm:text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+                          className="w-20 border border-gray-300 rounded-lg px-2 py-2.5 sm:py-2 text-center text-base sm:text-sm focus:ring-2 focus:ring-violet-300 outline-none"
                           min="0"
                           max={detail.subjectStatus?.find((s) => s.subjectId === selectedSubjectId)?.totalMarks}
                           placeholder="—"

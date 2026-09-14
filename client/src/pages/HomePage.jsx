@@ -12,7 +12,7 @@ import studentService from "../services/studentService";
 // --- Reusable UI Components ---
 
 // 🎓 Stat Card (Modernized)
-const StatCard = ({ title, value, icon, colorClass = "from-pink-500 to-rose-400" }) => (
+const StatCard = ({ title, value, icon, colorClass = "from-violet-500 to-indigo-400" }) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition-shadow duration-300">
     <div className={`w-14 h-14 rounded-xl bg-gradient-to-tr ${colorClass} flex items-center justify-center text-white text-2xl shadow-sm`}>
       {icon}
@@ -29,14 +29,14 @@ const ActionCard = ({ to, title, description, state = {}, icon = "→" }) => (
   <Link
     to={to}
     state={state}
-    className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-pink-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+    className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-violet-200 transition-all duration-300 flex flex-col h-full relative overflow-hidden"
   >
-    <div className="absolute -right-6 -top-6 w-24 h-24 bg-pink-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+    <div className="absolute -right-6 -top-6 w-24 h-24 bg-violet-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
     <div className="relative z-10 flex-grow">
-      <h3 className="font-extrabold text-lg text-gray-800 group-hover:text-pink-600 transition-colors">{title}</h3>
+      <h3 className="font-extrabold text-lg text-gray-800 group-hover:text-violet-600 transition-colors">{title}</h3>
       <p className="text-gray-500 text-sm mt-2 leading-relaxed">{description}</p>
     </div>
-    <div className="mt-6 flex items-center text-sm font-bold text-pink-600 group-hover:text-pink-700 relative z-10">
+    <div className="mt-6 flex items-center text-sm font-bold text-violet-600 group-hover:text-violet-700 relative z-10">
       Access Portal <span className="ml-2 group-hover:translate-x-1 transition-transform">{icon}</span>
     </div>
   </Link>
@@ -79,7 +79,7 @@ const HomePage = () => {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 border-4 border-pink-100 border-t-pink-600 rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin"></div>
         <p className="text-gray-500 font-medium animate-pulse">Loading Dashboard Space...</p>
       </div>
     );
@@ -91,15 +91,15 @@ const HomePage = () => {
       <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-10 animate-fade-in">
         {/* Welcome Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-pink-100 to-transparent rounded-bl-full opacity-50"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-violet-100 to-transparent rounded-bl-full opacity-50"></div>
           <div className="relative z-10">
-            <span className="text-pink-600 font-bold tracking-wider uppercase text-sm mb-2 block">Administrator Panel</span>
+            <span className="text-violet-600 font-bold tracking-wider uppercase text-sm mb-2 block">Administrator Panel</span>
             <h2 className="text-3xl md:text-4xl font-black text-gray-900">
                Welcome back, {currentUser.fullName}
             </h2>
           </div>
           <div className="relative z-10">
-            <Link to="/profile" className="inline-flex items-center gap-2 bg-gray-50 hover:bg-pink-50 text-gray-700 hover:text-pink-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-gray-200">
+            <Link to="/profile" className="inline-flex items-center gap-2 bg-gray-50 hover:bg-violet-50 text-gray-700 hover:text-violet-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-gray-200">
               <span>⚙️</span> Account Settings
             </Link>
           </div>
@@ -109,7 +109,7 @@ const HomePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard title="Active Students" value={stats?.students ?? "..."} icon="👨‍🎓" colorClass="from-blue-500 to-cyan-400" />
           <StatCard title="Teachers/Staff" value={stats?.teachers ?? "..."} icon="👩‍🏫" colorClass="from-purple-500 to-fuchsia-400" />
-          <StatCard title="Total Subjects" value={stats?.subjects ?? "..."} icon="📚" colorClass="from-pink-500 to-rose-400" />
+          <StatCard title="Total Subjects" value={stats?.subjects ?? "..."} icon="📚" colorClass="from-violet-500 to-indigo-400" />
         </div>
 
         {/* Quick Actions */}
@@ -208,11 +208,11 @@ const HomePage = () => {
       <div className="max-w-[1200px] mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
         
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-400 to-rose-500 flex items-center justify-center text-white text-3xl font-bold shadow-md z-10">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-violet-400 to-indigo-500 flex items-center justify-center text-white text-3xl font-bold shadow-md z-10">
              {studentData.fullName.charAt(0)}
           </div>
           <div className="text-center md:text-left z-10">
-             <span className="text-pink-600 font-bold tracking-wider uppercase text-xs mb-1 block">Parent Portal</span>
+             <span className="text-violet-600 font-bold tracking-wider uppercase text-xs mb-1 block">Parent Portal</span>
              <h2 className="text-3xl font-black text-gray-900">{studentData.fullName}</h2>
              <p className="text-gray-500 mt-1 font-medium">View academic progress and official school records.</p>
           </div>
@@ -254,21 +254,21 @@ const HomePage = () => {
 
   // --- 4. Visitor View (Demo Portal / Landing Page) ---
   return (
-    <div className="min-h-screen bg-gray-50 selection:bg-pink-200 selection:text-pink-900">
+    <div className="min-h-screen bg-gray-50 selection:bg-violet-200 selection:text-violet-900">
       
       {/* 🌟 Modern Hero Section */}
       <div className="relative overflow-hidden bg-white border-b border-gray-200">
         {/* Decorative Background Elements */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-pink-100 rounded-full blur-[100px] opacity-60"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-100 rounded-full blur-[100px] opacity-60"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-[100px] opacity-60"></div>
 
         <div className="max-w-[1200px] mx-auto px-4 py-24 sm:py-32 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-100 text-pink-600 text-sm font-bold mb-8 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-50 border border-violet-100 text-violet-600 text-sm font-bold mb-8 shadow-sm">
             <span>✨</span> Next-Gen School Management
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tight leading-[1.1]">
             Welcome to <br className="hidden md:block"/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">Aneja Kiddos School</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-indigo-500">Aneja Kiddos School</span>
           </h1>
           <p className="mt-8 max-w-2xl mx-auto text-lg md:text-xl text-gray-500 font-medium leading-relaxed">
             A secure, seamless, and colorful platform designed to bring administration, teachers, and parents together in one place.
@@ -302,7 +302,7 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-300">
-              <div className="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner">📊</div>
+              <div className="w-14 h-14 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner">📊</div>
               <h4 className="font-extrabold text-xl mb-3 text-gray-900">Smart Reporting</h4>
               <p className="text-gray-500 leading-relaxed font-medium">
                 Generate beautiful, printable report cards, automated timetables, and detailed class rosters instantly.

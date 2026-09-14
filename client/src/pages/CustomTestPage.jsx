@@ -285,7 +285,7 @@ const CustomTestPage = () => {
   if (pageLoading) {
     return (
       <div className="flex justify-center items-center mt-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500"></div>
       </div>
     );
   }
@@ -314,7 +314,7 @@ const CustomTestPage = () => {
               if (selectedSubject) setNewTestSubject(selectedSubject);
               setView("create");
             }}
-            className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2"
+            className="bg-violet-500 hover:bg-violet-600 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2"
           >
             <span>+</span> New Custom Test
           </button>
@@ -327,7 +327,7 @@ const CustomTestPage = () => {
               <select
                 value={selectedClass}
                 onChange={(e) => { setSelectedClass(e.target.value); setSelectedSubject(""); }}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 transition-all cursor-pointer"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer"
               >
                 <option value="">-- All Classes --</option>
                 {availableClasses.map((cls) => (
@@ -341,7 +341,7 @@ const CustomTestPage = () => {
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
                 disabled={!selectedClass}
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 focus:ring-2 focus:ring-pink-500 transition-all cursor-pointer"
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer"
               >
                 <option value="">-- All Subjects --</option>
                 {filteredSubjects.map((s) => (
@@ -364,7 +364,7 @@ const CustomTestPage = () => {
                 if (selectedClass) setNewTestClass(selectedClass);
                 if (selectedSubject) setNewTestSubject(selectedSubject);
                 setView("create");
-              }} className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-6 rounded-lg transition-all">
+              }} className="bg-violet-500 hover:bg-violet-600 text-white font-bold py-2.5 px-6 rounded-lg transition-all">
                 + Create Custom Test
               </button>
             </div>
@@ -381,7 +381,7 @@ const CustomTestPage = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="font-bold text-gray-800 text-lg">{test.name}</h3>
-                        <span className="bg-pink-50 text-pink-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-pink-100">{test.subject?.name || "N/A"}</span>
+                        <span className="bg-violet-50 text-violet-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-violet-100">{test.subject?.name || "N/A"}</span>
                         <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-0.5 rounded-full">{test.gradeLevel}</span>
                         <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-0.5 rounded-full">{test.totalMarks} Marks</span>
                       </div>
@@ -426,14 +426,14 @@ const CustomTestPage = () => {
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Test Name <span className="text-red-400">*</span></label>
               <input type="text" value={newTestName} onChange={(e) => setNewTestName(e.target.value)}
                 placeholder='e.g. "Surprise Test", "Weekly Quiz", "Unit Test-1"...'
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none transition-all" required />
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none transition-all" required />
               <p className="text-xs text-gray-400 mt-1">You can name it anything you want — completely custom!</p>
             </div>
 
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Class <span className="text-red-400">*</span></label>
               <select value={newTestClass} onChange={(e) => { setNewTestClass(e.target.value); setNewTestSubject(""); }}
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none" required>
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none" required>
                 <option value="">-- Select Class --</option>
                 {availableClasses.map((cls) => (<option key={cls} value={cls}>{cls}</option>))}
               </select>
@@ -442,7 +442,7 @@ const CustomTestPage = () => {
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Subject <span className="text-red-400">*</span></label>
               <select value={newTestSubject} onChange={(e) => setNewTestSubject(e.target.value)} disabled={!newTestClass}
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm disabled:opacity-50 focus:ring-2 focus:ring-pink-500 outline-none" required>
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm disabled:opacity-50 focus:ring-2 focus:ring-violet-500 outline-none" required>
                 <option value="">-- Select Subject --</option>
                 {createSubjects.map((s) => (<option key={s._id} value={s._id}>{s.name}</option>))}
               </select>
@@ -452,12 +452,12 @@ const CustomTestPage = () => {
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Total Marks <span className="text-red-400">*</span></label>
                 <input type="number" value={newTestMarks} onChange={(e) => setNewTestMarks(e.target.value)}
-                  placeholder="e.g. 20, 50, 100" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none" min="1" required />
+                  placeholder="e.g. 20, 50, 100" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none" min="1" required />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Semester</label>
                 <select value={newTestSemester} onChange={(e) => setNewTestSemester(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none">
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 outline-none">
                   <option value="First Semester">Term I</option>
                   <option value="Second Semester">Term II</option>
                 </select>
@@ -474,7 +474,7 @@ const CustomTestPage = () => {
               </div>
             </div>
 
-            <button type="submit" className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-lg shadow-sm transition-all text-base">Create Custom Test</button>
+            <button type="submit" className="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-3 px-6 rounded-lg shadow-sm transition-all text-base">Create Custom Test</button>
           </form>
         </div>
       </div>
@@ -495,7 +495,7 @@ const CustomTestPage = () => {
               <div className="flex items-center gap-3 flex-wrap">
                 <button onClick={() => setView("list")} className="text-gray-400 hover:text-gray-600 transition-colors">←</button>
                 <h2 className="text-xl font-bold text-gray-800">{selectedTest.name}</h2>
-                <span className="bg-pink-50 text-pink-600 text-xs font-bold px-2.5 py-0.5 rounded-full">Max: {selectedTest.totalMarks}</span>
+                <span className="bg-violet-50 text-violet-600 text-xs font-bold px-2.5 py-0.5 rounded-full">Max: {selectedTest.totalMarks}</span>
               </div>
               <p className="text-sm text-gray-500 mt-1 ml-7">
                 {studentsWithScores.length} students • Auto-deletes on{" "}
@@ -543,7 +543,7 @@ const CustomTestPage = () => {
                       type="checkbox"
                       checked={selectAll}
                       onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-400 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-violet-500 focus:ring-violet-400 cursor-pointer"
                     />
                   </th>
                   <th className="py-3.5 px-4 font-bold w-10 text-center">#</th>
@@ -570,7 +570,7 @@ const CustomTestPage = () => {
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => toggleStudent(student._id)}
-                            className="w-4 h-4 rounded border-gray-300 text-pink-500 focus:ring-pink-400 cursor-pointer"
+                            className="w-4 h-4 rounded border-gray-300 text-violet-500 focus:ring-violet-400 cursor-pointer"
                           />
                         </td>
                         <td className="py-3 px-4 text-center text-gray-400 text-sm">{idx + 1}</td>

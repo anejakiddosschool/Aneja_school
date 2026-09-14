@@ -149,7 +149,7 @@
 //   };
 
 //   // --- Render Logic ---
-//   if (loading) return <div className="flex justify-center mt-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div></div>;
+//   if (loading) return <div className="flex justify-center mt-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-violet-600"></div></div>;
 //   if (error) return <p className="text-center text-red-500 mt-8 font-semibold bg-red-50 p-4 rounded-xl max-w-lg mx-auto">{error}</p>;
 //   if (!student) return <p className="text-center text-lg mt-8 text-gray-500">Student not found.</p>;
 
@@ -157,16 +157,16 @@
 //     <div className="max-w-[1200px] mx-auto p-4 md:p-6 space-y-6 animate-fade-in pb-20">
         
 //       {/* Top Navigation */}
-//       <Link to="/students" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-pink-600 transition-colors">
+//       <Link to="/students" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-violet-600 transition-colors">
 //         <span className="mr-1">←</span> Back to Directory
 //       </Link>
 
 //       {/* STUDENT PROFILE HEADER CARD */}
 //       <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
-//         <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-50 rounded-full blur-3xl opacity-50 pointer-events-none hidden md:block"></div>
+//         <div className="absolute -top-10 -right-10 w-40 h-40 bg-violet-50 rounded-full blur-3xl opacity-50 pointer-events-none hidden md:block"></div>
         
 //         <div className="flex flex-row items-center gap-4 md:gap-5 z-10 w-full md:w-auto border-b border-gray-100 md:border-none pb-4 md:pb-0">
-//             <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md shrink-0">
+//             <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-violet-500 to-indigo-400 flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md shrink-0">
 //                 {student.fullName.charAt(0).toUpperCase()}
 //             </div>
 //             <div>
@@ -180,7 +180,7 @@
 //         </div>
 
 //         <div className="flex flex-col sm:flex-row gap-2.5 w-full md:w-auto z-10">
-//             <button onClick={() => setIsReportOpen(true)} className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm">
+//             <button onClick={() => setIsReportOpen(true)} className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm">
 //                 📄 Generate Report
 //             </button>
 //             {isAdmin && (
@@ -384,7 +384,7 @@
 //           <Dialog.Content className="fixed inset-2 md:inset-6 lg:inset-10 bg-gray-100 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col animate-fade-in">
 //             <div className="p-4 bg-white border-b border-gray-200 flex justify-between items-center shadow-sm z-10">
 //               <Dialog.Title className="text-lg md:text-xl font-extrabold text-gray-800 flex items-center gap-2">
-//                   <span className="text-pink-600">📄</span> Report Card
+//                   <span className="text-violet-600">📄</span> Report Card
 //               </Dialog.Title>
 //               <Dialog.Close asChild>
 //                 <button className="bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors border border-gray-200 hover:border-red-200">
@@ -584,7 +584,7 @@ const StudentDetailPage = () => {
   };
 
   // --- Render Logic ---
-  if (loading) return <div className="flex justify-center mt-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div></div>;
+  if (loading) return <div className="flex justify-center mt-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-violet-600"></div></div>;
   if (error) return <p className="text-center text-red-500 mt-8 font-semibold bg-red-50 p-4 rounded-xl max-w-lg mx-auto">{error}</p>;
   if (!student) return <p className="text-center text-lg mt-8 text-gray-500">Student not found.</p>;
 
@@ -592,16 +592,16 @@ const StudentDetailPage = () => {
     <div className="max-w-[1200px] mx-auto p-4 md:p-6 space-y-6 animate-fade-in pb-20">
         
       {/* Top Navigation */}
-      <Link to="/students" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-pink-600 transition-colors">
+      <Link to="/students" className="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-violet-600 transition-colors">
         <span className="mr-1">←</span> Back to Directory
       </Link>
 
       {/* STUDENT PROFILE HEADER CARD */}
       <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-50 rounded-full blur-3xl opacity-50 pointer-events-none hidden md:block"></div>
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-violet-50 rounded-full blur-3xl opacity-50 pointer-events-none hidden md:block"></div>
         
         <div className="flex flex-row items-center gap-4 md:gap-5 z-10 w-full md:w-auto border-b border-gray-100 md:border-none pb-4 md:pb-0">
-            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md shrink-0">
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-violet-500 to-indigo-400 flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md shrink-0">
                 {student.fullName.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -626,7 +626,7 @@ const StudentDetailPage = () => {
                         <option key={session} value={session}>{session}</option>
                     ))}
                 </select>
-                <button onClick={() => setIsReportOpen(true)} className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap">
+                <button onClick={() => setIsReportOpen(true)} className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap">
                     📄 Report
                 </button>
             </div>
@@ -828,7 +828,7 @@ const StudentDetailPage = () => {
           <Dialog.Content className="fixed inset-2 md:inset-6 lg:inset-10 bg-gray-100 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col animate-fade-in">
             <div className="p-4 bg-white border-b border-gray-200 flex justify-between items-center shadow-sm z-10">
               <Dialog.Title className="text-lg md:text-xl font-extrabold text-gray-800 flex items-center gap-2">
-                  <span className="text-pink-600">📄</span> Report Card ({selectedSession})
+                  <span className="text-violet-600">📄</span> Report Card ({selectedSession})
               </Dialog.Title>
               <Dialog.Close asChild>
                 <button className="bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors border border-gray-200 hover:border-red-200">

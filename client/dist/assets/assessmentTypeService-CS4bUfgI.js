@@ -1,0 +1,1 @@
+import{c as t}from"./index-Bi3grtd1.js";const s="/assessment-types",n=(e,r)=>t.get(s,{params:{subjectId:e,semester:r}}),o=e=>t.post(s,e),a=(e,r)=>t.put(`${s}/${e}`,r),c=e=>t.delete(`${s}/${e}`),u={getBySubject:n,create:o,update:a,remove:c};export{u as a};

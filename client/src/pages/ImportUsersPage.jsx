@@ -45,7 +45,7 @@ const ImportUsersPage = () => {
     return (
         <div className={cardContainer}>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Import Users from Excel</h2>
-            <Link to="/admin/users" className="text-pink-500 hover:underline mb-6 block">
+            <Link to="/admin/users" className="text-violet-500 hover:underline mb-6 block">
                 ← Back to User Management
             </Link>
 
@@ -93,7 +93,7 @@ const ImportUsersPage = () => {
                             </tbody>
                         </table>
                     </div>
-                    <button onClick={() => navigate('/admin/users')} className="mt-6 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg">
+                    <button onClick={() => navigate('/admin/users')} className="mt-6 bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg">
                         Back to User List
                     </button>
                 </div>

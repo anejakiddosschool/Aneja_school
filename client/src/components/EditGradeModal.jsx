@@ -121,7 +121,7 @@
 
 //           <div className="text-right text-2xl font-bold text-gray-800 mt-4 p-4 bg-gray-100 rounded-lg">
 //             Final Score:{" "}
-//             <span className="text-pink-600">{currentFinalScore}</span>
+//             <span className="text-violet-600">{currentFinalScore}</span>
 //           </div>
 
 //           <div className="flex justify-end gap-3 mt-6">
@@ -134,7 +134,7 @@
 //             </button>
 //             <button
 //               type="submit"
-//               className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded"
+//               className="bg-violet-500 hover:bg-violet-600 text-white px-6 py-2 rounded"
 //             >
 //               Update Grade
 //             </button>
@@ -263,7 +263,7 @@ const EditGradeModal = ({ gradeId, onClose, onUpdate }) => {
                 Edit Grade
                 </h2>
                 <div className="flex gap-2 mt-2">
-                    <span className="bg-pink-50 text-pink-700 text-xs font-bold px-2 py-1 rounded border border-pink-100 uppercase tracking-wide">
+                    <span className="bg-violet-50 text-violet-700 text-xs font-bold px-2 py-1 rounded border border-violet-100 uppercase tracking-wide">
                         {gradeData.subject?.name || "Unknown Subject"}
                     </span>
                     <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded border border-gray-200 uppercase tracking-wide">
@@ -286,7 +286,7 @@ const EditGradeModal = ({ gradeId, onClose, onUpdate }) => {
           ) : (
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {assessmentTypes.map((at) => (
-                    <div key={at._id} className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 shadow-sm focus-within:border-pink-300 focus-within:ring-2 focus-within:ring-pink-50 transition-all">
+                    <div key={at._id} className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 shadow-sm focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-50 transition-all">
                     <label htmlFor={at._id} className="flex justify-between items-center mb-2">
                         <span className="font-bold text-gray-700 text-sm">{at.name}</span>
                         <span className="text-[10px] bg-white px-2 py-0.5 rounded text-gray-500 font-bold border border-gray-200">Max: {at.totalMarks}</span>
@@ -299,7 +299,7 @@ const EditGradeModal = ({ gradeId, onClose, onUpdate }) => {
                         onChange={(e) => handleScoreChange(at._id, e.target.value)}
                         min={0}
                         max={at.totalMarks}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 font-bold focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-colors"
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 font-bold focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors"
                         required
                     />
                     </div>
@@ -310,7 +310,7 @@ const EditGradeModal = ({ gradeId, onClose, onUpdate }) => {
           {assessmentTypes.length > 0 && (
             <div className="flex justify-between items-center mt-8 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 shadow-inner">
                 <span className="font-bold text-gray-500 uppercase tracking-wider text-sm">Total Calculated Score</span>
-                <span className="text-3xl font-black text-pink-600 drop-shadow-sm">{currentFinalScore}</span>
+                <span className="text-3xl font-black text-violet-600 drop-shadow-sm">{currentFinalScore}</span>
             </div>
           )}
 
@@ -325,7 +325,7 @@ const EditGradeModal = ({ gradeId, onClose, onUpdate }) => {
             <button
               type="submit"
               disabled={assessmentTypes.length === 0}
-              className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-8 py-2.5 rounded-xl shadow-sm shadow-pink-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-violet-600 hover:bg-violet-700 text-white font-bold px-8 py-2.5 rounded-xl shadow-sm shadow-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Changes
             </button>

@@ -8,6 +8,7 @@ import rankService from "../services/rankService";
 import "./ReportCard.css";
 import domtoimage from "dom-to-image";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const LOGO_URL =
   "https://res.cloudinary.com/dityqhoqp/image/upload/v1757673591/UNMARK_LOGO_copy_1_nonp8j.png";
@@ -82,10 +83,21 @@ const formatScore = (num) => {
 //   const API_URL = import.meta.env.VITE_API_URL;
 
 
-const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear }) => {
+const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onUploadSuccess }) => {
   const { id: routeId } = useParams();
   const id = studentId || routeId;
   const API_URL = import.meta.env.VITE_API_URL;
+
+  // Called after upload/delete in auto (bulk) mode so the parent page can refresh data.
+  // Safety net: parent pages that don't pass onUploadSuccess still get a data reload.
+  const notifyParent = (err) => {
+    if (typeof onUploadSuccess === "function") {
+      onUploadSuccess(err);
+    } else if (!studentId) {
+      // Standalone page usage without a callback: reload to show fresh data
+      window.location.reload();
+    }
+  };
 
   // --- state ---
   const [userRole, setUserRole] = useState(null);
@@ -562,22 +574,64 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear }) =
 
   // --- ACTIONS ---
   const handlePrint = () => {
-    // const printableContent = document.getElementById("printableArea");
-     const printableContent = document.getElementById(`printableArea-${id}`);
+    const printableContent = document.getElementById(`printableArea-${id}`);
     if (!printableContent) return;
     const contentToPrint = printableContent.innerHTML;
+
     let styles = "";
+    let printRules = ""; // rules inside @media print, extracted to measure true print layout
     for (const sheet of document.styleSheets) {
       try {
+        for (const rule of sheet.cssRules) {
+          if (rule.media && /print/i.test(rule.media.mediaText)) {
+            printRules += Array.from(rule.cssRules)
+              .map((r) => r.cssText)
+              .join("\n");
+          }
+        }
         styles += Array.from(sheet.cssRules)
           .map((rule) => rule.cssText)
           .join("\n");
       } catch (e) {}
     }
+
+    // --- AUTO-FIT: simulate print layout in a hidden frame, measure height,
+    // --- and scale with zoom ONLY if content would spill to a 2nd page.
+    const MM = 3.7795275591; // px per mm at 96dpi
+    const PRINT_MARGIN_MM = 4;
+    const printableH = (297 - PRINT_MARGIN_MM * 2) * MM; // ~1092px
+    let scale = 1;
+
+    const measureFrame = document.createElement("iframe");
+    measureFrame.style.cssText =
+      "position:fixed;left:-10000px;top:0;width:198mm;height:600px;border:0;";
+    document.body.appendChild(measureFrame);
+    try {
+      const mdoc = measureFrame.contentDocument;
+      mdoc.open();
+      mdoc.write(
+        `<html><head><style>${styles}${printRules}</style></head><body>${contentToPrint}</body></html>`,
+      );
+      mdoc.close();
+      const contentH = mdoc.body ? mdoc.body.scrollHeight : 0;
+      if (contentH > printableH) {
+        scale = Math.max(0.5, printableH / contentH);
+      }
+    } catch (e) {
+      scale = 1;
+    } finally {
+      document.body.removeChild(measureFrame);
+    }
+
+    const fitStyle =
+      scale < 1
+        ? `<style>@media print{body{zoom:${scale.toFixed(4)} !important;}.sheet-paper{width:${(100 / scale).toFixed(2)}% !important;max-width:none !important;}}@page{margin:${PRINT_MARGIN_MM}mm !important;}</style>`
+        : `<style>@page{margin:${PRINT_MARGIN_MM}mm !important;}</style>`;
+
     const printWindow = window.open("", "", "height=800,width=1000");
     if (!printWindow) return alert("Please allow pop-ups to print.");
     printWindow.document.write(
-      `<html><head><title>Print Report Card</title><style>${styles}</style></head><body>${contentToPrint}</body></html>`,
+      `<html><head><title>Print Report Card</title><style>${styles}</style>${fitStyle}</head><body>${contentToPrint}</body></html>`,
     );
     printWindow.document.close();
     setTimeout(() => {
@@ -766,14 +820,19 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear }) =
       if (isAutoUploadMode) {
         if (onUploadSuccess) onUploadSuccess();
       } else {
-        alert("Report uploaded successfully!");
-        window.location.reload();
+        toast.success("Report uploaded successfully!");
+        if (!studentId) {
+          window.location.reload();
+        } else if (typeof onUploadSuccess === "function") {
+          onUploadSuccess();
+        }
       }
     } catch (err) {
+      console.error("Report upload failed:", err);
       if (isAutoUploadMode) {
         if (onUploadSuccess) onUploadSuccess(err);
       } else {
-        alert("Upload failed!");
+        toast.error("Upload failed! Please try again.");
       }
     } finally {
       setUploading(false);
@@ -796,10 +855,22 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear }) =
         `${API_URL}/students/${studentIdToDelete}${endpoints[viewType]}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      alert("Report deleted successfully.");
-      window.location.reload();
+      toast.success("Report deleted successfully.");
+      if (studentId) {
+        // Embedded usage: refetch in place (full reload would break parent modals)
+        const [studentRes, gradesRes, reportsRes] = await Promise.all([
+          studentService.getStudentById(id),
+          gradeService.getGradesByStudent(id),
+          behavioralReportService.getReportsByStudent(id),
+        ]);
+        setStudent(studentRes?.data?.data || null);
+        setAllGrades(gradesRes?.data?.data || []);
+        setAllReports(reportsRes?.data?.data || []);
+      } else {
+        window.location.reload();
+      }
     } catch (error) {
-      alert("Failed to delete report.");
+      toast.error("Failed to delete report.");
     }
     setUploading(false);
   };

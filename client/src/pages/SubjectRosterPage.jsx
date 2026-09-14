@@ -98,8 +98,8 @@
 
 //     // --- Tailwind CSS class strings ---
 //     const inputLabel = "block text-gray-700 text-sm font-bold";
-//     const formInput = "shadow-sm mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-pink-500 focus:border-pink-500";
-//     const buttonPrimary = `bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 ${!selectedSubject || loading ? 'opacity-50 cursor-not-allowed' : ''}`;
+//     const formInput = "shadow-sm mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-violet-500 focus:border-violet-500";
+//     const buttonPrimary = `bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 ${!selectedSubject || loading ? 'opacity-50 cursor-not-allowed' : ''}`;
 //     const buttonSecondary = "bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200";
 //     const tableHeader = "px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300";
 //     const tableCell = "px-4 py-2 whitespace-nowrap text-sm text-center border border-gray-300";
@@ -161,7 +161,7 @@
 //                                             {month}
 //                                         </th>
 //                                     ))}
-//                                     <th rowSpan="2" className={`${tableHeader} bg-pink-100`}>Final Score</th>
+//                                     <th rowSpan="2" className={`${tableHeader} bg-violet-100`}>Final Score</th>
 //                                 </tr>
 //                                 <tr>
 //                                     {rosterData.sortedMonths.map(month => (
@@ -183,7 +183,7 @@
 //                                                 <td key={at._id} className={tableCell}>{student.detailedScores[at._id]}</td>
 //                                             ))
 //                                         ))}
-//                                         <td className={`${tableCell} font-bold bg-pink-50`}>{student.finalScore}</td>
+//                                         <td className={`${tableCell} font-bold bg-violet-50`}>{student.finalScore}</td>
 //                                     </tr>
 //                                 ))}
 //                             </tbody>
@@ -337,7 +337,7 @@ const SubjectRosterPage = () => {
                     
                     <div>
                         <label htmlFor="subject" className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">1. Select Subject</label>
-                        <select id="subject" value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 cursor-pointer transition-all" required>
+                        <select id="subject" value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 cursor-pointer transition-all" required>
                             <option value="">-- Choose Subject --</option>
                             {subjects.map(s => <option key={s._id} value={s._id}>{s.name} ({s.gradeLevel})</option>)}
                         </select>
@@ -345,7 +345,7 @@ const SubjectRosterPage = () => {
 
                     <div>
                         <label htmlFor="semester" className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">2. Term / Semester</label>
-                        <select id="semester" value={semester} onChange={e => setSemester(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 cursor-pointer transition-all" required>
+                        <select id="semester" value={semester} onChange={e => setSemester(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 cursor-pointer transition-all" required>
                             <option value="First Semester">First Semester (Term I)</option>
                             <option value="Second Semester">Second Semester (Term II)</option>
                         </select>
@@ -354,13 +354,13 @@ const SubjectRosterPage = () => {
                     {/* FIXED ACADEMIC YEAR DROPDOWN */}
                     <div>
                         <label htmlFor="academicYear" className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">3. Academic Session</label>
-                        <select id="academicYear" value={academicYear} onChange={e => setAcademicYear(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-500 cursor-pointer transition-all" required>
+                        <select id="academicYear" value={academicYear} onChange={e => setAcademicYear(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 cursor-pointer transition-all" required>
                             {yearOptions.map(year => <option key={year} value={year}>{year}</option>)}
                         </select>
                     </div>
 
                     <div className="flex gap-3 h-[42px] mt-auto">
-                        <button type="submit" className="flex-1 bg-pink-500 hover:bg-pink-600 disabled:bg-pink-300 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all" disabled={!selectedSubject || loading}>
+                        <button type="submit" className="flex-1 bg-violet-500 hover:bg-violet-600 disabled:bg-violet-300 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition-all" disabled={!selectedSubject || loading}>
                             {loading ? 'Generating...' : 'Load Data'}
                         </button>
                         
@@ -380,7 +380,7 @@ const SubjectRosterPage = () => {
                     <div className="bg-gray-50 p-5 border-b border-gray-200 flex justify-between items-center">
                         <div>
                             <h3 className="text-lg font-bold text-gray-800">
-                                Register for: <span className="text-pink-600">{subjects.find(s => s._id === selectedSubject)?.name}</span>
+                                Register for: <span className="text-violet-600">{subjects.find(s => s._id === selectedSubject)?.name}</span>
                             </h3>
                             <p className="text-sm font-medium text-gray-500 mt-1">
                                 Class: {subjects.find(s => s._id === selectedSubject)?.gradeLevel} | {semester}
@@ -395,16 +395,16 @@ const SubjectRosterPage = () => {
                         <table id="subjectRosterTable" className="w-full divide-y divide-gray-200 border-collapse">
                             <thead>
                                 <tr>
-                                    <th rowSpan="2" className={`${thStyle} bg-rose-600 text-white`}>ID</th>
-                                    <th rowSpan="2" className={`${thStyle} bg-rose-600 text-white`}>Student Name</th>
-                                    <th rowSpan="2" className={`${thStyle} bg-rose-600 text-white`}>Sex</th>
-                                    <th rowSpan="2" className={`${thStyle} bg-rose-600 text-white`}>Age</th>
+                                    <th rowSpan="2" className={`${thStyle} bg-violet-700 text-white`}>ID</th>
+                                    <th rowSpan="2" className={`${thStyle} bg-violet-700 text-white`}>Student Name</th>
+                                    <th rowSpan="2" className={`${thStyle} bg-violet-700 text-white`}>Sex</th>
+                                    <th rowSpan="2" className={`${thStyle} bg-violet-700 text-white`}>Age</th>
                                     {rosterData.sortedMonths.map(month => (
                                         <th key={month} colSpan={rosterData.assessmentsByMonth[month].length} className={`${thStyle} bg-gray-100 text-gray-900 border-b-2 border-gray-300`}>
                                             {month}
                                         </th>
                                     ))}
-                                    <th rowSpan="2" className={`${thStyle} bg-rose-700 text-white`}>Final Score</th>
+                                    <th rowSpan="2" className={`${thStyle} bg-violet-800 text-white`}>Final Score</th>
                                 </tr>
                                 <tr>
                                     {rosterData.sortedMonths.map(month => (
@@ -431,7 +431,7 @@ const SubjectRosterPage = () => {
                                                 </td>
                                             ))
                                         ))}
-                                        <td className={`${tdStyle} bg-pink-50 text-pink-700 font-extrabold text-lg`}>
+                                        <td className={`${tdStyle} bg-violet-50 text-violet-700 font-extrabold text-lg`}>
                                             {student.finalScore}
                                         </td>
                                     </tr>
