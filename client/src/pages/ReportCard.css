@@ -898,10 +898,10 @@ input[type="file"] {
 
 @media (max-width: 600px) {
   .report-card-container {
-    max-width: 900px;
-    width: 900px;
+    max-width: 100%;
+    width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 6px;
   }
 
   .paper-wrap {
@@ -909,11 +909,14 @@ input[type="file"] {
     overflow: visible;
   }
 
+  /* Full-width fluid sheet instead of fixed 900px (was forcing pinch-zoom on phones).
+     PNG capture still gets the desktop layout because generateReportCardImage()
+     temporarily sets the viewport meta to width=1100 during capture. */
   .sheet-paper {
-    width: 900px;
-    max-width: 900px;
-    min-width: 900px;
-    padding: 10mm;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 12px;
     border-radius: 0;
     box-shadow: none;
     margin: 0;
@@ -940,10 +943,23 @@ input[type="file"] {
     padding: 10px 0;
   }
 
+  /* HEADER: stack logo over title on narrow screens */
   .rc-header {
-    grid-template-columns: 72px 1fr 90px;
-    gap: 10px;
-    padding: 10px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .rc-right {
+    justify-content: center;
+  }
+
+  .small-meta {
+    flex-direction: row;
+    justify-content: center;
+    gap: 14px;
     text-align: center;
   }
 
@@ -954,7 +970,7 @@ input[type="file"] {
   }
 
   .school-name {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .school-sub,
@@ -963,24 +979,25 @@ input[type="file"] {
     font-size: 12px;
   }
 
+  /* STUDENT CARD: photo left, details right (keeps vertical space compact) */
   .student-card {
     flex-direction: row;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
     padding: 10px;
-    margin-top: 12px;
+    margin-top: 10px;
   }
 
   .student-photo,
   .student-photo.placeholder {
-    width: 88px;
-    height: 110px;
-    margin: 0 auto;
+    width: 76px;
+    height: 96px;
+    margin: 0;
   }
 
   .profile-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px 12px;
+    grid-template-columns: 1fr;
+    gap: 2px;
     width: 100%;
   }
 
@@ -990,9 +1007,13 @@ input[type="file"] {
     gap: 4px;
   }
 
-  .label,
+  .label {
+    min-width: 84px;
+    font-size: 11px;
+  }
+
   .value {
-    font-size: 11.5px;
+    font-size: 11px;
   }
 
   .scholastic,
@@ -1000,46 +1021,47 @@ input[type="file"] {
   .signatures,
   .rc-footer {
     padding: 0;
-    margin-top: 12px;
+    margin-top: 10px;
     width: 100%;
   }
 
+  /* MARKS TABLE: horizontal swipe instead of unreadable squeeze */
   .table-scroll {
     width: 100%;
-    overflow: hidden;
-    padding-bottom: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .rc-table {
-    width: 100%;
-    min-width: 0;
+    min-width: 560px;
     font-size: 10.5px;
   }
 
   .col-num {
-    width: 28px;
-    min-width: 28px;
-    max-width: 28px;
+    width: 26px;
+    min-width: 26px;
+    max-width: 26px;
   }
 
   .col-sub {
-    width: 118px;
-    min-width: 118px;
-    max-width: 118px;
+    width: 104px;
+    min-width: 104px;
+    max-width: 104px;
     padding-left: 5px !important;
   }
 
+  /* TRAITS + REMARKS: stack vertically, full width */
   .traits-grid {
-    flex-direction: row;
+    flex-direction: column;
     gap: 10px;
     width: 100%;
   }
 
   .traits-table,
   .co-cards {
-    width: 50%;
+    width: 100%;
     min-width: 0;
-    max-width: 50%;
+    max-width: 100%;
   }
 
   .co-card {
@@ -1047,16 +1069,18 @@ input[type="file"] {
     font-size: 11px;
   }
 
+  /* SIGNATURES: stay in one row (3 compact columns) */
   .signatures {
     flex-direction: row;
     gap: 8px;
     align-items: flex-end;
-    margin-top: 24px;
+    margin-top: 20px;
     width: 100%;
   }
 
   .sig-col {
     width: auto;
+    min-width: 0;
   }
 
   .sig-box {
@@ -1065,12 +1089,12 @@ input[type="file"] {
   }
 
   .sig-label {
-    font-size: 11px;
+    font-size: 10.5px;
   }
 
   .sig-line {
-    width: 100px;
-    max-width: 100px;
+    width: 100%;
+    max-width: 90px;
   }
 
   .rc-footer {
@@ -1086,29 +1110,25 @@ input[type="file"] {
 }
 
 @media (max-width: 400px) {
-  .report-card-container {
-    width: 900px;
-    max-width: 900px;
-  }
-
-  .sheet-paper {
-    width: 900px;
-    max-width: 900px;
-    min-width: 900px;
-  }
-
   .rc-table {
+    min-width: 520px;
     font-size: 10px;
+  }
+
+  .col-sub {
+    width: 92px;
+    min-width: 92px;
+    max-width: 92px;
   }
 
   .student-photo,
   .student-photo.placeholder {
-    width: 82px;
-    height: 104px;
+    width: 68px;
+    height: 86px;
   }
 
-  .profile-grid {
-    font-size: 11px;
+  .label {
+    min-width: 76px;
   }
 
   .co-card,
@@ -1118,8 +1138,7 @@ input[type="file"] {
   }
 
   .sig-line {
-    width: 90px;
-    max-width: 90px;
+    max-width: 78px;
   }
 }
 

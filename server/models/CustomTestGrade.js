@@ -6,8 +6,7 @@ const customTestGradeSchema = new mongoose.Schema({
     customTest: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'CustomTest',
-        required: true,
-        index: true
+        required: true
     },
     student: {
         type: mongoose.Schema.Types.ObjectId,
@@ -33,9 +32,7 @@ const customTestGradeSchema = new mongoose.Schema({
 });
 
 // Each student can only have one grade per custom test
+// (compound index also covers { customTest: 1 } prefix queries, so no separate index needed)
 customTestGradeSchema.index({ customTest: 1, student: 1 }, { unique: true });
-
-// For efficient grade queries
-customTestGradeSchema.index({ customTest: 1 });
 
 module.exports = mongoose.model('CustomTestGrade', customTestGradeSchema);
