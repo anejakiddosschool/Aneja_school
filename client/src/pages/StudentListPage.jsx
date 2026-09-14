@@ -1498,6 +1498,7 @@ import classService from "../services/classService";
 import * as Dialog from "@radix-ui/react-dialog";
 import ReportCardPage from "./ReportCardPage";
 import { socket } from "../components/socket";
+import { useSession } from "../context/SessionContext";
 import toast from "react-hot-toast";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
@@ -1518,16 +1519,8 @@ const StudentListPage = () => {
     }
   });
 
-  const currentYear = new Date().getFullYear();
-  const sessionOptions = useMemo(() => {
-    return Array.from({ length: 5 }, (_, i) => {
-      const startYear = currentYear - 2 + i;
-      return `${startYear}-${startYear + 1}`;
-    });
-  }, [currentYear]);
-  const [selectedSession, setSelectedSession] = useState(
-    `${currentYear}-${currentYear + 1}`,
-  );
+  // 🌟 GLOBAL SESSION: shared via Navbar switcher (persisted in localStorage)
+  const { currentSession: selectedSession, setCurrentSession: setSelectedSession, isPastSession } = useSession();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -2328,17 +2321,10 @@ const StudentListPage = () => {
             <span className="text-sm font-bold text-gray-500 uppercase whitespace-nowrap">
               Session:
             </span>
-            <select
-              value={selectedSession}
-              onChange={(e) => setSelectedSession(e.target.value)}
-              className="w-full md:w-44 border border-gray-300 rounded-lg p-2.5 md:p-2 text-sm font-semibold focus:ring-2 focus:ring-violet-500 outline-none cursor-pointer bg-gray-50"
-            >
-              {sessionOptions.map((session) => (
-                <option key={session} value={session}>
-                  {session}
-                </option>
-              ))}
-            </select>
+            <span className="text-sm font-bold text-violet-700 bg-violet-50 border border-violet-100 rounded-lg px-3 py-2 whitespace-nowrap">
+              {selectedSession}
+              {isPastSession && " ⚠️"}
+            </span>
           </div>
 
           {selectedGrade && (

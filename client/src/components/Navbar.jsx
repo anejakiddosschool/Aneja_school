@@ -4,6 +4,7 @@ import { NavLink, useNavigate, Link } from "react-router-dom";
 import authService from "../services/authService";
 import studentAuthService from "../services/studentAuthService";
 import { useNotifications } from "../context/NotificationContext";
+import { useSession } from "../context/SessionContext";
 import { io } from "socket.io-client";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -27,6 +28,13 @@ const Navbar = () => {
 
   const navigate = useNavigate();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
+  const { currentSession, setCurrentSession, isPastSession } = useSession();
+
+  // 5 session options: 2 past, current, 2 future
+  const sessionOptions = useMemo(() => {
+    const y = new Date().getFullYear();
+    return Array.from({ length: 5 }, (_, i) => `${y - 2 + i}-${y - 2 + i + 1}`);
+  }, []);
 
   useEffect(() => {
     const user = authService.getCurrentUser();
@@ -228,8 +236,54 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* ACTION AREA (WhatsApp & Logout) */}
-            <div className="hidden xl:flex items-center gap-4">
+            {/* ACTION AREA (Session Switcher, WhatsApp & Logout) */}
+            <div className="hidden xl:flex items-center gap-3">
+              {/* 🗓 GLOBAL SESSION SWITCHER (staff only) */}
+              {currentUser && (
+                <div className="flex items-center">
+                  <div
+                    className={`flex items-center gap-2 rounded-full px-3 py-1.5 border shadow-sm transition-colors ${
+                      isPastSession
+                        ? "border-amber-300 bg-amber-50"
+                        : "border-gray-200 bg-gray-50 hover:bg-gray-100"
+                    }`}
+                    title={
+                      isPastSession
+                        ? "You are viewing a PAST session — double-check before entering marks!"
+                        : "Active academic session (applies to all pages)"
+                    }
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-4 w-4 ${isPastSession ? "text-amber-600" : "text-violet-600"}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <select
+                      value={currentSession}
+                      onChange={(e) => setCurrentSession(e.target.value)}
+                      className={`bg-transparent border-none outline-none text-xs font-bold cursor-pointer ${
+                        isPastSession ? "text-amber-700" : "text-gray-700"
+                      }`}
+                    >
+                      {sessionOptions.map((session) => (
+                        <option key={session} value={session}>
+                          {session}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
               {currentUser?.role === "admin" && (
                 <div className="relative" ref={dropdownRef}>
                   {/* WHATSAPP BUTTON */}
@@ -338,6 +392,46 @@ const Navbar = () => {
                 </div>
               )}
               
+              {currentUser && (
+                <div className="pt-4 border-t border-gray-200">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-3 mb-1.5 block">
+                    Academic Session
+                  </label>
+                  <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-xl border border-gray-200 shadow-sm">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-4 w-4 ${isPastSession ? "text-amber-600" : "text-violet-600"}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <select
+                      value={currentSession}
+                      onChange={(e) => setCurrentSession(e.target.value)}
+                      className="bg-transparent border-none outline-none text-sm font-bold text-gray-700 cursor-pointer flex-1"
+                    >
+                      {sessionOptions.map((session) => (
+                        <option key={session} value={session}>
+                          {session}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {isPastSession && (
+                    <p className="mt-2 mx-1 text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      ⚠️ Viewing a past session — data shown is historical.
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
                  {currentUser?.role === "admin" && (
                      <button onClick={() => { setShowWhatsAppQr(true); closeMobileMenu(); window.scrollTo(0,0); }} className="text-left text-sm font-semibold text-gray-700 py-3 flex items-center justify-center gap-2 bg-white px-4 rounded-xl border border-gray-200 shadow-sm">

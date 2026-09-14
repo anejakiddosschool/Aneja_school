@@ -335,6 +335,7 @@ import React, { useState, useEffect } from "react";
 import rosterService from "../services/rosterService";
 import authService from "../services/authService";
 import subjectService from "../services/subjectService";
+import { useSession } from "../context/SessionContext";
 import toast from "react-hot-toast";
 
 const RosterPage = () => {
@@ -344,9 +345,8 @@ const RosterPage = () => {
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 5 }, (_, i) => `${currentYear - i}-${currentYear - i + 1}`);
 
-  // --- States ---
-  const [gradeLevel, setGradeLevel] = useState(currentUser.homeroomGrade || "");
-  const [academicYear, setAcademicYear] = useState(yearOptions[0]); // Default to current session
+  // 🌟 GLOBAL SESSION: controlled by the Navbar session switcher
+  const { currentSession: academicYear, isPastSession } = useSession();
   
   const [rosterData, setRosterData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -507,16 +507,19 @@ const RosterPage = () => {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">2. Academic Session</label>
-            <select
-              value={academicYear}
-              onChange={(e) => setAcademicYear(e.target.value)}
-              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 cursor-pointer transition-all"
-            >
-              {yearOptions.map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">
+              2. Academic Session
+              <span className="ml-2 text-[10px] font-semibold text-gray-400 normal-case">
+                (change from navbar switcher)
+              </span>
+            </label>
+            <div className={`w-full p-2.5 rounded-lg border text-sm font-bold ${
+              isPastSession
+                ? "bg-amber-50 border-amber-300 text-amber-700"
+                : "bg-violet-50 border-violet-100 text-violet-700"
+            }`}>
+              {academicYear}{isPastSession ? " ⚠️" : ""}
+            </div>
           </div>
 
           <div className="lg:col-span-2 flex gap-3 h-[42px] mt-auto">

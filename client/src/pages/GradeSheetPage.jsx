@@ -385,6 +385,7 @@ import assessmentTypeService from "../services/assessmentTypeService";
 import gradeService from "../services/gradeService";
 import authService from "../services/authService";
 import userService from "../services/userService";
+import { useSession } from "../context/SessionContext";
 import toast from "react-hot-toast";
 
 const GradeSheetPage = () => {
@@ -409,8 +410,9 @@ const GradeSheetPage = () => {
     });
   }, [currentYear]);
 
-  // Automatically sets default session to current year (e.g., "2026-2027")
-  const [academicYear, setAcademicYear] = useState(`${currentYear}-${currentYear + 1}`);
+  // 🌟 GLOBAL SESSION: controlled by the Navbar session switcher (still allows
+  // handleYearChange to work if called programmatically, but UI shows a locked field)
+  const { currentSession: academicYear, setCurrentSession: setAcademicYear } = useSession();
 
   const [assessmentTypes, setAssessmentTypes] = useState([]);
   const [sheetData, setSheetData] = useState(null);
@@ -623,8 +625,9 @@ const GradeSheetPage = () => {
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Session</label>
                 <select
                   value={academicYear}
-                  onChange={handleYearChange} 
-                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer focus:ring-2 focus:ring-blue-500"
+                  disabled
+                  title="Session is controlled by the navbar switcher"
+                  className="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg text-gray-600 cursor-not-allowed"
                 >
                   {yearsList.map((year) => (<option key={year} value={year}>{year}</option>))}
                 </select>

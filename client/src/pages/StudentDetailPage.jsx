@@ -425,6 +425,7 @@ import authService from "../services/authService";
 import * as Dialog from "@radix-ui/react-dialog";
 import ReportCardPage from "./ReportCardPage";
 import EditGradeModal from "../components/EditGradeModal";
+import { useSession } from "../context/SessionContext";
 
 const StudentDetailPage = () => {
   // --- State Management ---
@@ -441,8 +442,15 @@ const StudentDetailPage = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [editingGradeId, setEditingGradeId] = useState(null);
   
-  // 🌟 NEW: Session State for Report Card
-  const [selectedSession, setSelectedSession] = useState("");
+  // 🌟 SESSION: starts from the global session switcher, but still lets the teacher
+  // view this student's older sessions locally (dropdown shows sessions with data).
+  const { currentSession: globalSession } = useSession();
+  const [selectedSession, setSelectedSession] = useState(globalSession);
+
+  // Follow the global switcher whenever it changes
+  useEffect(() => {
+    setSelectedSession(globalSession);
+  }, [globalSession]);
 
   // --- Data Fetching ---
   useEffect(() => {
@@ -620,6 +628,7 @@ const StudentDetailPage = () => {
                 <select 
                     value={selectedSession} 
                     onChange={(e) => setSelectedSession(e.target.value)}
+                    title="Session for this student (synced with the global switcher)"
                     className="bg-transparent border-none text-gray-700 text-sm font-bold focus:ring-0 cursor-pointer pl-2 outline-none"
                 >
                     {availableSessions.map(session => (

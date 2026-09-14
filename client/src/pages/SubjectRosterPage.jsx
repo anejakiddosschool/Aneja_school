@@ -205,6 +205,7 @@ import rosterService from '../services/rosterService';
 import subjectService from '../services/subjectService';
 import authService from '../services/authService';
 import userService from '../services/userService';
+import { useSession } from '../context/SessionContext';
 import toast from 'react-hot-toast';
 
 const SubjectRosterPage = () => {
@@ -219,7 +220,8 @@ const SubjectRosterPage = () => {
     const [subjects, setSubjects] = useState([]);
     const [selectedSubject, setSelectedSubject] = useState(location.state?.subjectId || '');
     const [semester, setSemester] = useState('First Semester');
-    const [academicYear, setAcademicYear] = useState(yearOptions[0]); // Changed from empty string to default session
+    // 🌟 GLOBAL SESSION: controlled by the Navbar session switcher
+    const { currentSession: academicYear, isPastSession } = useSession();
     
     const [rosterData, setRosterData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -354,7 +356,7 @@ const SubjectRosterPage = () => {
                     {/* FIXED ACADEMIC YEAR DROPDOWN */}
                     <div>
                         <label htmlFor="academicYear" className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">3. Academic Session</label>
-                        <select id="academicYear" value={academicYear} onChange={e => setAcademicYear(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-violet-500 cursor-pointer transition-all" required>
+                        <select id="academicYear" value={academicYear} disabled title="Session is controlled by the navbar switcher" className="w-full p-2.5 bg-gray-100 border border-gray-200 rounded-lg text-gray-600 cursor-not-allowed" required>
                             {yearOptions.map(year => <option key={year} value={year}>{year}</option>)}
                         </select>
                     </div>

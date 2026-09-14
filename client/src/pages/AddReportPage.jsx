@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import behavioralReportService from '../services/behavioralReportService';
+import { useSession } from '../context/SessionContext';
 
 // Predefined areas for evaluation
 const EVALUATION_AREAS = [
@@ -60,7 +61,8 @@ const AddReportPage = () => {
 
     // --- State Management ---
     const [semester, setSemester] = useState('First Semester');
-    const [academicYear, setAcademicYear] = useState(getCurrentAcademicYear());
+    // 🌟 GLOBAL SESSION: report always saves to the session selected in the navbar
+    const { currentSession: academicYear } = useSession();
     const [teacherComment, setTeacherComment] = useState('');
     const [conduct, setConduct] = useState('A');
     const [evaluations, setEvaluations] = useState(
@@ -128,8 +130,8 @@ const AddReportPage = () => {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="academicYear" className={inputLabel}>Academic Year</label>
-                        <input id="academicYear" type="text" value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} className={textInput} />
+                        <label htmlFor="academicYear" className={inputLabel}>Academic Year (from session switcher)</label>
+                        <input id="academicYear" type="text" value={academicYear} readOnly className={`${textInput} bg-gray-100 text-gray-600 cursor-not-allowed`} />
                     </div>
                     <div>
                         <label htmlFor="conduct" className={inputLabel}>Overall Conduct</label>

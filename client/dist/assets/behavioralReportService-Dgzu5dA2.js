@@ -1,0 +1,1 @@
+import{d as e}from"./index-CzH_LwuS.js";const r="/reports",n=t=>e.get(`${r}/student/${t}`),p=t=>e.get(`${r}/${t}`),s=t=>e.post(r,t),d=(t,o)=>e.put(`${r}/${t}`,o),u=t=>e.delete(`${r}/${t}`),$={getReportsByStudent:n,getReportById:p,addReport:s,updateReport:d,deleteReport:u};export{$ as b};
