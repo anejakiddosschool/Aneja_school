@@ -1,1 +1,0 @@
-import{d as e}from"./index-CzH_LwuS.js";const a=({gradeLevel:r,subjectId:t,semester:s,academicYear:o})=>e.get("/rosters/subject-details",{params:{gradeLevel:r,subjectId:t,semester:s,academicYear:o}}),c=({gradeLevel:r,academicYear:t})=>e.get("/rosters",{params:{gradeLevel:r,academicYear:t}}),p={getRoster:c,getSubjectRoster:a};export{p as r};

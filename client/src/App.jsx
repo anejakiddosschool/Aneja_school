@@ -18,6 +18,7 @@ import UniversalRoute from './components/UniversalRoute';
 import HomePage from './pages/HomePage';
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const ParentLoginPage = lazy(() => import('./pages/ParentLoginPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const TimetablePage = lazy(() => import('./pages/TimetablePage'));
 
@@ -99,6 +100,7 @@ function App() {
           <Routes>
             {/* ======= 1. PUBLIC ROUTES ======== */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/parent-login" element={<ParentLoginPage />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/timetable" element={<TimetablePage />} />

@@ -7,6 +7,7 @@ const ProfilePage = () => {
     // --- State Management ---
     const [user, setUser] = useState(null);
     const [fullName, setFullName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,6 +23,7 @@ const ProfilePage = () => {
             .then(res => {
                 setUser(res.data);
                 setFullName(res.data.fullName);
+                setPhoneNumber(res.data.phoneNumber || '');
             })
             .catch(() => setError("Failed to load profile."))
             .finally(() => setLoading(false));
@@ -31,6 +33,9 @@ const ProfilePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         // Frontend validation
+        if (phoneNumber && phoneNumber.replace(/\D/g, '').length !== 10) {
+            return setError("Please enter a valid 10-digit phone number (or leave it empty).");
+        }
         if (newPassword && newPassword.length < 6) {
             return setError("New password must be at least 6 characters long.");
         }
@@ -42,7 +47,7 @@ const ProfilePage = () => {
         setError('');
         setSuccess('');
         try {
-            const updateData = { fullName };
+            const updateData = { fullName, phoneNumber: phoneNumber.replace(/\D/g, '') };
             // Only include password fields if the user is trying to change them
             if (newPassword) {
                 if (!currentPassword) {
@@ -94,6 +99,23 @@ const ProfilePage = () => {
                             <div className="mb-4">
                                 <label htmlFor="fullName" className={inputLabel}>Full Name</label>
                                 <input id="fullName" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className={textInput} required/>
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="phoneNumber" className={inputLabel}>WhatsApp Number</label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">+91</span>
+                                    <input
+                                        id="phoneNumber"
+                                        type="tel"
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                        className={`${textInput} pl-12`}
+                                        placeholder="10-digit mobile number"
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1.5 font-medium">
+                                    Used for WhatsApp OTP login recovery. Keep it updated!
+                                </p>
                             </div>
                             <div className="mb-4">
                                 <label className={inputLabel}>Username</label>

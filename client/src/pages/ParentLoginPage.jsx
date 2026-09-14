@@ -133,10 +133,19 @@ const ParentLoginPage = () => {
                     )}
                 </form>
 
-                <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                <div className="mt-5 text-center">
+                    <Link
+                        to="/forgot-password"
+                        className="text-sm font-bold text-gray-500 hover:text-violet-600 transition-colors"
+                    >
+                        Forgot Student ID or password?
+                    </Link>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-gray-100 text-center">
                     <p className="text-sm text-gray-500 font-medium">
                         Are you a teacher or admin?{" "}
-                        <Link to="/login" className="font-bold text-purple-600 hover:text-purple-700 transition-colors">
+                        <Link to="/login" className="font-bold text-violet-600 hover:text-violet-700 transition-colors">
                             Staff Login
                         </Link>
                     </p>

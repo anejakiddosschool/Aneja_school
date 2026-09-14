@@ -1,6 +1,7 @@
 // src/pages/ParentDashboardPage.js
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import studentAuthService from '../services/studentAuthService';
 import studentService from '../services/studentService';
 import gradeService from '../services/gradeService';
@@ -27,6 +28,29 @@ const ParentDashboardPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // --- Phone update (for WhatsApp OTP recovery) ---
+    const [phone, setPhone] = useState('');
+    const [savingPhone, setSavingPhone] = useState(false);
+    const [showPhoneForm, setShowPhoneForm] = useState(false);
+
+    const handlePhoneSave = async () => {
+        if (phone.replace(/\D/g, '').length !== 10) {
+            toast.error('Please enter a valid 10-digit phone number.');
+            return;
+        }
+        setSavingPhone(true);
+        try {
+            await studentAuthService.updatePhone(phone);
+            toast.success('Phone number updated! You can now use WhatsApp OTP recovery.');
+            setStudent((s) => ({ ...s, parentContact: { ...s.parentContact, phone } }));
+            setShowPhoneForm(false);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to update phone number.');
+        } finally {
+            setSavingPhone(false);
+        }
+    };
+
     useEffect(() => {
         const currentStudent = studentAuthService.getCurrentStudent();
         if (currentStudent) {
@@ -38,7 +62,10 @@ const ParentDashboardPage = () => {
                         gradeService.getGradesByStudent(studentId),
                         behavioralReportService.getReportsByStudent(studentId)
                     ]);
-                    if (results[0].status === 'fulfilled') setStudent(results[0].value.data.data);
+                    if (results[0].status === 'fulfilled') {
+                        setStudent(results[0].value.data.data);
+                        setPhone(results[0].value.data.data?.parentContact?.phone || '');
+                    }
                     if (results[1].status === 'fulfilled') setGrades(results[1].value.data.data);
                     if (results[2].status === 'fulfilled') setReports(results[2].value.data.data);
                 } catch (err) {
@@ -158,6 +185,64 @@ const ParentDashboardPage = () => {
                             <p className="font-medium">No academic grades recorded yet.</p>
                         </div>
                     )}
+                </div>
+            </div>
+
+            {/* Account Settings: phone for WhatsApp OTP + change password link */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <span>⚙️</span> Account Settings
+                    </h3>
+                    <button
+                        onClick={() => setShowPhoneForm((v) => !v)}
+                        className="text-sm font-bold text-violet-600 hover:text-violet-700 transition-colors"
+                    >
+                        {showPhoneForm ? 'Cancel' : 'Update Phone'}
+                    </button>
+                </div>
+                <div className="p-5 space-y-4">
+                    {!showPhoneForm ? (
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <div className="flex-1">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Registered WhatsApp Number</p>
+                                <p className="text-gray-800 font-bold mt-0.5">
+                                    {student?.parentContact?.phone
+                                        ? `+91 ${student.parentContact.phone}`
+                                        : <span className="text-amber-600">⚠️ Not set — add a phone to enable OTP recovery</span>}
+                                </p>
+                            </div>
+                            <Link
+                                to="/parent/change-password"
+                                className="text-center bg-gray-50 hover:bg-violet-50 text-gray-700 hover:text-violet-700 text-sm font-bold px-4 py-2.5 rounded-xl border border-gray-200 transition-colors"
+                            >
+                                🔑 Change Password
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <div className="relative flex-1">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">+91</span>
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                    placeholder="10-digit WhatsApp number"
+                                    className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-medium focus:outline-none focus:bg-white focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
+                                />
+                            </div>
+                            <button
+                                onClick={handlePhoneSave}
+                                disabled={savingPhone}
+                                className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 disabled:opacity-60 text-white text-sm font-bold px-6 py-2.5 rounded-xl transition-all shadow-sm"
+                            >
+                                {savingPhone ? 'Saving...' : 'Save'}
+                            </button>
+                        </div>
+                    )}
+                    <p className="text-xs text-gray-400 font-medium">
+                        This number is used to send report cards and OTPs on WhatsApp.
+                    </p>
                 </div>
             </div>
 

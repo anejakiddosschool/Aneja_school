@@ -9,8 +9,12 @@ server/node_modules/
 # Build & Production
 # -------------------------
 client/build/
+client/dist/
 server/dist/
 server/build/
+
+# User-uploaded runtime files (Cloudinary fallbacks, temp uploads)
+server/uploads/
 
 # -------------------------
 # Environment Variables

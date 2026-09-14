@@ -63,3 +63,35 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+// @desc    Update the logged-in parent's contact phone (used for OTP recovery + WhatsApp alerts)
+// @route   PUT /api/student-auth/phone
+exports.updatePhone = async (req, res) => {
+    const { phone } = req.body;
+    const normalized = String(phone || '').replace(/\D/g, '');
+
+    if (normalized.length !== 10) {
+        return res.status(400).json({ message: 'Please provide a valid 10-digit phone number.' });
+    }
+
+    try {
+        const student = await Student.findById(req.student._id);
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found.' });
+        }
+
+        student.parentContact = {
+            ...(student.parentContact ? student.parentContact.toObject() : {}),
+            phone: normalized,
+        };
+        await student.save();
+
+        res.json({
+            success: true,
+            message: 'Phone number updated successfully.',
+            phone: normalized,
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

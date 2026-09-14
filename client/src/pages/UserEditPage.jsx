@@ -219,6 +219,7 @@ const UserEditPage = () => {
     const [assignedSubjects, setAssignedSubjects] = useState(new Set());
     const [isHomeroom, setIsHomeroom] = useState(false);
     const [homeroomGrade, setHomeroomGrade] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -239,6 +240,7 @@ const UserEditPage = () => {
                 setAllSubjects(subjectsRes.data.data);
                 setIsHomeroom(!!userData.homeroomGrade);
                 setHomeroomGrade(userData.homeroomGrade || '');
+                setPhoneNumber(userData.phoneNumber || '');
                 const assignedIds = new Set(userData.subjectsTaught.map(item => item.subject?._id).filter(Boolean));
                 setAssignedSubjects(assignedIds);
             } catch (err) {
@@ -266,7 +268,8 @@ const UserEditPage = () => {
         const updatedSubjectsTaught = Array.from(assignedSubjects).map(id => ({ subject: id }));
         const updatePayload = {
             subjectsTaught: updatedSubjectsTaught,
-            homeroomGrade: isHomeroom ? homeroomGrade : "" 
+            homeroomGrade: isHomeroom ? homeroomGrade : "",
+            phoneNumber: phoneNumber.replace(/\D/g, ''),
         };
         try {
             await userService.update(userId, updatePayload);
@@ -321,6 +324,30 @@ const UserEditPage = () => {
                         ⚠️ {error}
                     </div>
                 )}
+
+                {/* CONTACT CARD */}
+                <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-800 mb-5 border-b border-gray-100 pb-3 flex items-center gap-2">
+                        <span>📱</span> Contact & Recovery
+                    </h3>
+                    <label htmlFor="phoneNumber" className="block text-gray-600 text-sm font-bold mb-2 uppercase tracking-wide">
+                        WhatsApp Number (used for OTP password recovery)
+                    </label>
+                    <div className="relative w-full md:w-1/2">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">+91</span>
+                        <input
+                            id="phoneNumber"
+                            type="tel"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            placeholder="10-digit mobile number"
+                            className="w-full pl-12 pr-4 border border-gray-300 rounded-xl py-2.5 px-4 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-violet-500 bg-gray-50 transition-colors"
+                        />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">
+                        Teacher can reset their own password via WhatsApp OTP using this number.
+                    </p>
+                </div>
 
                 {/* EDIT FORM */}
                 {user && (
