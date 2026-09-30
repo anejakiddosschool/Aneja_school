@@ -2,8 +2,8 @@
 const mongoose = require('mongoose');
 
 const MONTHS = [
-    "September", "October", "November", "December", 
-    "January", "February", "March", "April", "May", "June"
+    "April", "May", "June", "July", "August", "September",
+    "October", "November", "December", "January", "February", "March"
 ];
 
 const assessmentTypeSchema = new mongoose.Schema({

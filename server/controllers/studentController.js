@@ -16,6 +16,16 @@ const capitalizeName = (name) => {
     .join(" ");
 };
 
+// Excel cells often carry stray spaces/case ("Female ", "male", "F").
+// Normalise so the schema enum is not rejected.
+const normalizeGender = (value) => {
+  if (value === undefined || value === null) return "";
+  const raw = String(value).trim().toLowerCase().replace(/\s+/g, "");
+  if (raw === "m" || raw === "male" || raw === "boy") return "Male";
+  if (raw === "f" || raw === "female" || raw === "girl") return "Female";
+  return String(value).trim();
+};
+
 const getMiddleName = (fullName) => {
   if (!fullName || typeof fullName !== "string") return "User";
   const names = fullName.trim().split(/\s+/);
@@ -474,11 +484,27 @@ exports.bulkCreateStudents = async (req, res) => {
       return res.status(400).json({ message: "The Excel file is empty." });
     }
 
-    const createdStudentsForResponse = [];
+    // ---- Pass 1: validate every row before writing anything, so a bad row
+    // cannot leave the class half-imported.
+    const preparedStudents = [];
 
-    for (const studentRow of studentsJson) {
+    for (const [index, studentRow] of studentsJson.entries()) {
+      const rowNumber = index + 2; // +1 for header, +1 for 1-based rows
       const fullName = studentRow["Full Name"] || studentRow["fullName"];
       const capitalizedFullName = capitalizeName(fullName);
+
+      if (!capitalizedFullName) {
+        throw new Error(`Missing Full Name at row ${rowNumber}.`);
+      }
+
+      const gender = normalizeGender(
+        studentRow["Gender"] || studentRow["gender"]
+      );
+      if (gender !== "Male" && gender !== "Female") {
+        throw new Error(
+          `Invalid gender "${studentRow["Gender"]}" for student: ${fullName} (row ${rowNumber}). Use Male or Female.`
+        );
+      }
 
       let dob = parseDob(
         studentRow["Date of Birth"] || studentRow["dateOfBirth"]
@@ -486,7 +512,7 @@ exports.bulkCreateStudents = async (req, res) => {
 
       if (!dob) {
         throw new Error(
-          `Invalid or missing date format for student: ${fullName}. Accepted: DD-MM-YYYY, DD/MM/YYYY, DD.MM.YYYY (Day-Month-Year).`
+          `Invalid or missing date format for student: ${fullName} (row ${rowNumber}). Accepted: DD-MM-YYYY, DD/MM/YYYY, DD.MM.YYYY (Day-Month-Year).`
         );
       }
 
@@ -495,41 +521,69 @@ exports.bulkCreateStudents = async (req, res) => {
         Date.UTC(dob.getFullYear(), dob.getMonth(), dob.getDate())
       );
 
-      const dobString = dob.toISOString().split("T")[0].replace(/-/g, "");
+      const gradeLevel = (
+        studentRow["Grade Level"] || studentRow["gradeLevel"] || ""
+      ).toString().trim();
+      if (!gradeLevel) {
+        throw new Error(`Missing Grade Level at row ${rowNumber}.`);
+      }
+
       const yearOfBirth = dob.getFullYear();
-
-      const lastStudent = await Student.findOne({
-        studentId: new RegExp(`^AKS-${dobString}`),
-      }).sort({ studentId: -1 });
-
-      const lastSequence = lastStudent
-        ? parseInt(lastStudent.studentId.split("-")[2], 10)
-        : 0;
-
-      const newStudentId = `AKS-${dobString}-${String(
-        lastSequence + 1
-      ).padStart(3, "0")}`;
       const middleName = getMiddleName(capitalizedFullName);
       const initialPassword = `${middleName}@${yearOfBirth}`;
 
-      const studentData = {
-        studentId: newStudentId,
-        fullName: capitalizedFullName,
-        gender: studentRow["Gender"] || studentRow["gender"],
-        dateOfBirth: dob,
-        gradeLevel: studentRow["Grade Level"] || studentRow["gradeLevel"],
-        password: initialPassword,
-        parentContact: {
-          parentName: studentRow["Parent Name"],
-          phone: studentRow["Parent Phone"],
+      preparedStudents.push({
+        rowNumber,
+        initialPassword,
+        studentData: {
+          fullName: capitalizedFullName,
+          gender,
+          dateOfBirth: dob,
+          gradeLevel,
+          password: initialPassword,
+          parentContact: {
+            parentName: studentRow["Parent Name"],
+            phone: studentRow["Parent Phone"],
+          },
+          section: studentRow["Section"],
+          rollNumber: studentRow["Roll No"] || studentRow["rollNumber"],
+          motherName: studentRow["Mother's Name"] || studentRow["motherName"],
+          address: studentRow["Address"] || studentRow["address"],
+          adhaarNumber:
+            studentRow["Aadhaar Card Number"] || studentRow["adhaarNumber"] || "",
         },
-        section: studentRow["Section"],
-        rollNumber: studentRow["Roll No"] || studentRow["rollNumber"],
-        motherName: studentRow["Mother's Name"] || studentRow["motherName"],
-        address: studentRow["Address"] || studentRow["address"],
-               // ✅ NAYA CODE (Fixed):
-        adhaarNumber: studentRow["Aadhaar Card Number"] || studentRow["adhaarNumber"] || "",
-      };
+      });
+    }
+
+    // ---- Pass 2: assign sequential IDs per DOB group, then save.
+    // Cached so students sharing a birth date inside this file get unique IDs.
+    const lastSequenceByDob = new Map();
+    const createdStudentsForResponse = [];
+
+    for (const { studentData, initialPassword } of preparedStudents) {
+      const dobString = studentData.dateOfBirth
+        .toISOString()
+        .split("T")[0]
+        .replace(/-/g, "");
+
+      if (!lastSequenceByDob.has(dobString)) {
+        const lastStudent = await Student.findOne({
+          studentId: new RegExp(`^AKS-${dobString}`),
+        }).sort({ studentId: -1 });
+
+        lastSequenceByDob.set(
+          dobString,
+          lastStudent ? parseInt(lastStudent.studentId.split("-")[2], 10) : 0
+        );
+      }
+
+      const nextSequence = lastSequenceByDob.get(dobString) + 1;
+      lastSequenceByDob.set(dobString, nextSequence);
+
+      studentData.studentId = `AKS-${dobString}-${String(nextSequence).padStart(
+        3,
+        "0"
+      )}`;
 
       const newStudent = new Student(studentData);
       await newStudent.save();
@@ -553,15 +607,16 @@ exports.bulkCreateStudents = async (req, res) => {
       error.name === "MongoBulkWriteError" ||
       error.name === "ValidationError"
     ) {
+      console.error("Student import validation error:", error);
       return res.status(400).json({
         message:
           "Import failed. Students may already exist or have invalid data.",
+        details: error.message,
       });
     }
     console.error("Bulk import error:", error);
-    res.status(500).json({
-      message: "An error occurred during the import process.",
-      details: error.message,
+    res.status(400).json({
+      message: error.message,
     });
   }
 };
