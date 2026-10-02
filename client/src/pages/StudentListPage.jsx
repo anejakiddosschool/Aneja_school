@@ -1530,6 +1530,7 @@ const StudentListPage = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [newGrade, setNewGrade] = useState("");
   const [newSection, setNewSection] = useState("");
+  const [sectionsByGrade, setSectionsByGrade] = useState({});
   const [availableSections, setAvailableSections] = useState([]);
 
   const [sendStatuses, setSendStatuses] = useState({});
@@ -1557,6 +1558,32 @@ const StudentListPage = () => {
         sensitivity: "base",
       }),
     );
+  };
+
+  // The directory lists every student client-side, so a single capped request
+  // silently hides whole classes once the total passes the page size.
+  // Fetch page by page until the server reports everything is collected.
+  const fetchAllStudents = async (pageSize = 500) => {
+    const collected = [];
+    let page = 1;
+    let total = Infinity;
+
+    while (collected.length < total) {
+      const res = await studentService.getAllStudents({
+        page,
+        limit: pageSize,
+      });
+      const batch = res.data.data || [];
+      total = res.data.total ?? collected.length + batch.length;
+
+      if (batch.length === 0) break;
+
+      collected.push(...batch);
+      if (batch.length < pageSize) break;
+      page += 1;
+    }
+
+    return collected;
   };
 
   useEffect(() => {
@@ -1640,17 +1667,17 @@ const StudentListPage = () => {
       setError(null);
 
       // Fetch students AND all available grades in parallel
-      const [studentRes, gradesRes] = await Promise.allSettled([
-        studentService.getAllStudents({ limit: 1000 }),
+      const [allFetchedStudents, gradesRes] = await Promise.allSettled([
+        fetchAllStudents(),
         classService.getAllGrades()
       ]);
-      
-      const allFetchedStudents = studentRes.status === 'fulfilled' ? (studentRes.value.data.data || []) : [];
-      setAllStudents(allFetchedStudents);
+
+      const students = allFetchedStudents.status === 'fulfilled' ? allFetchedStudents.value : [];
+      setAllStudents(students);
 
       // Merge grades from API with grades from students (for fallback)
       const apiGrades = gradesRes.status === 'fulfilled' ? (gradesRes.value.data.data || []) : [];
-      const studentGrades = allFetchedStudents.map((s) => s.gradeLevel).filter(Boolean);
+      const studentGrades = students.map((s) => s.gradeLevel).filter(Boolean);
       const allMergedGrades = [...new Set([...apiGrades, ...studentGrades])];
 
       if (currentUser.role === "admin") {
@@ -1668,7 +1695,7 @@ const StudentListPage = () => {
       }
 
       const extractedSections = [
-        ...new Set(allFetchedStudents.map((s) => s.section)),
+        ...new Set(students.map((s) => s.section)),
       ]
         .filter(Boolean)
         .sort();
@@ -1677,7 +1704,7 @@ const StudentListPage = () => {
       setAvailableSections(extractedSections);
 
       const initialStatuses = {};
-      allFetchedStudents.forEach((s) => {
+      students.forEach((s) => {
         initialStatuses[s.id || s._id] = "Idle";
       });
       setSendStatuses(initialStatuses);
@@ -1691,6 +1718,45 @@ const StudentListPage = () => {
   useEffect(() => {
     loadInitialData();
   }, [currentUser.role]);
+
+  // Sections created in Class Management live in the Section collection, so
+  // ask the server for them instead of guessing A/B/C/D. Cached per class.
+  useEffect(() => {
+    if (!newGrade || sectionsByGrade[newGrade]) return;
+
+    let cancelled = false;
+    classService
+      .getAllSections(newGrade)
+      .then((res) => {
+        if (cancelled) return;
+        const names = (res.data.data || [])
+          .map((s) => (typeof s === "string" ? s : s.name))
+          .filter(Boolean);
+        setSectionsByGrade((prev) => ({ ...prev, [newGrade]: names }));
+      })
+      .catch(() => {
+        if (!cancelled) setSectionsByGrade((prev) => ({ ...prev, [newGrade]: [] }));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [newGrade, sectionsByGrade]);
+
+  // Managed sections plus any section already used by a student in the class.
+  const sectionsForNewGrade = useMemo(() => {
+    if (!newGrade) return [];
+
+    const managed = sectionsByGrade[newGrade] || [];
+    const fromStudents = allStudents
+      .filter((s) => s.gradeLevel === newGrade)
+      .map((s) => s.section)
+      .filter(Boolean);
+
+    return [...new Set([...managed, ...fromStudents])].sort((a, b) =>
+      String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: "base" })
+    );
+  }, [newGrade, sectionsByGrade, allStudents]);
 
   const filteredStudents = useMemo(() => {
     if (!selectedGrade) return [];
@@ -2383,7 +2449,12 @@ const StudentListPage = () => {
               {(currentUser.role === "admin" ||
                 currentUser.role === "principal") && (
                 <button
-                  onClick={() => setIsUpdateModalOpen(true)}
+                  onClick={() => {
+                    // Always refetch, so sections added in Class Management
+                    // since this page loaded show up here.
+                    setSectionsByGrade({});
+                    setIsUpdateModalOpen(true);
+                  }}
                   disabled={isBulkUploading}
                   className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm border border-orange-600 flex items-center gap-1"
                 >
@@ -2919,21 +2990,7 @@ const StudentListPage = () => {
       </div>
 
       {(() => {
-        let dependentSections = [];
-        if (newGrade) {
-          dependentSections = [
-            ...new Set(
-              allStudents
-                .filter((s) => s.gradeLevel === newGrade)
-                .map((s) => s.section),
-            ),
-          ]
-            .filter(Boolean)
-            .sort();
-        }
-
-        if (dependentSections.length === 0)
-          dependentSections = ["A", "B", "C", "D"];
+        const dependentSections = sectionsForNewGrade;
 
         return (
           <Dialog.Root
@@ -2994,7 +3051,9 @@ const StudentListPage = () => {
                       <option value="">
                         {!newGrade
                           ? "Select a class first..."
-                          : "-- Select Section --"}
+                          : dependentSections.length === 0
+                            ? "No sections for this class yet"
+                            : "-- Select Section --"}
                       </option>
                       {dependentSections.map((sec) => (
                         <option key={sec} value={sec}>

@@ -5,7 +5,14 @@ const fs = require("fs");
 const Student = require("../models/Student");
 const Grade = require("../models/Grade");
 const Subject = require("../models/Subject");
+const Section = require("../models/Section");
 const { cloudinary } = require("../config/cloudinary");
+const {
+  buildGradeLookup,
+  canonicalizeGradeLevel,
+  buildSectionLookup,
+  canonicalizeSection,
+} = require("../utils/canonicalize");
 
 // --- HELPER FUNCTIONS ---
 const capitalizeName = (name) => {
@@ -78,17 +85,35 @@ const parseDob = (value) => {
   // DD<sep>MM<sep>YYYY or DD<sep>MMM(M)<sep>YYYY — sep can be - / . or space
   m = raw.match(/^(\d{1,2})[-/. ]([A-Za-z]{3,9}|\d{1,2})[-/. ](\d{2,4})$/);
   if (m) {
-    const day = parseInt(m[1], 10);
-    const monthRaw = m[2].toLowerCase();
-    const month = /^\d+$/.test(monthRaw)
-      ? parseInt(monthRaw, 10) - 1
-      : MONTH_NAMES[monthRaw.slice(0, 4)] ?? MONTH_NAMES[monthRaw.slice(0, 3)];
-    if (month === undefined || month < 0 || month > 11) return null;
+    const first = parseInt(m[1], 10);
+    const secondRaw = m[2].toLowerCase();
+    const secondIsNumeric = /^\d+$/.test(secondRaw);
+    const secondNum = secondIsNumeric ? parseInt(secondRaw, 10) : undefined;
+    const second = secondIsNumeric ? secondNum - 1 : undefined;
     let year = parseInt(m[3], 10);
     if (year < 100) year += year <= 30 ? 2000 : 1900;
-    if (day < 1 || day > 31) return null;
-    const d = new Date(Date.UTC(year, month, day));
-    return isNaN(d.getTime()) || d.getUTCDate() !== day ? null : d;
+
+    const build = (monthIdx, day) => {
+      if (monthIdx === undefined || monthIdx < 0 || monthIdx > 11) return null;
+      if (day < 1 || day > 31) return null;
+      const d = new Date(Date.UTC(year, monthIdx, day));
+      return isNaN(d.getTime()) || d.getUTCDate() !== day ? null : d;
+    };
+
+    // Month names are unambiguous: always day-first.
+    const namedMonth = secondIsNumeric
+      ? undefined
+      : MONTH_NAMES[secondRaw.slice(0, 4)] ?? MONTH_NAMES[secondRaw.slice(0, 3)];
+    if (namedMonth !== undefined) {
+      return build(namedMonth, first);
+    }
+
+    // Numeric pair: try DD-MM first (Indian convention). Only if that is
+    // impossible — e.g. "10/31/2018" — retry as MM-DD, so a valid DD-MM date
+    // is never reinterpreted.
+    const dayFirst = build(second, first);
+    if (dayFirst) return dayFirst;
+    return build(first - 1, secondNum);
   }
 
   // Fallback: "15 May 2010" / "May 15, 2010"
@@ -488,6 +513,22 @@ exports.bulkCreateStudents = async (req, res) => {
     // cannot leave the class half-imported.
     const preparedStudents = [];
 
+    // Resolve class/section spellings against the canonical Subject/Section
+    // values so one class never splits into near-duplicates.
+    const gradeLookup = buildGradeLookup(await Subject.distinct("gradeLevel"));
+    const knownGrades = [...gradeLookup.values()].map((g) => g.value);
+    const sectionsByGrade = new Map();
+    for (const doc of await Section.find(
+      { gradeLevel: { $in: knownGrades } },
+      { gradeLevel: 1, name: 1 }
+    ).lean()) {
+      if (!sectionsByGrade.has(doc.gradeLevel)) sectionsByGrade.set(doc.gradeLevel, []);
+      sectionsByGrade.get(doc.gradeLevel).push({ name: doc.name });
+    }
+    const sectionLookups = new Map(
+      [...sectionsByGrade].map(([grade, entries]) => [grade, buildSectionLookup(entries)])
+    );
+
     for (const [index, studentRow] of studentsJson.entries()) {
       const rowNumber = index + 2; // +1 for header, +1 for 1-based rows
       const fullName = studentRow["Full Name"] || studentRow["fullName"];
@@ -521,12 +562,18 @@ exports.bulkCreateStudents = async (req, res) => {
         Date.UTC(dob.getFullYear(), dob.getMonth(), dob.getDate())
       );
 
-      const gradeLevel = (
-        studentRow["Grade Level"] || studentRow["gradeLevel"] || ""
-      ).toString().trim();
+      const gradeLevel = canonicalizeGradeLevel(
+        studentRow["Grade Level"] || studentRow["gradeLevel"],
+        gradeLookup
+      );
       if (!gradeLevel) {
         throw new Error(`Missing Grade Level at row ${rowNumber}.`);
       }
+
+      const section = canonicalizeSection(
+        studentRow["Section"],
+        sectionLookups.get(gradeLevel) || null
+      );
 
       const yearOfBirth = dob.getFullYear();
       const middleName = getMiddleName(capitalizedFullName);
@@ -545,7 +592,7 @@ exports.bulkCreateStudents = async (req, res) => {
             parentName: studentRow["Parent Name"],
             phone: studentRow["Parent Phone"],
           },
-          section: studentRow["Section"],
+          section: section || undefined,
           rollNumber: studentRow["Roll No"] || studentRow["rollNumber"],
           motherName: studentRow["Mother's Name"] || studentRow["motherName"],
           address: studentRow["Address"] || studentRow["address"],

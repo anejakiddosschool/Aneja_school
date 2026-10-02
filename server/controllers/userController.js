@@ -5,6 +5,7 @@ const User = require('../models/User');
 const Subject = require('../models/Subject'); // 🌟 ADDED SUBJECT MODEL HERE
 const capitalizeName = require('../utils/capitalizeName');
 const generateToken = require('../utils/generateToken');
+const { canonicalizeGradeLevel } = require('../utils/canonicalize');
 
 
 // @desc    Get all users (for Admin)
@@ -111,6 +112,9 @@ exports.updateUser = async (req, res) => {
         }
 
         const { fullName, role, subjectsTaught, homeroomGrade, phoneNumber } = req.body;
+    const canonicalHomeroomGrade = homeroomGrade
+        ? canonicalizeGradeLevel(homeroomGrade)
+        : homeroomGrade;
 
         // --- VALIDATION 1: Check for Subject Assignment Conflicts ---
         if (subjectsTaught) {
@@ -131,15 +135,15 @@ exports.updateUser = async (req, res) => {
         }
 
         // --- VALIDATION 2: Check for Homeroom Teacher Conflicts ---
-        if (homeroomGrade) {
+        if (canonicalHomeroomGrade) {
             const conflictingHomeroomTeacher = await User.findOne({
-                homeroomGrade: homeroomGrade,
+                homeroomGrade: canonicalHomeroomGrade,
                 _id: { $ne: userToUpdate._id }
             });
 
             if (conflictingHomeroomTeacher) {
                 return res.status(400).json({
-                    message: `Assignment failed. The grade "${homeroomGrade}" already has a homeroom teacher: ${conflictingHomeroomTeacher.fullName}.`
+                    message: `Assignment failed. The grade "${canonicalHomeroomGrade}" already has a homeroom teacher: ${conflictingHomeroomTeacher.fullName}.`
                 });
             }
         }
@@ -157,7 +161,7 @@ exports.updateUser = async (req, res) => {
         }
 
         if (homeroomGrade !== undefined) {
-            userToUpdate.homeroomGrade = homeroomGrade || null;
+            userToUpdate.homeroomGrade = canonicalHomeroomGrade || null;
         }
 
         const updatedUser = await userToUpdate.save();

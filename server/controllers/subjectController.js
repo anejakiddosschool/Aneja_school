@@ -1,13 +1,14 @@
 const Subject = require('../models/Subject');
 const xlsx = require('xlsx');
-const fs = require('fs'); 
+const fs = require('fs');
+const { canonicalizeGradeLevel } = require('../utils/canonicalize'); 
 
 // @desc    Create a new subject
 // @route   POST /api/subjects
 exports.createSubject = async (req, res) => {
     try {
         const { name, code, gradeLevel } = req.body;
-        const subject = await Subject.create({ name, code, gradeLevel });
+        const subject = await Subject.create({ name, code, gradeLevel: canonicalizeGradeLevel(gradeLevel) });
         res.status(201).json({ success: true, data: subject });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
@@ -94,7 +95,9 @@ exports.bulkCreateSubjects = async (req, res) => {
         // Prepare the data for insertion, matching Excel columns to our schema
         const subjectsToCreate = subjectsJson.map(subject => ({
             name: subject['Name'] || subject['name'],
-            gradeLevel: subject['Grade Level'] || subject['gradeLevel'],
+            // Subjects define the canonical class names, so only alias/typo
+            // correction and whitespace tidying apply here (no lookup).
+            gradeLevel: canonicalizeGradeLevel(subject['Grade Level'] || subject['gradeLevel']),
             code: subject['Code'] || subject['code'] || '' // Code is optional
         }));
 

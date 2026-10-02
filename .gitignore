@@ -16,6 +16,9 @@ server/build/
 # User-uploaded runtime files (Cloudinary fallbacks, temp uploads)
 server/uploads/
 
+# Data snapshots written by one-off migration scripts
+server/backups/
+
 # -------------------------
 # Environment Variables
 # -------------------------
