@@ -61,12 +61,30 @@ exports.getGrades = async (req, res) => {
 exports.getGradesByStudent = async (req, res) => {
     try {
         const studentId = req.params.id || req.params.studentId;
-        // .lean() skips hydration — ~2x faster for report-card payloads
         let allGrades = await Grade.find({ student: studentId })
             .populate('subject', 'name gradeLevel')
             .populate('assessments.assessmentType')
             .lean();
         allGrades = allGrades.filter(grade => grade.subject !== null);
+
+        const CORE_SUBJECT_PRIORITY = {
+            english: 0,
+            hindi: 1,
+            maths: 2,
+            mathematics: 2,
+            evs: 3,
+            science: 4,
+            'social science': 5,
+            'social studies': 5,
+            sst: 5,
+        };
+
+        allGrades.sort((a, b) => {
+            const pa = CORE_SUBJECT_PRIORITY[a.subject.name.toLowerCase().trim()] ?? Infinity;
+            const pb = CORE_SUBJECT_PRIORITY[b.subject.name.toLowerCase().trim()] ?? Infinity;
+            if (pa !== pb) return pa - pb;
+            return a.subject.name.localeCompare(b.subject.name);
+        });
 
         res.status(200).json({ success: true, count: allGrades.length, data: allGrades });
     } catch (error) {

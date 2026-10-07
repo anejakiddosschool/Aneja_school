@@ -308,8 +308,25 @@ exports.generateRoster = async (req, res) => {
   try {
     const homeroomTeacher = await User.findOne({ homeroomGrade: gradeLevel }).select("fullName");
     
-    const subjects = await Subject.find({ gradeLevel }).sort({ name: 1 });
-    if (subjects.length === 0) return res.status(404).json({ message: "No subjects found." });
+    const CORE_SUBJECT_PRIORITY = {
+      english: 0,
+      hindi: 1,
+      maths: 2,
+      mathematics: 2,
+      evs: 3,
+      science: 4,
+      "social science": 5,
+      "social studies": 5,
+      sst: 5,
+    };
+
+    const subjects = await Subject.find({ gradeLevel }).lean();
+    subjects.sort((a, b) => {
+      const pa = CORE_SUBJECT_PRIORITY[a.name.toLowerCase().trim()] ?? Infinity;
+      const pb = CORE_SUBJECT_PRIORITY[b.name.toLowerCase().trim()] ?? Infinity;
+      if (pa !== pb) return pa - pb;
+      return a.name.localeCompare(b.name);
+    });
 
     const students = await Student.find({ gradeLevel, status: "Active" })
       .select("studentId fullName gender dateOfBirth") 
