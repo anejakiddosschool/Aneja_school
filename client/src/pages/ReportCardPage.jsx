@@ -76,6 +76,21 @@ const formatScore = (num) => {
   return Number.isInteger(num) ? num.toString() : Number(num).toFixed(2);
 };
 
+const TRAIT_GRADE_MAP = {
+  E: "Excellent",
+  VG: "Very Good",
+  G: "Good",
+  A: "Average",
+  B: "Below Average",
+  P: "Poor",
+};
+
+const formatTraitGrade = (grade) => {
+  if (!grade) return "-";
+  const key = String(grade).trim().toUpperCase();
+  return TRAIT_GRADE_MAP[key] || grade;
+};
+
 // --- MAIN COMPONENT ---
 // const ReportCardPage = ({ studentId, isAutoUploadMode = false, onUploadSuccess }) => {
 //   const { id: routeId } = useParams();
@@ -1445,19 +1460,23 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onU
                       </tr>
                     </thead>
                     <tbody>
-                      {EVALUATION_AREAS.map((area, i) => (
+                       {EVALUATION_AREAS.map((area, i) => (
                         <tr key={`trait-${i}`}>
                           <td className="left">{area}</td>
                           <td>
-                            {firstSemesterReport?.evaluations?.find(
-                              (e) => e.area === area,
-                            )?.result ?? "-"}
+                            {formatTraitGrade(
+                              firstSemesterReport?.evaluations?.find(
+                                (e) => e.area === area,
+                              )?.result,
+                            )}
                           </td>
                           {hasTerm2Data && (
                             <td>
-                              {secondSemesterReport?.evaluations?.find(
-                                (e) => e.area === area,
-                              )?.result ?? "-"}
+                              {formatTraitGrade(
+                                secondSemesterReport?.evaluations?.find(
+                                  (e) => e.area === area,
+                                )?.result,
+                              )}
                             </td>
                           )}
                         </tr>
