@@ -579,66 +579,25 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onU
     const contentToPrint = printableContent.innerHTML;
 
     let styles = "";
-    let printRules = ""; // rules inside @media print, extracted to measure true print layout
     for (const sheet of document.styleSheets) {
       try {
-        for (const rule of sheet.cssRules) {
-          if (rule.media && /print/i.test(rule.media.mediaText)) {
-            printRules += Array.from(rule.cssRules)
-              .map((r) => r.cssText)
-              .join("\n");
-          }
-        }
         styles += Array.from(sheet.cssRules)
           .map((rule) => rule.cssText)
           .join("\n");
       } catch (e) {}
     }
 
-    // --- AUTO-FIT: simulate print layout in a hidden frame, measure height,
-    // --- and scale with zoom ONLY if content would spill to a 2nd page.
-    const MM = 3.7795275591; // px per mm at 96dpi
-    const PRINT_MARGIN_MM = 4;
-    const printableH = (297 - PRINT_MARGIN_MM * 2) * MM; // ~1092px
-    let scale = 1;
-
-    const measureFrame = document.createElement("iframe");
-    measureFrame.style.cssText =
-      "position:fixed;left:-10000px;top:0;width:198mm;height:600px;border:0;";
-    document.body.appendChild(measureFrame);
-    try {
-      const mdoc = measureFrame.contentDocument;
-      mdoc.open();
-      mdoc.write(
-        `<html><head><style>${styles}${printRules}</style></head><body>${contentToPrint}</body></html>`,
-      );
-      mdoc.close();
-      const contentH = mdoc.body ? mdoc.body.scrollHeight : 0;
-      if (contentH > printableH) {
-        scale = Math.max(0.5, printableH / contentH);
-      }
-    } catch (e) {
-      scale = 1;
-    } finally {
-      document.body.removeChild(measureFrame);
-    }
-
-    const fitStyle =
-      scale < 1
-        ? `<style>@media print{body{zoom:${scale.toFixed(4)} !important;}.sheet-paper{width:${(100 / scale).toFixed(2)}% !important;max-width:none !important;}}@page{margin:${PRINT_MARGIN_MM}mm !important;}</style>`
-        : `<style>@page{margin:${PRINT_MARGIN_MM}mm !important;}</style>`;
-
     const printWindow = window.open("", "", "height=800,width=1000");
     if (!printWindow) return alert("Please allow pop-ups to print.");
     printWindow.document.write(
-      `<html><head><title>Print Report Card</title><style>${styles}</style>${fitStyle}</head><body>${contentToPrint}</body></html>`,
+      `<html><head><title>Print Report Card</title><style>${styles}</style></head><body>${contentToPrint}</body></html>`,
     );
     printWindow.document.close();
     setTimeout(() => {
       printWindow.focus();
       printWindow.print();
       printWindow.close();
-    }, 600);
+    }, 250);
   };
 
   const generateReportCardImage = async () => {

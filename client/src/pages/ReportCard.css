@@ -108,19 +108,22 @@ body {
 }
 
 .sheet-paper {
-  width: 100%;
-  max-width: 900px;
+  width: 210mm;
+  max-width: 100%;
   min-height: 297mm;
+  height: 297mm;
   background: var(--bg);
   box-shadow: 0 10px 30px rgba(30, 27, 75, 0.14);
   border-radius: 14px;
   overflow: hidden;
-  padding: 10mm;
+  padding: 8mm;
   color: var(--text);
   margin: 0 auto;
   position: relative;
   border-top: 6px solid transparent;
   border-image: linear-gradient(90deg, #7c3aed, #4f46e5, #f97316) 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ---------------- HEADER ---------------- */
@@ -599,11 +602,11 @@ input[type="file"] {
   border-color: #555773;
 }
 
-/* ---------------- PRINT (compact single-page) ---------------- */
+/* ---------------- PRINT (A4 full-page) ---------------- */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 6mm;
+    margin: 8mm;
   }
 
   html,
@@ -637,16 +640,17 @@ input[type="file"] {
   }
 
   .sheet-paper {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: auto !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    height: auto !important;
+    padding: 8mm !important;
+    margin: 0 auto !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     border: none !important;
     border-top: none !important;
+    display: block !important;
   }
 
   /* HEADER */
@@ -685,12 +689,13 @@ input[type="file"] {
 
   /* STUDENT CARD */
   .student-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
     margin-top: 7px !important;
     padding: 6px 10px !important;
     gap: 10px !important;
     box-shadow: none !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
   .student-photo,
@@ -701,6 +706,8 @@ input[type="file"] {
   }
 
   .profile-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 2px 14px !important;
   }
 
@@ -710,17 +717,6 @@ input[type="file"] {
 
   /* SECTIONS */
   .scholastic,
-  .co-scholastic,
-  .signatures,
-  .rc-footer {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .scholastic {
-    margin-top: 7px !important;
-  }
-
   .co-scholastic {
     margin-top: 7px !important;
   }

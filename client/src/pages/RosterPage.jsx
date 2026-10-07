@@ -352,6 +352,7 @@ const RosterPage = () => {
   const [loading, setLoading] = useState(false);
   const [homeroomTeacher, setHomeroomTeacher] = useState("");
   const [gradeOptions, setGradeOptions] = useState([]);
+  const [gradeLevel, setGradeLevel] = useState("");
 
   // Auto-generate if teacher has a homeroom grade assigned
   useEffect(() => {
@@ -410,23 +411,23 @@ const RosterPage = () => {
         <style>
             @page { 
                 size: A4 landscape; 
-                margin: 1cm; 
+                margin: 0; 
             }
-            body { 
-                padding: 10px;
+            html, body { 
+                margin: 0; 
+                padding: 6mm; 
                 font-family: Arial, sans-serif;
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
             }
             table { 
-                margin-top: 15px;
                 width: 100%; 
                 border-collapse: collapse; 
-                font-size: 8pt; 
+                font-size: 7.5pt; 
             }
             th, td { 
                 border: 1px solid #000; 
-                padding: 6px; 
+                padding: 4px 5px; 
                 text-align: center; 
             }
             th { 
@@ -444,13 +445,15 @@ const RosterPage = () => {
             }
             .titleOfAll {
                 text-align: center;
-                font-size: 16pt;
-                margin-bottom: 5px;
+                font-size: 13pt;
+                font-weight: bold;
+                margin-bottom: 3px;
             }
             .subTitle {
                 text-align: center;
-                font-size: 12pt;
-                color: #555;
+                font-size: 9pt;
+                color: #333;
+                margin-bottom: 6px;
             }
             .bg-gray-100 { background-color: #f3f4f6 !important; }
             .bg-gray-200 { background-color: #e5e7eb !important; }
@@ -470,7 +473,7 @@ const RosterPage = () => {
       printWindow.focus();
       printWindow.print();
       printWindow.close();
-    }, 1000);
+    }, 250);
   };
 
   // --- Web UI Table Classes ---
