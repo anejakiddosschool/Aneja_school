@@ -473,7 +473,7 @@ body {
 .signatures {
   display: flex;
   gap: 10px;
-  margin-top: 34px;
+  margin-top: 12px;
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: nowrap;
@@ -487,16 +487,16 @@ body {
 
 .sig-box {
   border-top: 2px dashed #c7d2fe;
-  padding-top: 12px;
+  padding-top: 6px;
   text-align: center;
-  min-height: 46px;
+  min-height: 28px;
   margin: 0;
 }
 
 .sig-label {
   font-weight: 700;
   color: #475569;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   font-size: 12px;
   word-break: break-word;
 }
@@ -504,7 +504,7 @@ body {
 .sig-line {
   width: 120px;
   border-top: 2px solid #94a3b8;
-  margin: 0 auto 4px;
+  margin: 0 auto 2px;
   height: 2px;
 }
 
@@ -830,22 +830,23 @@ input[type="file"] {
 
   /* SIGNATURES */
   .signatures {
-    margin-top: 14px !important;
+    margin-top: 10px !important;
     gap: 10px !important;
   }
 
   .sig-box {
-    padding-top: 8px !important;
-    min-height: 38px !important;
+    padding-top: 4px !important;
+    min-height: 28px !important;
   }
 
   .sig-label {
     font-size: 11px !important;
-    margin-bottom: 3px !important;
+    margin-bottom: 1px !important;
   }
 
   .sig-line {
     width: 110px !important;
+    margin-bottom: 2px !important;
   }
 
   .sig-image {

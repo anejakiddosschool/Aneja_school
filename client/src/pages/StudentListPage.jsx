@@ -1490,6 +1490,7 @@
 
 
 import React, { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import studentService from "../services/studentService";
 import authService from "../services/authService";
@@ -2001,7 +2002,7 @@ const StudentListPage = () => {
         await new Promise((r) => setTimeout(r, 1000));
         combinedHTML += `
   <div class="print-page-wrapper" style="page-break-after: always;">
-    ${printArea.innerHTML}
+    ${printArea.outerHTML}
   </div>
 `;
         updateStatus(student._id, "Print Ready ✓");
@@ -2037,47 +2038,35 @@ const StudentListPage = () => {
               <meta name="viewport" content="width=900">
               <style>${styles}</style>
               <style>
+                @page {
+                  size: A4 portrait;
+                  margin: 0;
+                }
                 html, body {
                   margin: 0 !important;
                   padding: 0 !important;
                   background: #ffffff !important;
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
-                  width: 100% !important;
-                }
-
-                .print-page-wrapper {
-                  width: 900px !important;
-                  max-width: 900px !important;
-                  min-width: 900px !important;
-                  margin: 0 auto !important;
-                  padding: 0 !important;
                   display: block !important;
                 }
-
-                @page {
-                  size: A4 portrait;
-                  margin: 10mm auto !important;
+                .print-page-wrapper {
+                  width: 210mm !important;
+                  min-height: 297mm !important;
+                  margin: 0 auto !important;
+                  page-break-after: always !important;
+                  break-after: page !important;
+                  display: block !important;
                 }
-
-                @media print {
-                  html, body {
-                    width: 100% !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    align-items: center !important;
-                  }
-
-                  .print-page-wrapper {
-                    width: 100% !important;
-                    max-width: 190mm !important;
-                    margin: 0 auto !important;
-                    page-break-after: always !important;
-                  }
-
-                  .no-print {
-                    display: none !important;
-                  }
+                .sheet-paper {
+                  width: 210mm !important;
+                  min-height: 297mm !important;
+                  page-break-after: always !important;
+                  break-after: page !important;
+                  display: block !important;
+                }
+                .no-print {
+                  display: none !important;
                 }
               </style>
             </head>
@@ -2296,33 +2285,35 @@ const StudentListPage = () => {
         </div>
       )}
 
-      {isBulkUploading && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center text-white">
-          <div className="bg-white p-8 rounded-2xl text-center shadow-2xl max-w-sm w-full">
-            <div className="w-16 h-16 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-gray-900 font-extrabold text-xl mb-1">
-              {bulkActionType === "upload"
-                ? "Uploading Reports..."
-                : "Preparing Print..."}
-            </h3>
-            <p className="text-gray-500 font-medium text-sm mb-4">
-              Session: {selectedSession}
-            </p>
+      {isBulkUploading &&
+        createPortal(
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center text-white">
+            <div className="bg-white p-8 rounded-2xl text-center shadow-2xl max-w-sm w-full">
+              <div className="w-16 h-16 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mx-auto mb-4"></div>
+              <h3 className="text-gray-900 font-extrabold text-xl mb-1">
+                {bulkActionType === "upload"
+                  ? "Uploading Reports..."
+                  : "Preparing Print..."}
+              </h3>
+              <p className="text-gray-500 font-medium text-sm mb-4">
+                Session: {selectedSession}
+              </p>
 
-            <div className="bg-gray-100 rounded-full h-3 w-full overflow-hidden mb-2">
-              <div
-                className="bg-violet-600 h-full transition-all duration-300"
-                style={{
-                  width: `${(bulkProgress.current / bulkProgress.total) * 100}%`,
-                }}
-              ></div>
+              <div className="bg-gray-100 rounded-full h-3 w-full overflow-hidden mb-2">
+                <div
+                  className="bg-violet-600 h-full transition-all duration-300"
+                  style={{
+                    width: `${(bulkProgress.current / bulkProgress.total) * 100}%`,
+                  }}
+                ></div>
+              </div>
+              <p className="text-violet-600 font-extrabold text-md">
+                {bulkProgress.current} / {bulkProgress.total} Processed
+              </p>
             </div>
-            <p className="text-violet-600 font-extrabold text-md">
-              {bulkProgress.current} / {bulkProgress.total} Processed
-            </p>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       <div className="max-w-[1300px] mx-auto space-y-4 md:space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 gap-4">
