@@ -589,15 +589,87 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onU
 
     const printWindow = window.open("", "", "height=800,width=1000");
     if (!printWindow) return alert("Please allow pop-ups to print.");
-    printWindow.document.write(
-      `<html><head><title>Print Report Card</title><style>${styles}</style></head><body>${contentToPrint}</body></html>`,
-    );
-    printWindow.document.close();
+
+    const printDoc = printWindow.document;
+    printDoc.open();
+    printDoc.write(`
+      <html>
+        <head>
+          <title>Print Report Card</title>
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 0;
+            }
+            html, body {
+              margin: 0;
+              padding: 0;
+              width: 210mm;
+              min-height: 297mm;
+              background: #fff;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .sheet-paper {
+              width: 210mm;
+              min-height: 297mm;
+              padding: 12mm;
+              box-sizing: border-box;
+              background: #fff;
+              transform-origin: center center;
+            }
+          </style>
+          <style>${styles}</style>
+        </head>
+        <body>
+          <div class="sheet-paper">
+            ${contentToPrint}
+          </div>
+        </body>
+      </html>
+    `);
+    printDoc.close();
+
+    // Wait for layout, then scale to fill page
     setTimeout(() => {
+      try {
+        const body = printDoc.body;
+        const content = body.querySelector('.sheet-paper') || body;
+        
+        // Get content size
+        const contentWidth = content.scrollWidth;
+        const contentHeight = content.scrollHeight;
+        
+        // A4 printable area (at 96dpi)
+        const pageWidth = 210 - 0; // mm
+        const pageHeight = 297 - 0; // mm
+        const mmToPx = 3.7795275591;
+        const printableWidth = pageWidth * mmToPx;
+        const printableHeight = pageHeight * mmToPx;
+        
+        // Calculate scale to fill page
+        const scaleX = printableWidth / contentWidth;
+        const scaleY = printableHeight / contentHeight;
+        const scale = Math.min(scaleX, scaleY);
+        
+        // Center and scale
+        if (scale !== 1) {
+          const transformOrigin = 'top center';
+          content.style.transform = `scale(${scale})`;
+          content.style.transformOrigin = transformOrigin;
+          content.style.margin = '0 auto';
+        }
+      } catch (e) {
+        console.error('Print scaling error:', e);
+      }
+      
       printWindow.focus();
       printWindow.print();
       printWindow.close();
-    }, 250);
+    }, 300);
   };
 
   const generateReportCardImage = async () => {
