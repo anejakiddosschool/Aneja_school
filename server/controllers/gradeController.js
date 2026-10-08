@@ -77,6 +77,7 @@ exports.getGradesByStudent = async (req, res) => {
             'social science': 5,
             'social studies': 5,
             sst: 5,
+            sanskrit: 6,
         };
 
         allGrades.sort((a, b) => {

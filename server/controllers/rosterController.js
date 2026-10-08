@@ -318,6 +318,7 @@ exports.generateRoster = async (req, res) => {
       "social science": 5,
       "social studies": 5,
       sst: 5,
+      sanskrit: 6,
     };
 
     const subjects = await Subject.find({ gradeLevel }).lean();
