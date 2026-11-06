@@ -1524,7 +1524,7 @@ const generateReportCardPDF = async (studentId) => {
   }
 
   const canvas = await html2canvas(element, {
-    scale: 2,
+    scale: 1.5,
     backgroundColor: "#ffffff",
     logging: false,
     useCORS: true,
@@ -1532,7 +1532,7 @@ const generateReportCardPDF = async (studentId) => {
     scrollY: 0,
   });
 
-  const imgData = canvas.toDataURL("image/png");
+  const imgData = canvas.toDataURL("image/jpeg", 0.85);
   const imgWidth = 210; // A4 width in mm
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
