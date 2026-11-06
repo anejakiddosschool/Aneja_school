@@ -1525,25 +1525,31 @@ const generateReportCardPDF = async (studentId) => {
 
   // Clone element to avoid modifying original DOM
   const elementClone = element.cloneNode(true);
-  elementClone.style.position = "absolute";
-  elementClone.style.visibility = "hidden";
+  elementClone.style.position = "relative";
+  elementClone.style.visibility = "visible";
   elementClone.style.backgroundColor = "#ffffff";
   elementClone.style.width = "210mm";
+  elementClone.style.maxWidth = "210mm";
+  elementClone.style.boxSizing = "border-box";
+  elementClone.style.overflow = "visible";
   document.body.appendChild(elementClone);
 
   const canvas = await html2canvas(elementClone, {
-    scale: 1.5,
+    scale: 2,
     backgroundColor: "#ffffff",
     logging: false,
     useCORS: true,
     scrollX: 0,
     scrollY: 0,
+    useCORS: true,
+    allowTaint: true,
+    foreignObjectRendering: false,
   });
 
   // Clean up cloned element
   document.body.removeChild(elementClone);
 
-  const imgData = canvas.toDataURL("image/jpeg", 0.85);
+  const imgData = canvas.toDataURL("image/jpeg", 0.95);
   const imgWidth = 210; // A4 width in mm
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -1553,7 +1559,22 @@ const generateReportCardPDF = async (studentId) => {
     format: "a4",
   });
 
-  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+  // Calculate proper scaling to fit page width
+  const pdfWidth = 210; // A4 width in mm
+  const pdfHeight = 297; // A4 height in mm
+  const imgAspect = imgData.height / imgData.width;
+  const canvasAspect = canvas.height / canvas.width;
+
+  let finalWidth = pdfWidth;
+  let finalHeight = finalWidth * imgAspect;
+
+  // If image is taller than page, scale to fit height
+  if (finalHeight > pdfHeight) {
+    finalHeight = pdfHeight;
+    finalWidth = finalHeight / imgAspect;
+  }
+
+  pdf.addImage(imgData, "PNG", 0, 0, finalWidth, finalHeight);
   const pdfDataUrl = pdf.output("datauristring");
 
   // Return pure base64 (strip data:application/pdf;base64, prefix)
@@ -2198,11 +2219,12 @@ const StudentListPage = () => {
       let polling = true;
       let pollCount = 0;
       const maxPolls = 300; // Max 10 minutes (300 * 2s)
+      let progress = { current: 0, total: validStudents.length };
       while (polling && pollCount < maxPolls) {
         await new Promise((r) => setTimeout(r, 2000)); // Poll every 2 seconds
         pollCount++;
         const progRes = await fetch(`${API_URL}/whatsapp/import-progress/${sessionId}`);
-        const progress = await progRes.json();
+        progress = await progRes.json();
 
         setBulkProgress({
           current: progress.current || 0,
