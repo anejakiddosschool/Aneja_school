@@ -2574,7 +2574,7 @@ const StudentListPage = () => {
               </label>
             </div>
 
-            <div className="flex flex-row overflow-x-auto w-full pb-2 sm:pb-0 gap-2 hide-scrollbar">
+            <div className="flex flex-row overflow-x-auto w-full pb-2 sm:pb-0 gap-2 custom-scrollbar">
               <button
                 onClick={handleBulkPrint}
                 disabled={isBulkUploading}
