@@ -135,7 +135,15 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onU
   const [visible, setVisible] = useState(false);
 
   // View types: reportCard, classTest, ntseTest, ptTest
-  const [viewType, setViewType] = useState(reportType || "reportCard");
+  // Map reportType prop to viewType
+  const REPORT_TYPE_MAP = {
+    reportCard: "reportCard",
+    classTest: "classTest",
+    ntse: "ntseTest",
+    ntseTest: "ntseTest",
+    ptTest: "ptTest",
+  };
+  const [viewType, setViewType] = useState(REPORT_TYPE_MAP[reportType] || "reportCard");
 
   // --- data fetching ---
   useEffect(() => {

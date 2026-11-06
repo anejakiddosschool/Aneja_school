@@ -1510,6 +1510,13 @@ const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 // Generate PDF from report card DOM element using html2canvas + jsPDF
 const generateReportCardPDF = async (studentId) => {
+  // Wait for React to render the correct report type view before capturing
+  for (let i = 0; i < 20; i++) {
+    const element = document.getElementById(`printableArea-${studentId}`);
+    if (element && element.children.length > 0) break;
+    await new Promise((r) => setTimeout(r, 200));
+  }
+
   const element = document.getElementById(`printableArea-${studentId}`);
   if (!element) {
     console.warn(`No printable area found for student ${studentId}`);
