@@ -2551,18 +2551,23 @@ const StudentListPage = () => {
                 ⚡ Auto-Upload
               </button>
 
-              <select
-                value={bulkReportType}
-                onChange={(e) => setBulkReportType(e.target.value)}
-                disabled={isBulkUploading}
-                className="text-xs font-bold bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-violet-500 outline-none"
-              >
-                <option value="reportCard">Report Card</option>
-                <option value="classTest">Class Test</option>
-                <option value="ntse">NTSE</option>
-                <option value="ptTest">PT Test</option>
-                <option value="all">All Reports</option>
-              </select>
+              <div className="flex items-center gap-2 min-w-auto">
+                <label className="text-xs font-bold text-gray-600 whitespace-nowrap">
+                  Report:
+                </label>
+                <select
+                  value={bulkReportType}
+                  onChange={(e) => setBulkReportType(e.target.value)}
+                  disabled={isBulkUploading}
+                  className="text-xs font-bold bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-violet-500 outline-none min-w-[140px]"
+                >
+                  <option value="reportCard">Report Card</option>
+                  <option value="classTest">Class Test</option>
+                  <option value="ntse">NTSE</option>
+                  <option value="ptTest">PT Test</option>
+                  <option value="all">All Reports</option>
+                </select>
+              </div>
 
               {(currentUser.role === "admin" ||
                 currentUser.role === "principal") && (
