@@ -1523,7 +1523,15 @@ const generateReportCardPDF = async (studentId) => {
     return null;
   }
 
-  const canvas = await html2canvas(element, {
+  // Clone element to avoid modifying original DOM
+  const elementClone = element.cloneNode(true);
+  elementClone.style.position = "absolute";
+  elementClone.style.visibility = "hidden";
+  elementClone.style.backgroundColor = "#ffffff";
+  elementClone.style.width = "210mm";
+  document.body.appendChild(elementClone);
+
+  const canvas = await html2canvas(elementClone, {
     scale: 1.5,
     backgroundColor: "#ffffff",
     logging: false,
@@ -1531,6 +1539,9 @@ const generateReportCardPDF = async (studentId) => {
     scrollX: 0,
     scrollY: 0,
   });
+
+  // Clean up cloned element
+  document.body.removeChild(elementClone);
 
   const imgData = canvas.toDataURL("image/jpeg", 0.85);
   const imgWidth = 210; // A4 width in mm
@@ -2185,8 +2196,11 @@ const StudentListPage = () => {
 
       // Poll progress until complete
       let polling = true;
-      while (polling) {
+      let pollCount = 0;
+      const maxPolls = 300; // Max 10 minutes (300 * 2s)
+      while (polling && pollCount < maxPolls) {
         await new Promise((r) => setTimeout(r, 2000)); // Poll every 2 seconds
+        pollCount++;
         const progRes = await fetch(`${API_URL}/whatsapp/import-progress/${sessionId}`);
         const progress = await progRes.json();
 
@@ -2214,7 +2228,7 @@ const StudentListPage = () => {
 
       setIsBulkUploading(false);
       toast.success(
-        `${labelName} Complete: ${setBulkProgress && ""} students processed`,
+        `${labelName} Complete: ${pollCount === maxPolls ? "Timed out" : "Done"}`,
       );
     } catch (err) {
       console.error("Bulk broadcast error:", err);
