@@ -66,8 +66,8 @@ io.on("connection", (socket) => {
 // initialize WhatsApp client (after Socket.IO is ready)
 initWhatsApp(io);
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(express.static(path.join(__dirname, "public")));
 
