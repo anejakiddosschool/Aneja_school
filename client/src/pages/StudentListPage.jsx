@@ -1503,8 +1503,44 @@ import { useSession } from "../context/SessionContext";
 import toast from "react-hot-toast";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
+// Generate PDF from report card DOM element using html2canvas + jsPDF
+const generateReportCardPDF = async (studentId) => {
+  const element = document.getElementById(`printableArea-${studentId}`);
+  if (!element) {
+    console.warn(`No printable area found for student ${studentId}`);
+    return null;
+  }
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    backgroundColor: "#ffffff",
+    logging: false,
+    useCORS: true,
+    scrollX: 0,
+    scrollY: 0,
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+  const imgWidth = 210; // A4 width in mm
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  const pdf = new jsPDF({
+    orientation: "p",
+    unit: "mm",
+    format: "a4",
+  });
+
+  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+  const pdfDataUrl = pdf.output("datauristring");
+
+  // Return pure base64 (strip data:application/pdf;base64, prefix)
+  return pdfDataUrl.split(",")[1];
+};
 
 const StudentListPage = () => {
   const [currentUser] = useState(authService.getCurrentUser());
@@ -1543,8 +1579,9 @@ const StudentListPage = () => {
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
   const [isBulkUploading, setIsBulkUploading] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
-  const [hiddenStudentForReport, setHiddenStudentForReport] = useState(null);
   const [bulkActionType, setBulkActionType] = useState("");
+  const [bulkReportType, setBulkReportType] = useState("reportCard");
+  const [hiddenStudentForReport, setHiddenStudentForReport] = useState(null);
 
   const formatDate = (dateString) => {
     if (!dateString) return "No Data";
@@ -1797,7 +1834,7 @@ const StudentListPage = () => {
       return toast.error("Please select at least one student!");
     if (
       !window.confirm(
-        `Auto-Upload Report Cards for ${validStudents.length} students for session ${selectedSession}?`,
+        `Auto-Upload ${bulkReportType === "all" ? "All Reports" : bulkReportType.charAt(0).toUpperCase() + bulkReportType.slice(1)} for ${validStudents.length} students for session ${selectedSession}?`,
       )
     )
       return;
@@ -1809,38 +1846,53 @@ const StudentListPage = () => {
     document.head.appendChild(newMeta);
     if (originalMeta) originalMeta.remove();
 
+    const REPORT_TYPE_MAP = {
+      reportCard: "reportCard",
+      classTest: "classTest",
+      ntse: "ntseTest",
+      ptTest: "ptTest",
+    };
+
+    const reportTypes = bulkReportType === "all"
+      ? ["reportCard", "classTest", "ntseTest", "ptTest"]
+      : [REPORT_TYPE_MAP[bulkReportType] || "reportCard"];
+
     setBulkActionType("upload");
     setIsBulkUploading(true);
-    setBulkProgress({ current: 0, total: validStudents.length });
 
-    for (let i = 0; i < validStudents.length; i++) {
-      const student = validStudents[i];
-      setBulkProgress({ current: i + 1, total: validStudents.length });
-      updateStatus(student._id, "Generating ⏳");
+    let processedCount = 0;
+    const totalTasks = validStudents.length * reportTypes.length;
 
-      setHiddenStudentForReport(student._id);
+    for (const student of validStudents) {
+      for (const reportType of reportTypes) {
+        setBulkProgress({ current: processedCount + 1, total: totalTasks });
+        updateStatus(student._id, `${reportType}: Generating ⏳`);
 
-      let waitTime = 0;
-      let btn = null;
-      while (waitTime < 12000) {
+        setHiddenStudentForReport(student._id);
+
+        let waitTime = 0;
+        let btn = null;
+        while (waitTime < 12000) {
+          await new Promise((r) => setTimeout(r, 500));
+          btn = document.getElementById(`trigger-upload-${student._id}`);
+          if (btn) break;
+          waitTime += 500;
+        }
+
+        if (btn) {
+          updateStatus(student._id, `${reportType}: Uploading ☁️`);
+          await new Promise((r) => setTimeout(r, 1000));
+          btn.click();
+          await new Promise((r) => setTimeout(r, 6000));
+          updateStatus(student._id, `${reportType}: Uploaded ✓`);
+        } else {
+          updateStatus(student._id, `${reportType}: Failed ✗ (Timeout)`);
+        }
+
+        setHiddenStudentForReport(null);
         await new Promise((r) => setTimeout(r, 500));
-        btn = document.getElementById(`trigger-upload-${student._id}`);
-        if (btn) break;
-        waitTime += 500;
+        processedCount++;
       }
-
-      if (btn) {
-        updateStatus(student._id, "Uploading ☁️");
-        await new Promise((r) => setTimeout(r, 1000));
-        btn.click();
-        await new Promise((r) => setTimeout(r, 6000));
-        updateStatus(student._id, "Uploaded ✓");
-      } else {
-        updateStatus(student._id, "Failed ✗ (Timeout)");
-      }
-
-      setHiddenStudentForReport(null);
-      await new Promise((r) => setTimeout(r, 500));
     }
 
     document.head.removeChild(newMeta);
@@ -2096,36 +2148,79 @@ const StudentListPage = () => {
     )
       return;
 
+    const sessionId = `bulk_${Date.now()}`;
+
+    // Build all payloads upfront
+    const allPayloads = [];
     for (const student of validStudents) {
-      try {
-        updateStatus(student._id, `${labelName}: Sending...`);
-        const payload = payloadFn(student);
-        const route =
-          reportType === "custom"
-            ? "/whatsapp/send-custom-message"
-            : "/whatsapp/send-report-links";
-
-        const res = await fetch(`${API_URL}${route}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        updateStatus(
-          student._id,
-          res.ok ? `${labelName}: Sent ✓` : `${labelName}: Failed ✗`,
-        );
-      } catch {
-        updateStatus(student._id, `${labelName}: Failed ✗`);
-      }
+      const payload = await payloadFn(student);
+      allPayloads.push(payload.students[0]);
     }
 
-    toast.success(`${labelName} Processed!`);
+    setBulkActionType("upload");
+    setIsBulkUploading(true);
+    setBulkProgress({ current: 0, total: validStudents.length });
+
+    try {
+      const res = await fetch(`${API_URL}/whatsapp/send-report-links`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          students: allPayloads,
+          sessionId,
+          delayMs: 3000, // 3 second gap between messages to avoid ban
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+
+      // Poll progress until complete
+      let polling = true;
+      while (polling) {
+        await new Promise((r) => setTimeout(r, 2000)); // Poll every 2 seconds
+        const progRes = await fetch(`${API_URL}/whatsapp/import-progress/${sessionId}`);
+        const progress = await progRes.json();
+
+        setBulkProgress({
+          current: progress.current || 0,
+          total: progress.total || validStudents.length,
+        });
+
+        // Update individual student statuses based on results
+        if (progress.results) {
+          progress.results.forEach((r) => {
+            updateStatus(
+              r.studentId,
+              r.status === "sent"
+                ? `${labelName}: Sent ✓`
+                : `${labelName}: Failed ✗`,
+            );
+          });
+        }
+
+        if (progress.status === "completed" || progress.status === "failed") {
+          polling = false;
+        }
+      }
+
+      setIsBulkUploading(false);
+      toast.success(
+        `${labelName} Complete: ${setBulkProgress && ""} students processed`,
+      );
+    } catch (err) {
+      console.error("Bulk broadcast error:", err);
+      setIsBulkUploading(false);
+      toast.error(`${labelName} failed: ${err.message}`);
+    }
   };
 
   const sendReportCardsToParents = () => {
-    processBroadcast("reportCard", "Report Card", (student) => {
+    processBroadcast("reportCard", "Report Card", async (student) => {
       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are pleased to share the academic report card for your ward, *${student.fullName}* for session *${selectedSession}*.\n\n*Student Details:*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n\nPlease find the detailed report card attached with this message. We encourage you to review the academic progress and reach out to the class teacher for any queries.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
+      const pdfData = await generateReportCardPDF(student._id);
 
       return {
         students: [
@@ -2134,6 +2229,7 @@ const StudentListPage = () => {
             fullName: student.fullName,
             parentContact: student.parentContact,
             parentPhone: student.parentContact?.phone,
+            pdfData,
             reportLink: student.reportCardUrl,
             reportType: "reportCard",
             message: msg,
@@ -2144,14 +2240,17 @@ const StudentListPage = () => {
   };
 
   const sendClassTestReportsToParents = () => {
-    processBroadcast("classTest", "Class Test", (student) => {
+    processBroadcast("classTest", "Class Test", async (student) => {
       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the recent *Class Test Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n• Session: ${selectedSession}\n\nWe encourage you to review the scores to track their continuous academic progress. If you have any concerns, please feel free to connect with the respective subject teachers.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
+      const pdfData = await generateReportCardPDF(student._id);
 
       return {
         students: [
           {
             id: student._id,
             parentPhone: student.parentContact?.phone,
+            pdfData,
             reportLink: student.reportClassTestUrl,
             reportType: "classTest",
             message: msg,
@@ -2162,14 +2261,17 @@ const StudentListPage = () => {
   };
 
   const sendNtseReportsToParents = () => {
-    processBroadcast("ntse", "NTSE", (student) => {
+    processBroadcast("ntse", "NTSE", async (student) => {
       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nWe are sharing the attached *NTSE (National Talent Search Examination) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n• Session: ${selectedSession}\n\nThis assessment helps us gauge their aptitude for competitive environments. Kindly go through the detailed report attached herewith.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
+      const pdfData = await generateReportCardPDF(student._id);
 
       return {
         students: [
           {
             id: student._id,
             parentPhone: student.parentContact?.phone,
+            pdfData,
             reportLink: student.reportNTSEUrl,
             reportType: "ntse",
             message: msg,
@@ -2180,14 +2282,17 @@ const StudentListPage = () => {
   };
 
   const sendPtReportsToParents = () => {
-    processBroadcast("ptTest", "PT Test", (student) => {
+    processBroadcast("ptTest", "PT Test", async (student) => {
       const msg = `Dear ${student.parentContact?.parentName || "Parent"},\n\nGreetings from Aneja Kiddos School.\n\nPlease find attached the *Periodic Test (PT) Report* for your ward.\n\n*Student Details:*\n• Name: *${student.fullName}*\n• Class: ${student.gradeLevel || "N/A"}\n• Section: ${student.section || "N/A"}\n• Session: ${selectedSession}\n\nPeriodic assessments are crucial for identifying areas of improvement and strengths. We request you to review the attached document and guide them accordingly at home.\n\nWarm regards,\n*Administration*\n*Aneja Kiddos School*`;
+
+      const pdfData = await generateReportCardPDF(student._id);
 
       return {
         students: [
           {
             id: student._id,
             parentPhone: student.parentContact?.phone,
+            pdfData,
             reportLink: student.reportPTUrl,
             reportType: "ptTest",
             message: msg,
@@ -2278,9 +2383,11 @@ const StudentListPage = () => {
           }}
         >
           <ReportCardPage
+            key={`${hiddenStudentForReport}-${bulkReportType}`}
             studentId={hiddenStudentForReport}
             isAutoUploadMode={true}
             academicYear={selectedSession}
+            reportType={bulkReportType}
           />
         </div>
       )}
@@ -2436,6 +2543,19 @@ const StudentListPage = () => {
               >
                 ⚡ Auto-Upload
               </button>
+
+              <select
+                value={bulkReportType}
+                onChange={(e) => setBulkReportType(e.target.value)}
+                disabled={isBulkUploading}
+                className="text-xs font-bold bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-violet-500 outline-none"
+              >
+                <option value="reportCard">Report Card</option>
+                <option value="classTest">Class Test</option>
+                <option value="ntse">NTSE</option>
+                <option value="ptTest">PT Test</option>
+                <option value="all">All Reports</option>
+              </select>
 
               {(currentUser.role === "admin" ||
                 currentUser.role === "principal") && (

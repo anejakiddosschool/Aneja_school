@@ -45,6 +45,8 @@ const io = new Server(server, {
   },
 });
 
+app.set("io", io);
+
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
   socket.on("addNewUser", (userId) => {

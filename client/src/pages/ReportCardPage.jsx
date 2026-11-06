@@ -98,7 +98,7 @@ const formatTraitGrade = (grade) => {
 //   const API_URL = import.meta.env.VITE_API_URL;
 
 
-const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onUploadSuccess }) => {
+const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onUploadSuccess, reportType }) => {
   const { id: routeId } = useParams();
   const id = studentId || routeId;
   const API_URL = import.meta.env.VITE_API_URL;
@@ -135,7 +135,7 @@ const ReportCardPage = ({ studentId, isAutoUploadMode = false, academicYear, onU
   const [visible, setVisible] = useState(false);
 
   // View types: reportCard, classTest, ntseTest, ptTest
-  const [viewType, setViewType] = useState("reportCard");
+  const [viewType, setViewType] = useState(reportType || "reportCard");
 
   // --- data fetching ---
   useEffect(() => {
