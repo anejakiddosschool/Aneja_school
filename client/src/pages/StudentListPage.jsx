@@ -2221,14 +2221,18 @@ const StudentListPage = () => {
           });
         }
 
-        if (progress.status === "completed" || progress.status === "failed") {
+        if (
+          progress.status === "completed" ||
+          progress.status === "failed" ||
+          progress.current >= progress.total
+        ) {
           polling = false;
         }
       }
 
       setIsBulkUploading(false);
       toast.success(
-        `${labelName} Complete: ${pollCount === maxPolls ? "Timed out" : "Done"}`,
+        `${labelName} Complete: ${progress.current}/${progress.total} processed`,
       );
     } catch (err) {
       console.error("Bulk broadcast error:", err);

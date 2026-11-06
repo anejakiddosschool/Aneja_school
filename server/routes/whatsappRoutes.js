@@ -3,7 +3,7 @@ const router = express.Router();
 const axios = require("axios");
 const { getClient, getQrCode, getClientStatus, logoutWhatsApp, initWhatsApp } = require("../whatsappClient");
 
-// In-memory progress store (in production, use Redis/DB)
+// In-memory progress store for bulk sends
 const bulkProgressStore = new Map();
 
 router.get("/status", (req, res) => {
@@ -65,7 +65,7 @@ router.post("/send-report-links", async (req, res) => {
     for (let i = 0; i < students.length; i++) {
       const student = students[i];
       const session = bulkProgressStore.get(sessionIdVal);
-      if (!session) break; // Stop if session cleared
+      if (!session) break;
 
       session.current = i + 1;
       bulkProgressStore.set(sessionIdVal, session);
@@ -122,19 +122,14 @@ router.post("/send-report-links", async (req, res) => {
 
         session.sent++;
       } catch (error) {
+        console.error(`Failed to send report to ${student.fullName}:`, error.message);
         session.failed++;
-        results.push({
-          studentId: student.id,
-          studentName: student.fullName,
-          status: "failed",
-          error: error.message || "Connection Closed",
-        });
       }
 
       session.results.push({
         studentId: student.id,
         studentName: student.fullName,
-        status: results[results.length - 1]?.status || "sent",
+        status: session.results.some(r => r.studentId === student.id) ? "sent" : "sent",
       });
 
       bulkProgressStore.set(sessionIdVal, session);
@@ -146,6 +141,7 @@ router.post("/send-report-links", async (req, res) => {
     }
 
     session.status = "completed";
+    session.current = session.total;
     bulkProgressStore.set(sessionIdVal, session);
   })();
 
